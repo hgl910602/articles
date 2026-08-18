@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大模型训练指南：从 Transformer 到预训练与后训练</title>
+<link href="/assets/css/theme.css" rel="stylesheet" />
+<link href="/assets/vendor/prism/prism-tomorrow.min.css" rel="stylesheet" />
+<link href="/assets/css/article.css" rel="stylesheet" />
+</head>
+<body>
+
+<button id="toc-toggle">☰ 目录</button>
+
+<!-- ==================== SIDEBAR ==================== -->
+<div id="sidebar">
+  <a class="back-home" href="/">← 返回首页</a>
+  <div class="doc-title">大模型训练指南<br><small style="font-weight:400;font-size:13px;color:var(--text-muted)">从 Transformer 到预训练与后训练</small></div>
+  <nav>
+    <ul>
+      <li><a href="#intro">引言</a></li>
+      <li><a href="#ch1">第一章：大模型是什么</a>
+        <ul>
+          <li><a href="#sec1-1">1.1 从文字接龙说起</a></li>
+          <li><a href="#sec1-2">1.2 Token：模型眼中的文字</a></li>
+          <li><a href="#sec1-3">1.3 Transformer：注意力加工厂</a>
+            <ul>
+              <li><a href="#sec1-3-1">1.3.1 为什么需要注意力</a></li>
+              <li><a href="#sec1-3-2">1.3.2 Q/K/V：词与词对暗号</a></li>
+              <li><a href="#sec1-3-3">1.3.3 多头注意力</a></li>
+              <li><a href="#sec1-3-4">1.3.4 位置编码</a></li>
+              <li><a href="#sec1-3-5">1.3.5 前馈网络与残差捷径</a></li>
+              <li><a href="#sec1-3-6">1.3.6 Decoder-only 与因果掩码</a></li>
+            </ul>
+          </li>
+          <li><a href="#sec1-4">1.4 参数：模型的脑回路</a></li>
+          <li><a href="#sec1-5">1.5 温度与采样</a></li>
+        </ul>
+      </li>
+      <li><a href="#ch2">第二章：预训练</a>
+        <ul>
+          <li><a href="#sec2-1">2.1 训练目标：猜下一个词</a></li>
+          <li><a href="#sec2-2">2.2 数据：几万亿词从哪来</a></li>
+          <li><a href="#sec2-3">2.3 训练过程：猜、对答案、拧旋钮</a></li>
+          <li><a href="#sec2-4">2.4 Scaling Law：越大越聪明</a></li>
+          <li><a href="#sec2-5">2.5 基座模型：博览群书的怪才</a></li>
+          <li><a href="#sec2-6">2.6 预训练的门槛</a></li>
+        </ul>
+      </li>
+      <li><a href="#ch3">第三章：后训练</a>
+        <ul>
+          <li><a href="#sec3-1">3.1 为什么基座不能直接用</a></li>
+          <li><a href="#sec3-2">3.2 SFT：照着范例学</a></li>
+          <li><a href="#sec3-3">3.3 RLHF：根据反馈学分寸</a></li>
+          <li><a href="#sec3-4">3.4 DPO：轻量级对齐</a></li>
+          <li><a href="#sec3-5">3.5 RLVR：学会打草稿</a></li>
+          <li><a href="#sec3-6">3.6 完整流水线总览</a></li>
+          <li><a href="#sec3-7">3.7 常见误区</a></li>
+        </ul>
+      </li>
+      <li><a href="#ch4">第四章：实践篇</a>
+        <ul>
+          <li><a href="#sec4-1">4.1 需求到方案决策树</a></li>
+          <li><a href="#sec4-2">4.2 LoRA：轻量微调</a></li>
+          <li><a href="#sec4-3">4.3 蒸馏：大老师教小学生</a></li>
+          <li><a href="#sec4-4">4.4 术语小词典</a></li>
+          <li><a href="#sec4-5">4.5 各阶段成本速览</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<!-- ==================== CONTENT ==================== -->
+<div id="content"><div class="inner">
+
+<!-- ====================== 引言 ====================== -->
+<h1 id="intro">大模型训练指南：从 Transformer 到预训练与后训练</h1>
+<p style="font-size:14px;color:var(--text-muted)">LLM 训练全景 &nbsp;|&nbsp; Python 代码示例</p>
+
+<div class="chapter-intro">
+<p><strong>本文的定位</strong>：很多人天天和 ChatGPT 聊天，却说不清"预训练""后训练""微调""对齐"这些词到底指什么、发生在模型生产的哪个环节。本文的目标是把<strong>一个模型从随机参数到能聊天的全过程</strong>讲透——它是什么、怎么养成、以及实践里该怎么选。</p>
+<p><strong>本文的叙事方式</strong>：先讲"模型是什么"（一台文字接龙机器），再讲"怎么养成"（预训练 = 读万卷书，后训练 = 岗前培训），最后讲"实践怎么选"（Prompt / RAG / 微调 / 继续预训练）。Transformer 架构部分参考了知乎《Transformer 架构原理通俗解释》的讲法。</p>
+</div>
+
+<blockquote>
+<p><strong>阅读建议：</strong> 完全没接触过大模型的读者建议从头读到尾；只关心"预训练和后训练到底差在哪"的读者可以直接跳到<a href="#ch2">第二章</a>。每章末尾有总结图。</p>
+</blockquote>
+
+<!-- ====================== 第一章 ====================== -->
+<h2 id="ch1">第一章：大模型是什么——一台文字接龙机器</h2>
+
+<p>在讲"训练"之前，必须先搞清楚被训练的东西是什么。很多人以为大模型"理解了问题然后思考作答"，但它的底层机制朴素得惊人：<strong>玩文字接龙</strong>。</p>
+
+<h3 id="sec1-1">1.1 从文字接龙说起</h3>
+
+<p>给模型一段开头：<code>Today is a</code>。它做的事情是——把这三个词读一遍，然后对词表里<strong>每一个</strong>词打一个分，输出一个概率分布：</p>
+
+<div class="diagram">
+<pre>输入: Today is a
+
+模型输出（词表上每个词一个概率）:
+  sunny    ████████████████████  0.62
+  nice     ██████                0.18
+  Monday   █████                 0.15
+  banana   ▏                    0.0001
+  ...      （词表里其余十几万个词）
+
+选中 "sunny" 接上去 → 得到 "Today is a sunny"
+再拿新句子预测下一个词 → 循环往复
+</pre>
+</div>
+
+<p>一篇几千字的长回答，就是这样<strong>一个词一个词接出来的</strong>。每接一个词，都要把"当前全部内容"重新读一遍、重新打分。这就是大模型生成文本的全部秘密。</p>
+
+<div class="callout callout-note">
+<strong>一个常见误解：</strong> 模型不是"想好了整段话再输出"，而是每一步只决定下一个词。前面接了什么词，会直接影响后面接什么词——所以同一个开头，接出的话每次都可能不一样。
+</div>
+
+<h3 id="sec1-2">1.2 Token：模型眼中的文字</h3>
+
+<p>模型不直接处理字符，而是处理 <strong>token（词元）</strong>——把文字切成的最小单元。切分由<strong>分词器（Tokenizer）</strong>完成，常用算法是 BPE（字节对编码）。</p>
+
+<pre><code class="language-python">from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-7B")
+
+tokens = tokenizer.tokenize("unbelievable power")
+print(tokens)        # ['un', 'believ', 'able', ' power']
+
+ids = tokenizer.convert_tokens_to_ids(tokens)
+print(ids)           # [1036, 69507, 540, 1511]  ← 模型真正看到的是这些编号
+</code></pre>
+
+<ul>
+<li>英文常见词通常一个词一个 token，生僻词会被拆碎（如 <code>unbelievable → un + believ + able</code>）</li>
+<li>中文大约 1 个汉字对应 1~2 个 token（取决于分词器）</li>
+<li>计费、上下文长度限制，说的都是 token 数而不是字数：100 万 token 大约是 75 万英文单词</li>
+</ul>
+
+<div class="callout callout-tip">
+<strong>为什么要有 token：</strong> 直接按字符处理，序列太长、计算太贵；直接按整词处理，词表会爆炸（中文组合无穷无尽）。token 是"长度"和"词表大小"之间的折中。
+</div>
+
+<h3 id="sec1-3">1.3 Transformer：注意力加工厂</h3>
+
+<p>接龙的关键问题是：看到 <code>Today is a</code>，凭什么 <code>sunny</code> 的分数最高？因为模型读句子时，每个词都<strong>带上了上下文的信息</strong>。完成这件事的架构就是 <strong>Transformer</strong>（2017 年 Google 论文《Attention Is All You Need》提出）。先看整体结构：</p>
+
+<div class="diagram">
+<pre>输入: "今天天气真好，我想吃"
+   │
+   ▼
+┌─────────────────────────────────────────┐
+│ ① Token 化 + 向量化                       │
+│    文字 → 编号 → 每个词一个向量            │
+│    （向量 = 一串数字，语义的数字表示）       │
+└──────────────────┬──────────────────────┘
+                   ▼
+┌─────────────────────────────────────────┐
+│ ② Transformer Block × N 层（N = 32~80+）  │
+│  ┌───────────────────────────────────┐  │
+│  │ 自注意力 Self-Attention             │  │
+│  │ 词与词互相"对暗号"，谁重要就多抄谁的   │  │
+│  │ 信息 —— 负责词之间的"沟通"            │  │
+│  └───────────────┬───────────────────┘  │
+│  ┌───────────────────────────────────┐  │
+│  │ 前馈网络 FFN                        │  │
+│  │ 对每个位置独立做非线性加工            │  │
+│  │ —— 大量事实知识存在这里               │  │
+│  └───────────────────────────────────┘  │
+│ （每层都有残差捷径 + 归一化，保证稳定）     │
+└──────────────────┬──────────────────────┘
+                   ▼
+┌─────────────────────────────────────────┐
+│ ③ 输出层：词表上每个词一个分数（logits）    │
+│    "苹果 5.2 / 冰淇淋 4.8 / 书 3.1 ..."   │
+└─────────────────────────────────────────┘
+</pre>
+</div>
+
+<h4 id="sec1-3-1">1.3.1 为什么需要注意力</h4>
+
+<p>看这句话：<code>小猫追着球跑，它玩得很开心</code>。<code>它</code>指的是小猫还是球？人一眼就看出来是<em>小猫</em>（会"玩得开心"的是猫）。要让模型也能判断，<code>它</code>这个词的表示里就必须<strong>混入"小猫"的信息</strong>。</p>
+
+<p>这就是注意力做的事：<strong>读句子时，每个词都去看一遍所有其他词，把相关的信息抄一点过来</strong>。相关度越高，抄得越多。经过几十层的注意力加工，每个词的向量就不再是"这个字本身"，而是"这个字在这句话里的意思"。</p>
+
+<h4 id="sec1-3-2">1.3.2 Q/K/V：词与词对暗号</h4>
+
+<p>注意力的具体机制靠三个矩阵，术语叫 Query、Key、Value。第一次见很容易被吓住，但用<strong>图书馆检索</strong>来理解就很简单：</p>
+
+<table>
+<tr><th>角色</th><th>全称</th><th>含义</th><th>图书馆比喻</th></tr>
+<tr><td><strong>Q</strong></td><td>Query（查询）</td><td>这个词<strong>想找</strong>什么信息</td><td>你写下的检索请求</td></tr>
+<tr><td><strong>K</strong></td><td>Key（键）</td><td>这个词<strong>能提供</strong>什么线索</td><td>每本书贴的索引标签</td></tr>
+<tr><td><strong>V</strong></td><td>Value（值）</td><td>这个词的<strong>实际内容</strong></td><td>书的正文</td></tr>
+</table>
+
+<p>流程是：每个词拿自己的 Q，去和句中所有词的 K 做<strong>匹配打分</strong>（点积），分数经过 softmax 变成"注意力权重"（总和为 1），然后按权重把所有人的 V <strong>加权抄过来</strong>，加进自己的表示里。</p>
+
+<div class="diagram">
+<pre>句子: "小猫 追 球， 它 开心"
+
+处理 "它" 这个词时:
+  "它"的Q × "小猫"的K = 8.1  ← 高分！
+  "它"的Q × "球"的K   = 2.3
+  "它"的Q × "追"的K   = 1.1
+  ...
+  softmax 后权重: 小猫 0.71 / 球 0.18 / 其他 0.11
+
+  → "它"的新表示 = 0.71×小猫的V + 0.18×球的V + ...
+  → "它"从此带上了"小猫"的信息，后面接龙就知道谁开心了
+</pre>
+</div>
+
+<div class="callout callout-note">
+<strong>Q/K/V 怎么来的：</strong> 每个词的向量分别乘上三个可学习的矩阵 W_Q、W_K、W_V 得到。这三个矩阵就是模型要学的参数的一部分——"怎么提问、怎么标索引、怎么存内容"本身是被训练出来的。
+</div>
+
+<h4 id="sec1-3-3">1.3.3 多头注意力</h4>
+
+<p>只从一个角度看句子不够。Transformer 让每个词同时发<strong>多组</strong> Q/K/V（比如 32 组，即 32 个"头"），每组独立做一遍注意力，最后拼起来。</p>
+
+<p>不同的头会自发学会关注不同的关系：有的头盯着<strong>指代关系</strong>（"它"→"小猫"），有的看<strong>语法结构</strong>（动词找主语宾语），有的找<strong>相邻搭配</strong>。就像 32 个编辑同时从不同角度批注同一句话，最后汇总。</p>
+
+<h4 id="sec1-3-4">1.3.4 位置编码</h4>
+
+<p>注意力有个先天缺陷：它只算"谁和谁相关"，<strong>天然不知道词的先后顺序</strong>——把"猫追狗"和"狗追猫"的词打乱输入，纯注意力会当成同一回事。所以在进模型前，要给每个 token 加一个<strong>座位号</strong>（位置编码），把"我是第几个词"的信息混进向量里。现代模型多用 RoPE（旋转位置编码）等方案。</p>
+
+<h4 id="sec1-3-5">1.3.5 前馈网络与残差捷径</h4>
+
+<ul>
+<li><strong>FFN（前馈网络）</strong>：注意力负责词与词之间"沟通"，FFN 负责对每个位置独立"深加工"。研究普遍认为，模型记住的<strong>事实知识</strong>（"北京是中国首都"这类）主要存储在 FFN 的权重里。</li>
+<li><strong>残差连接</strong>：每层的输出 = 输入 + 本层的加工结果。相当于给信息留了一条"抄近道"的捷径，几十层堆叠时信号和梯度都能顺利通过，不至于传着传着就消失了。</li>
+<li><strong>归一化（LayerNorm/RMSNorm）</strong>：把数值范围稳住，防止越算越炸。</li>
+</ul>
+
+<h4 id="sec1-3-6">1.3.6 Decoder-only 与因果掩码</h4>
+
+<p>原始 Transformer 分编码器和解码器两部分；翻译模型是"编码器读原文 + 解码器写译文"。而 GPT 这类生成模型只用了解码器，叫 <strong>Decoder-only</strong> 结构，并且加了<strong>因果掩码</strong>：预测第 n 个词时只许看前 n-1 个词，不许偷看后面。</p>
+
+<p>为什么？因为训练目标就是"猜下一个词"——如果能看到下一个词，就等于抄答案，什么都学不到。这个"只许看左边"的约束，恰好和接龙任务的形态完全一致，这也是 Decoder-only 成为主流的原因。</p>
+
+<h3 id="sec1-4">1.4 参数：模型的脑回路</h3>
+
+<p>所谓"7B 模型"，指它有 <strong>70 亿个参数</strong>——70 亿个可调节的浮点数（W_Q、W_K、W_V、FFN 权重等加起来）。</p>
+
+<ul>
+<li><strong>推理</strong>：参数固定不动，输入一句话跑一遍前向传播，得到下一个词的分数。一次接龙只需毫秒级。</li>
+<li><strong>训练</strong>：参数从随机数开始，不断被调整，直到模型"接得好"。这才是烧钱的部分。</li>
+</ul>
+
+<div class="callout callout-tip">
+<strong>一句话类比：</strong> 架构是"大脑的沟回结构"（Transformer 怎么连），参数是"突触强度"（70 亿个旋钮的当前读数），训练是"调旋钮的过程"。同一个架构，拧到不同的参数值，就是不同的模型。
+</div>
+
+<h3 id="sec1-5">1.5 温度与采样：接龙的方式</h3>
+
+<p>拿到概率分布后，怎么选词？永远选最高分的（贪心）会让回答死板重复；纯随机又容易蹦出怪词。实践用<strong>温度（temperature）+ 采样</strong>：</p>
+
+<pre><code class="language-python">import torch
+
+logits = model(**inputs).logits[0, -1]          # 词表上每个词的分数
+
+# 温度：除以 T 再 softmax。T 越小分布越"尖"，T 越大分布越"平"
+probs = (logits / 0.8).softmax(dim=-1)
+
+next_token = torch.multinomial(probs, num_samples=1)   # 按概率抽签
+</code></pre>
+
+<table>
+<tr><th>temperature</th><th>效果</th><th>适用场景</th></tr>
+<tr><td>接近 0</td><td>几乎总选最高分，输出稳定</td><td>代码生成、信息抽取、数学</td></tr>
+<tr><td>0.7 ~ 1.0</td><td>有随机性，自然多样</td><td>日常对话、文案写作</td></tr>
+<tr><td>&gt; 1.2</td><td>过于发散，容易跑偏</td><td>头脑风暴（慎用）</td></tr>
+</table>
+
+<p>这就是"同样的问题每次回答不一样"的原因——<strong>模型本身每次的打分几乎一样，差别只在最后抽签那一下</strong>。</p>
+
+<!-- 第一章总结图 -->
+<div class="chapter-summary">
+<svg viewBox="0 0 680 480" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>大模型是什么总结图</title>
+  <desc>文字接龙、Token、Transformer 注意力加工厂、参数与采样四要素</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">大模型是什么</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">一台被训练得特别会"文字接龙"的机器</text>
+
+  <line x1="70" y1="78" x2="70" y2="348" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">文字接龙</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">读入全部上文 → 词表上每个词打分 → 选一个接上 → 循环</text>
+
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">Token 化</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">文字切成最小单元 → 编号 → 向量；长度和计费都按 token 算</text>
+
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">Transformer 加工厂</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">自注意力让词互相抄信息（Q 找 K 匹配抄 V）· FFN 存知识 · ×N 层</text>
+
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">参数与采样</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">7B = 70 亿个可调旋钮；温度控制抽签的随机程度</text>
+
+  <line x1="40" y1="365" x2="640" y2="365" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="385" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">核心结论</text>
+
+  <rect x="40" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="420" font-size="12" font-weight="500" fill="#444441">推理 = 参数固定，跑前向传播</text>
+  <text x="55" y="440" font-size="11" font-weight="400" fill="#5F5E5A">每生成一个词都要把全文重新读一遍</text>
+
+  <rect x="350" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="420" font-size="12" font-weight="500" fill="#444441">训练 = 反复调那几十亿个旋钮</text>
+  <text x="365" y="440" font-size="11" font-weight="400" fill="#5F5E5A">接下来两章的主角</text>
+</svg>
+</div>
+
+<!-- ====================== 第二章 ====================== -->
+<h2 id="ch2">第二章：预训练——把图书馆读进参数里</h2>
+
+<div class="chapter-intro">
+<p>架构搭好了，参数还是一堆随机数——一个"刚出厂、啥都不会"的大脑。<strong>预训练（Pre-training）</strong>就是把这个大脑养成的第一步：用海量文本玩"猜下一个词"，一玩几个月。这一章讲清楚：目标、数据、过程、规律、产物和代价。</p>
+</div>
+
+<hr>
+
+<h3 id="sec2-1">2.1 训练目标：一个游戏玩几万亿次</h3>
+
+<p>预训练的损失函数说出来简单到不像话——<strong>让模型猜中的下一个 token 的概率尽可能大</strong>。具体做法：把语料每个位置的"下一个词"盖住当标准答案，让模型猜，猜错得越离谱，惩罚（loss）越大。</p>
+
+<pre><code class="language-python"># 伪代码：预训练的核心只有这几行
+model = Transformer(params=random_init())        # 参数随机初始化
+optimizer = AdamW(model.parameters(), lr=1e-4)   # 优化器 + 学习率（步子大小）
+
+for batch in dataloader:          # 数据：几万亿 token，切成批次
+    x, y = batch[:, :-1], batch[:, 1:]   # 输入: 前 n-1 个词；标签: 右移一位的答案
+
+    logits = model(x)                    # 前向传播：猜每个位置的下一个词
+    loss = cross_entropy(logits, y)      # 对答案：猜得越离谱，loss 越大
+
+    optimizer.zero_grad()
+    loss.backward()                      # 反向传播：算出每个参数该往哪拧、拧多少
+    optimizer.step()                     # 拧旋钮：所有参数朝降低 loss 的方向微调
+
+# 这几行循环几百万步，就是"预训练"
+</code></pre>
+
+<p>神奇之处在于：为了把"接龙"这一件事做好，模型<strong>被迫</strong>学会语法（不然接不通顺）、事实（"中国的首都是"后面接什么）、逻辑（推理链条）、代码（GitHub 上接注释和函数体）……所有能力都被压缩进参数里。</p>
+
+<div class="callout callout-note">
+<strong>为什么"猜下一个词"这么有效：</strong> 想把海量的接龙都接对，唯一的办法就是真正"理解"文本里的规律。这个朴素的目标函数，逼出了通用智能的雏形——这是 GPT 系列最反直觉也最深刻的洞察。
+</div>
+
+<h3 id="sec2-2">2.2 数据：几万亿词从哪来</h3>
+
+<div class="diagram">
+<pre>互联网原始数据（几十 TB：网页/书籍/论文/代码）
+   ↓ 去重（相同、近似页面合并）
+   ↓ 质量过滤（垃圾站、乱码、广告、低质内容）
+   ↓ 安全处理（隐私信息、有害内容）
+   ↓ 语料配比（网页 : 书籍 : 代码 : 论文 按比例混合）
+高质量语料（几万亿 ~ 十几万亿 token）
+   ↓
+喂给模型玩"猜下一个词"
+</pre>
+</div>
+
+<table>
+<tr><th>数据源</th><th>占比（典型）</th><th>主要贡献</th></tr>
+<tr><td>网页（Common Crawl 等）</td><td>最大头</td><td>常识、口语、世界知识</td></tr>
+<tr><td>书籍</td><td>中</td><td>长文连贯性、书面语、深度知识</td></tr>
+<tr><td>代码（GitHub）</td><td>中</td><td>推理能力、代码生成能力</td></tr>
+<tr><td>论文 / 百科 / 数学</td><td>小但精</td><td>专业知识、推理密度</td></tr>
+</table>
+
+<div class="callout callout-warning">
+<strong>数据质量 &gt; 数据数量：</strong> "Garbage In, Garbage Out"。预训练语料的清洗和配比是各家最核心的机密之一——同样的架构和算力，数据配比不同，最终能力可以差一大截。高质量数据的获取，已经成了预训练的主要瓶颈。
+</div>
+
+<h3 id="sec2-3">2.3 训练过程：猜、对答案、拧旋钮</h3>
+
+<div class="diagram">
+<pre>        ┌──────────── 一个训练步 ────────────┐
+        │                                    │
+        │  取一批文本（一批几百万 token）        │
+        │        ↓                           │
+        │  前向传播：猜每个位置的下一个词         │
+        │        ↓                           │
+        │  对答案：算 loss（越差数字越大）        │
+        │        ↓                           │
+        │  反向传播：算每个参数的梯度            │
+        │  （往哪拧、拧多少）                   │
+        │        ↓                           │
+        │  更新参数：所有旋钮微调一点点           │
+        │        ↓                           │
+        │  loss 降不动了？否 → 回到顶部         │
+        └────────────────────────────────────┘
+
+   几百万步 × 几千张 GPU × 几个月 = 一次预训练
+</pre>
+</div>
+
+<p>训练过程中最常看的指标是 <strong>loss 曲线</strong>：一条从高位缓缓下降、逐渐趋平的曲线。loss 越低，说明模型在整个语料上"接龙"接得越准。训练中途存下来的存档叫 <strong>checkpoint</strong>（所以才有了后来泄露的各种"半成品模型"）。</p>
+
+<h3 id="sec2-4">2.4 Scaling Law：越大越聪明</h3>
+
+<p>2020 年 OpenAI 发表 Scaling Laws（Kaplan 等），2022 年 DeepMind 的 Chinchilla 论文修正了结论。核心经验规律：</p>
+
+<blockquote>
+<p><strong>在相当大的范围内，参数越多、数据越多、算力越多，loss 就越低，模型就越聪明——且可以提前预测。</strong></p>
+</blockquote>
+
+<table>
+<tr><th>维度</th><th>含义</th><th>通俗说法</th></tr>
+<tr><td>参数量</td><td>模型多大（7B / 70B / 405B…）</td><td>脑子多大</td></tr>
+<tr><td>数据量</td><td>喂多少 token</td><td>读多少书</td></tr>
+<tr><td>算力</td><td>总 FLOPs（GPU 数 × 时间）</td><td>上多少年学</td></tr>
+</table>
+
+<p>Chinchilla 给出的经验结论：算力预算固定时，参数量和数据量应<strong>同比例增长</strong>（大约每个参数配 20 个 token）。这条规律直接决定了"砸多少钱 → 得到多聪明的模型"的投入产出预估，也是各家军备竞赛的理论依据。不过实践中（Llama 3 等）普遍会在同参数量下喂<strong>远超</strong> Chinchilla 最优值的数据——多读书总是更好，只是边际收益递减。</p>
+
+<h3 id="sec2-5">2.5 基座模型：博览群书的"怪才"</h3>
+
+<p>预训练的产物叫<strong>基座模型（Base Model）</strong>。它知识渊博，但有个尴尬的问题——<strong>它只学过"接龙"，没学过"当助手"</strong>。</p>
+
+<pre><code class="language-text">问基座模型: 中国的首都是哪里？
+
+期待的回答:  中国的首都是北京。
+
+基座模型:    中国的首都是哪里？这是小学地理考试中
+            常见的题目之一。除此之外，中国的主要
+            城市还有上海、广州、深圳……
+
+（它不是在回答你，它是在"续写"——因为训练语料里
+  问题后面往往还跟着别的问题和讲解文本）
+</code></pre>
+
+<table>
+<tr><th>能力</th><th>基座模型</th><th>说明</th></tr>
+<tr><td>知识储备</td><td>✅ 强</td><td>几万亿 token 的知识都在参数里</td></tr>
+<tr><td>语言流畅</td><td>✅ 强</td><td>接龙接了万亿次的语感</td></tr>
+<tr><td>理解指令</td><td>❌ 弱</td><td>不知道"你要它当助手"，倾向续写而非回答</td></tr>
+<tr><td>对话格式</td><td>❌ 无</td><td>不认识对话轮次，不会说"我是 AI"</td></tr>
+<tr><td>拒绝与安全</td><td>❌ 无</td><td>没有对齐，有害请求照接不误</td></tr>
+</table>
+
+<div class="callout callout-tip">
+<strong>生活化的比喻：</strong> 基座模型像一个把图书馆读完的书呆子——你问他问题，他可能接着你的话往下背书。要让他变成好同事，需要"岗前培训"。这就是第三章：后训练。
+</div>
+
+<h3 id="sec2-6">2.6 预训练的门槛</h3>
+
+<ul>
+<li><strong>算力</strong>：旗舰模型需要数千到数万张顶级 GPU 连续跑数月，仅电费和硬件折旧就是数千万到数亿美元量级</li>
+<li><strong>数据</strong>：高质量、去重、合规的万亿级 token 语料，工程量巨大</li>
+<li><strong>工程</strong>：大规模分布式训练（数据/张量/流水线并行）、断点恢复、故障自愈，本身就是高门槛技术栈</li>
+<li><strong>算法</strong>：MoE（混合专家）、长上下文扩展等架构决策，试错成本极高</li>
+</ul>
+
+<p>所以全世界从头预训练旗舰模型的公司屈指可数，其余玩家都在开源基座（Llama、Qwen、DeepSeek 等）之上做后训练或应用。</p>
+
+<!-- 第二章总结图 -->
+<div class="chapter-summary">
+<svg viewBox="0 0 680 540" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>预训练总结图</title>
+  <desc>预训练的目标、数据、过程、规律、产物与门槛</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">预训练 Pre-training</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">读万卷书——把整个互联网量级的知识压进参数</text>
+
+  <line x1="70" y1="78" x2="70" y2="408" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">目标：猜下一个词</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">交叉熵损失 — 为了接得准，被迫学会语法、事实、逻辑、代码</text>
+
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">数据：万亿级 token</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">网页/书籍/代码/论文 — 去重、质量过滤、配比，质量重于数量</text>
+
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">过程：梯度下降</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">猜 → 对答案 → 反向传播拧参数 → 循环几百万步</text>
+
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">规律：Scaling Law</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">参数、数据、算力同比例增长，能力可预测地提升</text>
+
+  <circle cx="70" cy="360" r="13" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="70" y="360" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">5</text>
+  <text x="100" y="355" font-size="14" font-weight="500" fill="#085041">产物：基座模型</text>
+  <text x="100" y="373" font-size="13" font-weight="400" fill="#5F5E5A">知识渊博但只会"续写"，不会当助手 — 必须再训后训练</text>
+
+  <line x1="40" y1="425" x2="640" y2="425" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="445" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">关键认知</text>
+
+  <rect x="40" y="460" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="480" font-size="12" font-weight="500" fill="#444441">知识几乎全部来自预训练</text>
+  <text x="55" y="500" font-size="11" font-weight="400" fill="#5F5E5A">后训练主要负责"行为"，不负责"知识"</text>
+
+  <rect x="350" y="460" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="480" font-size="12" font-weight="500" fill="#444441">预训练极贵，只做一次</text>
+  <text x="365" y="500" font-size="11" font-weight="400" fill="#5F5E5A">数千卡 × 数月 × 数千万美元级 — 头部大厂的游戏</text>
+</svg>
+</div>
+
+<!-- ====================== 第三章 ====================== -->
+<h2 id="ch3">第三章：后训练——从书呆子到好助手<span class="badge badge-hot">重点</span></h2>
+
+<div class="chapter-intro">
+<p>预训练产出的基座模型没法直接给用户用。<strong>后训练（Post-training）</strong>是在基座之上继续做的"小灶式"训练，把"博览群书的怪才"变成"好用的助手"。本章按主流流水线顺序讲四个环节：SFT → RLHF → DPO → RLVR，最后给出完整流水线和常见误区。</p>
+<p>贯穿本章的比喻：<strong>预训练 = 上学读书；SFT = 岗前培训；RLHF = 实习中被人点评；RLVR = 刷题练出打草稿的习惯。</strong></p>
+</div>
+
+<hr>
+
+<h3 id="sec3-1">3.1 为什么基座模型不能直接用</h3>
+
+<p>回看 2.5 节的例子：你问"中国的首都是哪里？"，基座模型可能接一句"这是小学地理考试常见的题目"。差的不是知识，而是<strong>行为模式</strong>：</p>
+
+<table>
+<tr><th>问题</th><th>基座的表现</th><th>期望的表现</th></tr>
+<tr><td>角色意识</td><td>不知道自己是助手</td><td>以助手身份回答</td></tr>
+<tr><td>回答方式</td><td>续写输入</td><td>先直接回答，再展开</td></tr>
+<tr><td>不知道就说不知道</td><td>一本正经往下编</td><td>承认不确定</td></tr>
+<tr><td>安全边界</td><td>有害请求照接</td><td>合理拒绝</td></tr>
+</table>
+
+<p>后训练要解决的就是这些——<strong>不教新知识，教"怎么表现"</strong>。</p>
+
+<h3 id="sec3-2">3.2 SFT：照着范例学</h3>
+
+<p><strong>SFT（Supervised Fine-Tuning，监督微调）</strong>是最直接的后训练：人工造几万到几百万条"问题 → 理想回答"的示范数据，用和预训练<strong>一模一样</strong>的"猜下一个词"方法去学。</p>
+
+<p>数据长这样（如今很多由强模型生成 + 人工校验）：</p>
+
+<pre><code class="language-json">[
+  {
+    "messages": [
+      {"role": "user", "content": "中国的首都是哪里？"},
+      {"role": "assistant", "content": "中国的首都是北京。"}
+    ]
+  },
+  {
+    "messages": [
+      {"role": "user", "content": "帮我写一句下雨天的朋友圈"},
+      {"role": "assistant", "content": "雨把城市调成了静音，我在窗边听它说话。"}
+    ]
+  }
+]
+</code></pre>
+
+<p>训练前，这些对话会被渲染成模型认识的<strong>对话模板（chat template）</strong>：</p>
+
+<pre><code class="language-python"># 对话模板：把结构化对话渲染成一段带特殊标记的文本
+prompt = tokenizer.apply_chat_template(messages, tokenize=False)
+# &lt;|im_start|&gt;user
+# 中国的首都是哪里？&lt;|im_end|&gt;
+# &lt;|im_start|&gt;assistant
+# 中国的首都是北京。&lt;|im_end|&gt;
+
+# 关键细节：loss 只算 assistant 部分的 token
+# —— 模型只学习"怎么答"，不用学习"怎么问"
+</code></pre>
+
+<div class="callout callout-note">
+<strong>SFT 学的是格式和角色，不是知识：</strong> 几万条数据相对几万亿 token 的预训练语料九牛一毛。SFT 教会模型的是：你是助手、先答后展开、用 markdown、不懂要说不懂、有害请求要拒绝。这一步之后，模型已经"像模像样"了。
+</div>
+
+<h3 id="sec3-3">3.3 RLHF：根据反馈学分寸</h3>
+
+<p>SFT 有个天花板：示范数据只能教"什么是好的"，但<strong>好到什么程度、哪种更好，说不清楚</strong>。就像看教学视频学礼仪能学会基本动作，但分寸感要在实习中被点评才能磨出来——这就是 <strong>RLHF（Reinforcement Learning from Human Feedback，人类反馈强化学习）</strong>，也是 ChatGPT 走红的技术核心（InstructGPT 论文，2022）。</p>
+
+<div class="diagram">
+<pre>          ┌────────────┐
+          │  SFT 模型   │
+          └─────┬──────┘
+                │ 对同一个问题生成 4~9 个不同回答
+                ▼
+          ┌────────────┐
+          │ 人类标注员   │  按有用/真实/安全排序（比直接打分容易）
+          └─────┬──────┘
+                │ 排序数据
+                ▼
+          ┌────────────┐
+          │ 奖励模型 RM │  学会"给任意回答打分"
+          └─────┬──────┘
+                │ 分数当奖励信号
+                ▼
+          ┌────────────┐
+          │ PPO 强化学习 │  模型朝高分方向调整参数
+          └─────┬──────┘
+                │ + KL 惩罚（不许偏离 SFT 模型太远）
+                ▼
+          对齐后的 Chat 模型
+</pre>
+</div>
+
+<pre><code class="language-python"># 伪代码：RLHF 的两个关键环节
+
+# 环节 1：训练奖励模型 —— 排序数据转成两两成对
+for question, chosen, rejected in preference_data:
+    r_chosen = reward_model(question, chosen)      # 给"更好的回答"打分
+    r_rejected = reward_model(question, rejected)  # 给"更差的回答"打分
+    loss = -F.logsigmoid(r_chosen - r_rejected)    # 目标：好的分 &gt; 差的分
+
+# 环节 2：PPO —— 拿奖励当信号做强化学习
+for question in prompt_data:
+    response = policy_model.generate(question)     # 当前模型生成回答
+    reward = reward_model(question, response)      # 奖励模型打分
+    # KL 惩罚：离 SFT 模型太远就扣分，防止"为讨好 RM 而说怪话"
+    loss = -(reward - beta * kl_divergence(policy_model, sft_model))
+    loss.backward(); optimizer.step()
+</code></pre>
+
+<table>
+<tr><th>维度</th><th>SFT</th><th>RLHF</th></tr>
+<tr><td>信号形式</td><td>"标准答案"（示范）</td><td>"哪个更好"（偏好）</td></tr>
+<tr><td>学什么</td><td>格式、角色、套路</td><td>分寸感、 Helpful/Harmless 的权衡</td></tr>
+<tr><td>比喻</td><td>岗前培训看手册</td><td>实习中被师傅点评</td></tr>
+<tr><td>工程复杂度</td><td>低</td><td>高（4 个模型同框，显存与稳定性都有挑战）</td></tr>
+</table>
+
+<div class="callout callout-warning">
+<strong>Reward Hacking（奖励投机）：</strong> 奖励模型只是人类偏好的近似。策略模型可能找到"让 RM 打高分但人觉得离谱"的输出——比如堆砌套话、过度冗长。KL 惩罚就是为压制这种漂移设计的，但无法根除。
+</div>
+
+<h3 id="sec3-4">3.4 DPO：轻量级对齐</h3>
+
+<p>RLHF 效果好但太重：要同时维护策略模型、参考模型、奖励模型、价值模型。<strong>DPO（Direct Preference Optimization，直接偏好优化，2023）</strong>证明了可以直接从偏好数据优化策略，跳过奖励模型和 PPO：</p>
+
+<pre><code class="language-json">// DPO 数据：同一个问题的两个回答，人类标注谁更好
+{
+  "prompt": "如何学习编程？",
+  "chosen":   "建议从一个小项目开始，边做边学。先定一个小目标……（详细、可执行）",
+  "rejected": "编程很简单，随便学学就会了。（敷衍、无信息量）"
+}
+</code></pre>
+
+<p>DPO 的损失直接比较两个回答的对数概率：让 <code>chosen</code> 的概率相对升高、<code>rejected</code> 的相对降低，数学上等价于一种隐式的奖励优化。</p>
+
+<table>
+<tr><th>维度</th><th>RLHF（PPO）</th><th>DPO</th></tr>
+<tr><td>需要奖励模型</td><td>需要（单独训练）</td><td>不需要</td></tr>
+<tr><td>需要强化学习</td><td>需要（PPO，不稳定）</td><td>不需要（类似监督训练）</td></tr>
+<tr><td>工程门槛</td><td>高</td><td>低，社区事实上的默认选项</td></tr>
+<tr><td>效果上限</td><td>更高（信号更充分）</td><td>略保守，但够用且稳</td></tr>
+</table>
+
+<h3 id="sec3-5">3.5 RLVR：学会打草稿<span class="badge badge-new">推理模型</span></h3>
+
+<p>近两年后训练最大的突破：在<strong>答案可以自动判对错</strong>的任务上做强化学习，全称 RL with Verifiable Rewards（可验证奖励的强化学习）。</p>
+
+<p>关键洞察：数学题可以核对答案、代码题可以跑单元测试——<strong>不需要人类标注"好不好"，对错机器自己知道</strong>。于是可以大规模地"刷题"：模型生成带推理过程的解答，对了给奖励，错了不给，能力就自己长出来了。</p>
+
+<div class="diagram">
+<pre>┌────────────── RLVR 训练循环 ──────────────┐
+│                                            │
+│  出一道数学/编程题（有标准答案或测试用例）     │
+│        ↓                                   │
+│  模型生成完整解题过程（思维链 CoT）           │
+│  "设未知数为 x……第一步……检查一下……"          │
+│        ↓                                   │
+│  机器自动判分：答案对 ✓ / 错 ✗ / 测试通过 ✓   │
+│        ↓                                   │
+│  强化学习：对的解题模式被强化，错的被抑制       │
+│        ↓                                   │
+│  模型逐渐学会：先打草稿、分步走、自我检查       │
+└────────────────────────────────────────────┘
+
+代表: OpenAI o1 (2024) · DeepSeek-R1 (2025)
+</pre>
+</div>
+
+<p>DeepSeek 的 R1 论文记录了有趣的现象：纯靠 RLVR（不加 SFT 起步的 R1-Zero 设置），模型<strong>自发涌现</strong>出越来越长的反思式思维链——中途会写出"等等，我刚才那步好像不对，让我重新算"，被称为"aha moment"。这证明推理能力可以在没有人类示范解题过程的情况下被激励出来。</p>
+
+<div class="callout callout-note">
+<strong>推理模型 vs 普通模型：</strong> 普通模型"凭直觉抢答"，推理模型"先打草稿再交卷"。代价是：更慢（生成几千 token 的思考过程）、更贵（token 数翻几倍）。所以日常闲聊用普通模型，数学/代码/复杂分析用推理模型。
+</div>
+
+<h3 id="sec3-6">3.6 完整流水线总览</h3>
+
+<div class="diagram">
+<pre>随机初始化的 Transformer（参数 = 一堆乱数）
+        │
+        ▼ 预训练：几万亿 token 上猜下一个词
+        │ （几千卡 × 几个月 × 数千万美元级）
+   基座模型 Base
+   （博览群书，但只会续写）
+        │
+        ▼ SFT：几万~百万条「问-答」示范
+        │ （学角色、格式、基本安全）
+        ▼ RLHF / DPO：人类偏好数据
+        │ （学分寸：helpful + harmless 的平衡）
+        ▼ （可选）RLVR：数学/代码刷题
+        │ （学思维链：先打草稿再交卷）
+   Chat / 推理 模型
+   （你在产品里聊天的那个）
+</pre>
+</div>
+
+<h3 id="sec3-7">3.7 常见误区</h3>
+
+<div class="callout callout-danger">
+<strong>误区一："模型的知识是微调教进去的。"</strong> 几万条微调数据教不动几万亿 token 建立的知识体系。想让模型知道新知识，正解是 RAG（外挂检索）或继续预训练（大量领域语料），而不是微调。
+</div>
+
+<div class="callout callout-danger">
+<strong>误区二："Base 模型答错了，一定是没训练好。"</strong> Base 模型的任务本来就不是回答问题，而是续写。拿 Base 当 Chat 用，答非所问属于"正常发挥"。
+</div>
+
+<div class="callout callout-danger">
+<strong>误区三："RLHF 之后模型就不幻觉了。"</strong> 幻觉源于预训练目标本身——学的是"接得像"而不是"接得对"。后训练能压制（让模型更倾向说"我不确定"），不能根除。
+</div>
+
+<!-- 第三章总结图 -->
+<div class="chapter-summary">
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>后训练总结图</title>
+  <desc>SFT、RLHF、DPO、RLVR 四个环节及完整流水线</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">后训练 Post-training</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">岗前培训——把书呆子变成好助手</text>
+
+  <line x1="70" y1="78" x2="70" y2="428" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="105" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="105" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="100" font-size="14" font-weight="500" fill="#712B13">SFT 监督微调</text>
+  <text x="100" y="118" font-size="13" font-weight="400" fill="#5F5E5A">「问-答」示范，loss 只算回答部分 — 学角色、格式、基本安全</text>
+
+  <circle cx="70" cy="175" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="175" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="170" font-size="14" font-weight="500" fill="#633806">奖励模型 RM</text>
+  <text x="100" y="188" font-size="13" font-weight="400" fill="#5F5E5A">人类排序 → 学会给回答打分 — 人类偏好的"代理评委"</text>
+
+  <circle cx="70" cy="245" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="245" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="240" font-size="14" font-weight="500" fill="#3C3489">RLHF / DPO</text>
+  <text x="100" y="258" font-size="13" font-weight="400" fill="#5F5E5A">朝高分方向调整 + KL 约束 — DPO 跳过 RM 和 PPO，轻量稳定</text>
+
+  <circle cx="70" cy="315" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="315" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="310" font-size="14" font-weight="500" fill="#0C447C">RLVR 推理强化</text>
+  <text x="100" y="328" font-size="13" font-weight="400" fill="#5F5E5A">数学/代码自动判分刷题 — o1/R1 学会"先打草稿再交卷"</text>
+
+  <circle cx="70" cy="385" r="13" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="70" y="385" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">5</text>
+  <text x="100" y="380" font-size="14" font-weight="500" fill="#085041">蒸馏（可选）</text>
+  <text x="100" y="398" font-size="13" font-weight="400" fill="#5F5E5A">用强模型生成的数据教小模型 — R1 的能力就这样传给小杯</text>
+
+  <line x1="40" y1="445" x2="640" y2="445" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="465" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">一句话记住</text>
+
+  <rect x="40" y="480" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="500" font-size="12" font-weight="500" fill="#444441">后训练教行为，不教知识</text>
+  <text x="55" y="520" font-size="11" font-weight="400" fill="#5F5E5A">格式、分寸、安全、思维链</text>
+
+  <rect x="350" y="480" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="500" font-size="12" font-weight="500" fill="#444441">基座 → Chat 的关键一跃</text>
+  <text x="365" y="520" font-size="11" font-weight="400" fill="#5F5E5A">SFT 起步，RLHF/DPO 定分寸，RLVR 练推理</text>
+</svg>
+</div>
+
+<!-- ====================== 第四章 ====================== -->
+<h2 id="ch4">第四章：实践篇——训练之外的选择</h2>
+
+<p>前三章讲的是模型厂商的流水线。对应用开发者来说，更重要的问题是：<strong>我的需求该用哪种手段满足？</strong>大多数时候答案不是"训一个模型"，而是从最简单的方案开始，按需递进。</p>
+
+<hr>
+
+<h3 id="sec4-1">4.1 需求到方案决策树</h3>
+
+<div class="diagram">
+<pre>你的需求是什么？
+│
+├── 输出不够好 / 格式不对 / 不会拆解任务
+│    └── → 优化 Prompt（角色设定、Few-shot、CoT）
+│         成本最低，先试这个
+│
+├── 需要私有知识 / 实时数据
+│    └── → RAG（检索增强）
+│         知识外挂，改了文档立即生效，可溯源
+│
+├── 需要固定的风格 / 领域行为 / 输出格式
+│    └── → 微调（LoRA）
+│         几千~几万条数据，教"怎么干"，不是教"知识"
+│
+├── 需要全新领域 / 新语言的基础能力
+│    └── → 继续预训练 CPT
+│         在开源基座上灌大量领域语料"补课"
+│
+└── 不确定？从最简单的开始，按需递进
+     Prompt → RAG → LoRA → CPT
+</pre>
+</div>
+
+<div class="callout callout-tip">
+<strong>经验法则：</strong> 80% 的"模型不够好"其实是 Prompt 没写好；剩下的大部分该用 RAG；真正需要微调的，往往是"输出格式/风格必须高度一致"的场景（如特定领域的结构化抽取）。知识类需求优先 RAG，不要指望微调灌知识。
+</div>
+
+<h3 id="sec4-2">4.2 LoRA：轻量微调</h3>
+
+<p>全参数微调 7B 模型需要上百 GB 显存，普通团队玩不起。<strong>LoRA（Low-Rank Adaptation）</strong>的思路：冻结原模型全部参数，在旁边加一对小矩阵，只训小矩阵。</p>
+
+<div class="diagram">
+<pre>原权重 W（d×d，冻结不动）
+              │
+              ├── 输出 += B·A    B: d×r  A: r×d   （r = 16，很小）
+              │
+效果: 可训练参数量 ≈ 原模型的 0.1% ~ 1%
+      训练完可以只保存几十 MB 的"补丁"，
+      同一个基座挂不同补丁 = 不同用途的模型
+</pre>
+</div>
+
+<pre><code class="language-python">from peft import LoraConfig, get_peft_model
+
+config = LoraConfig(
+    r=16,                                    # 秩：越小越省，16/32 常用
+    lora_alpha=32,
+    target_modules=["q_proj", "v_proj"],     # 只在注意力的部分投影上加
+    task_type="CAUSAL_LM"
+)
+model = get_peft_model(base_model, config)
+model.print_trainable_parameters()
+# trainable params: 13M || all params: 7B || trainable%: 0.19%
+</code></pre>
+
+<table>
+<tr><th>维度</th><th>全参微调</th><th>LoRA</th></tr>
+<tr><td>可训练参数</td><td>100%（7B）</td><td>0.1%~1%</td></tr>
+<tr><td>显存需求</td><td>上百 GB（多卡）</td><td>单张消费级卡可跑（QLoRA 更省）</td></tr>
+<tr><td>产物大小</td><td>完整模型（14 GB+）</td><td>几十 MB 补丁</td></tr>
+<tr><td>效果上限</td><td>最高</td><td>绝大多数场景够用</td></tr>
+</table>
+
+<h3 id="sec4-3">4.3 蒸馏：大老师教小学生</h3>
+
+<p><strong>知识蒸馏（Distillation）</strong>：用强模型的输出当训练数据，去教小模型。R1 论文的做法就是典型——用 R1 生成 80 万条高质量推理数据，SFT 教给小模型，让 7B 的小杯也学会打草稿。</p>
+
+<ul>
+<li><strong>数据蒸馏</strong>（主流）：强模型生成"问题-答案"数据 → SFT 小模型</li>
+<li><strong>logits 蒸馏</strong>（更学术）：小模型直接拟合强模型的输出概率分布</li>
+</ul>
+
+<p>价值：推理成本降一个数量级。大模型当"老师"离线生成，小模型当"学生"在线服务。</p>
+
+<h3 id="sec4-4">4.4 术语小词典</h3>
+
+<table>
+<tr><th>术语</th><th>一句话解释</th></tr>
+<tr><td><strong>Base / Chat / Instruct</strong></td><td>同一模型的两个版本：Base 是预训练产物（只会续写）；Chat/Instruct 是后训练产物（能对话）。日常永远选后者</td></tr>
+<tr><td><strong>Checkpoint</strong></td><td>训练过程中存下的参数快照，"存档"</td></tr>
+<tr><td><strong>Loss</strong></td><td>模型"错得有多离谱"的数字，训练就是把它压下去</td></tr>
+<tr><td><strong>Epoch / Step</strong></td><td>数据完整过一遍 / 每处理一个批次更新一次参数</td></tr>
+<tr><td><strong>学习率 LR</strong></td><td>每次拧旋钮的幅度：太大震荡不收敛，太慢训不动</td></tr>
+<tr><td><strong>上下文窗口</strong></td><td>模型一次能"看进去"的最大 token 数（4K~1M+）</td></tr>
+<tr><td><strong>幻觉</strong></td><td>一本正经地编造——因为训练目标是"接得像"而非"接得对"</td></tr>
+<tr><td><strong>对齐</strong></td><td>让模型行为符合人类意图和价值观（RLHF/DPO 做的事）</td></tr>
+<tr><td><strong>思维链 CoT</strong></td><td>让模型"一步步想"的输出/提示方式，推理模型将其内化</td></tr>
+<tr><td><strong>推理模型</strong></td><td>后训练阶段经 RLVR 强化、会先打长草稿再作答的模型（o1、R1）</td></tr>
+<tr><td><strong>MoE</strong></td><td>混合专家：每次只激活部分参数，大容量低推理成本</td></tr>
+<tr><td><strong>量化</strong></td><td>把参数从 16bit 压到 4/8bit，模型变小变快，精度略降</td></tr>
+</table>
+
+<h3 id="sec4-5">4.5 各阶段成本速览</h3>
+
+<table>
+<tr><th>阶段</th><th>数据规模</th><th>算力</th><th>周期</th><th>谁玩得起</th></tr>
+<tr><td>预训练</td><td>10T+ token</td><td>数千~数万卡</td><td>数月</td><td>头部大厂</td></tr>
+<tr><td>继续预训练 CPT</td><td>10B~1T token</td><td>数十~数百卡</td><td>数天~数周</td><td>有算力的团队</td></tr>
+<tr><td>SFT</td><td>1万~百万条</td><td>数卡~数十卡</td><td>数天</td><td>普通团队</td></tr>
+<tr><td>RLHF / DPO</td><td>1万~百万偏好对</td><td>数卡~数十卡</td><td>数天</td><td>普通团队</td></tr>
+<tr><td>LoRA 微调</td><td>数百~数万条</td><td>单卡</td><td>数小时~数天</td><td>个人</td></tr>
+</table>
+
+<p>可以看到一条清晰的规律：<strong>越靠近预训练，越是"巨头的游戏"；越靠近应用，门槛越低</strong>。这也是开源基座的价值所在——把最贵的一步替你做完了。</p>
+
+<!-- 第四章总结图 -->
+<div class="chapter-summary">
+<svg viewBox="0 0 680 440" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>实践篇总结图</title>
+  <desc>从 Prompt 到继续预训练的选型递进，LoRA 与蒸馏的定位</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">实践篇：选型递进</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">从最简单的开始，按需升级</text>
+
+  <text x="340" y="85" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">需求强度递增 →</text>
+
+  <rect x="40" y="105" width="120" height="72" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="100" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Prompt</text>
+  <text x="100" y="150" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">输出更好</text>
+  <text x="100" y="166" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">零成本</text>
+
+  <rect x="185" y="105" width="120" height="72" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="245" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">RAG</text>
+  <text x="245" y="150" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">私有知识</text>
+  <text x="245" y="166" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">实时数据</text>
+
+  <rect x="330" y="105" width="120" height="72" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="390" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">微调 LoRA</text>
+  <text x="390" y="150" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">风格/格式</text>
+  <text x="390" y="166" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">单卡可训</text>
+
+  <rect x="475" y="105" width="165" height="72" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="557" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">继续预训练 CPT</text>
+  <text x="557" y="150" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">全新领域基础能力</text>
+  <text x="557" y="166" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">团队级投入</text>
+
+  <line x1="40" y1="215" x2="640" y2="215" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="240" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">两条经验</text>
+
+  <rect x="40" y="260" width="290" height="72" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="283" font-size="12" font-weight="500" fill="#444441">知识类需求 → RAG</text>
+  <text x="55" y="303" font-size="11" font-weight="400" fill="#5F5E5A">微调教"怎么干"，不教"知道什么"</text>
+  <text x="55" y="320" font-size="11" font-weight="400" fill="#5F5E5A">文档更新立即生效，可溯源</text>
+
+  <rect x="350" y="260" width="290" height="72" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="283" font-size="12" font-weight="500" fill="#444441">成本类需求 → 蒸馏</text>
+  <text x="365" y="303" font-size="11" font-weight="400" fill="#5F5E5A">强模型当老师离线生成数据</text>
+  <text x="365" y="320" font-size="11" font-weight="400" fill="#5F5E5A">小模型学生在线服务，便宜一个量级</text>
+
+  <text x="340" y="375" text-anchor="middle" font-size="12" font-weight="400" fill="#888780">80% 的"模型不够好"其实是 Prompt 没写好</text>
+</svg>
+</div>
+
+<hr>
+
+<h2>总结：从随机参数到聊天伙伴</h2>
+
+<table>
+<tr><th>阶段</th><th>干什么</th><th>比喻</th><th>产物</th></tr>
+<tr><td>架构 + 随机初始化</td><td>搭好 Transformer，参数是乱数</td><td>刚出厂的大脑</td><td>白纸一张</td></tr>
+<tr><td>预训练</td><td>万亿 token 上猜下一个词</td><td>读万卷书</td><td>基座模型（会续写）</td></tr>
+<tr><td>SFT</td><td>模仿「问-答」示范</td><td>岗前培训</td><td>会对话</td></tr>
+<tr><td>RLHF / DPO</td><td>按人类偏好调整</td><td>实习被点评</td><td>有分寸、安全</td></tr>
+<tr><td>RLVR</td><td>可验证任务上刷题</td><td>打草稿再交卷</td><td>推理模型</td></tr>
+</table>
+
+<p>这些阶段不是"后者取代前者"，而是<strong>层层叠加</strong>：</p>
+
+<ul>
+<li>推理模型再能打草稿，底层依然是那个只会"猜下一个词"的接龙机器</li>
+<li>对话能力再自然，也建立在预训练灌进去的万亿 token 之上</li>
+<li>再强的对齐，也压不住接龙目标的先天属性——幻觉只能管理，不能消灭</li>
+</ul>
+
+<p><strong>记住一句话就够了：架构是"大脑怎么连"，预训练是"读书养成知识"，后训练是"学着好好说话做事"。</strong>三者合起来，才是你面前这个能聊天的 AI。</p>
+
+<div class="footer">
+  <p>大模型训练指南 v1.0 &nbsp;|&nbsp; LLM 训练全景</p>
+  <p>参考：知乎《Transformer 架构原理通俗解释》 &nbsp;|&nbsp; Attention Is All You Need (2017) &nbsp;|&nbsp; InstructGPT (2022) &nbsp;|&nbsp; Chinchilla (2022) &nbsp;|&nbsp; DPO (2023) &nbsp;|&nbsp; DeepSeek-R1 (2025)</p>
+</div>
+
+</div></div>
+
+<script src="/assets/vendor/prism/prism-core.min.js"></script>
+<script src="/assets/vendor/prism/prism-clike.min.js"></script>
+<script src="/assets/vendor/prism/prism-python.min.js"></script>
+<script src="/assets/vendor/prism/prism-markdown.min.js"></script>
+<script src="/assets/vendor/prism/prism-json.min.js"></script>
+
+<script src="/assets/js/article.js"></script>
+
+</body>
+</html>

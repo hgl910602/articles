@@ -12,6 +12,14 @@
       "date": "2026-08-12",
       "category": "架构设计",
       "tags": ["架构", "DDD", "技术方案", "Java"]
+    },
+    {
+      "slug": "llm-training-guide",
+      "title": "大模型训练指南：从 Transformer 到预训练与后训练",
+      "description": "把大模型当作文字接龙机器讲起：Token、注意力、参数与采样；再看预训练如何把图书馆读进参数，SFT、RLHF、DPO、RLVR 等后训练如何把基座变成好助手；最后落到 LoRA、蒸馏与实践决策树。",
+      "date": "2026-08-18",
+      "category": "大模型",
+      "tags": ["大模型", "Transformer", "预训练", "后训练", "Python"]
     }
   ]
 }
