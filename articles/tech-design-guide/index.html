@@ -1,0 +1,3295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技术方案设计指南：从架构演进到领域建模</title>
+<link href="/assets/css/theme.css" rel="stylesheet" />
+<link href="/assets/vendor/prism/prism-tomorrow.min.css" rel="stylesheet" />
+<link href="/assets/css/article.css" rel="stylesheet" />
+</head>
+<body>
+
+<button id="toc-toggle">☰ 目录</button>
+
+<!-- ==================== SIDEBAR ==================== -->
+<div id="sidebar">
+  <a class="back-home" href="/">← 返回首页</a>
+  <div class="doc-title">技术方案设计指南<br><small style="font-weight:400;font-size:13px;color:var(--text-muted)">从架构演进到领域建模</small></div>
+  <nav>
+    <ul>
+      <li><a href="#intro">引言</a></li>
+      <li><a href="#ch1">第一章：架构演进史</a>
+        <ul>
+          <li><a href="#sec1-1">1.1 软件架构的本质</a></li>
+          <li><a href="#sec1-2">1.2 原始单体时代</a></li>
+          <li><a href="#sec1-3">1.3 分层架构的诞生</a></li>
+          <li><a href="#sec1-4">1.4 面向服务架构（SOA）</a></li>
+          <li><a href="#sec1-5">1.5 微服务架构</a></li>
+          <li><a href="#sec1-6">1.6 云原生时代</a></li>
+          <li><a href="#sec1-7">1.7 演进的启示</a></li>
+        </ul>
+      </li>
+      <li><a href="#ch2">第二章：架构方法论基础</a>
+        <ul>
+          <li><a href="#sec2-1">2.1 CRUD：最朴素的实践</a></li>
+          <li><a href="#sec2-2">2.2 MVC 分层架构</a></li>
+          <li><a href="#sec2-3">2.3 经典三层架构</a></li>
+          <li><a href="#sec2-4">2.4 贫血 vs 充血模型</a></li>
+          <li><a href="#sec2-5">2.5 更广阔的方法论版图</a>
+            <ul>
+              <li><a href="#sec2-5-1">2.5.1 数据访问模式</a></li>
+              <li><a href="#sec2-5-2">2.5.2 架构边界模式</a></li>
+              <li><a href="#sec2-5-3">2.5.3 读写分离模式</a></li>
+              <li><a href="#sec2-5-4">2.5.4 通信范式</a></li>
+              <li><a href="#sec2-5-5">2.5.5 扩展模式</a></li>
+              <li><a href="#sec2-5-6">2.5.6 全景对照</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#ch3">第三章：领域驱动设计</a>
+        <ul>
+          <li><a href="#sec3-1">3.1 为什么需要 DDD</a></li>
+          <li><a href="#sec3-2">3.2 DDD 全景</a></li>
+          <li><a href="#sec3-3">3.3 战略设计</a>
+            <ul>
+              <li><a href="#sec3-3-1">3.3.1 领域与子域</a></li>
+              <li><a href="#sec3-3-2">3.3.2 限界上下文</a></li>
+              <li><a href="#sec3-3-3">3.3.3 上下文映射</a></li>
+            </ul>
+          </li>
+          <li><a href="#sec3-4">3.4 战术设计</a>
+            <ul>
+              <li><a href="#sec3-4-1">3.4.1 实体（Entity）</a></li>
+              <li><a href="#sec3-4-2">3.4.2 值对象（Value Object）</a></li>
+              <li><a href="#sec3-4-3">3.4.3 聚合与聚合根</a></li>
+              <li><a href="#sec3-4-4">3.4.4 领域服务</a></li>
+              <li><a href="#sec3-4-5">3.4.5 领域事件</a></li>
+              <li><a href="#sec3-4-6">3.4.6 仓储（Repository）</a></li>
+              <li><a href="#sec3-4-7">3.4.7 工厂（Factory）</a></li>
+              <li><a href="#sec3-4-8">3.4.8 四色建模法</a></li>
+            </ul>
+          </li>
+          <li><a href="#sec3-5">3.5 DDD 分层架构</a></li>
+          <li><a href="#sec3-6">3.6 从需求到代码</a></li>
+          <li><a href="#sec3-7">3.7 常见陷阱与最佳实践</a></li>
+        </ul>
+      </li>
+      <li><a href="#ch4">第四章：如何写好技术方案</a>
+        <ul>
+          <li><a href="#sec4-1">4.1 技术方案核心要素</a></li>
+          <li><a href="#sec4-2">4.2 技术方案模板</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<!-- ==================== CONTENT ==================== -->
+<div id="content"><div class="inner">
+
+<!-- ====================== 引言 ====================== -->
+<h1 id="intro">技术方案设计指南：从架构演进到领域建模</h1>
+<p style="font-size:14px;color:var(--text-muted)">电商交易场景 &nbsp;|&nbsp; Java 代码示例</p>
+
+<div class="chapter-intro">
+<p><strong>本文的定位</strong>：很多研发在接到需求后，第一反应是"建表 → 写接口 → 联调上线"，很少思考"为什么这样设计"。代码能跑，但难以维护、难以扩展、难以交接。本文的目标是建立<strong>架构思维</strong>——在写第一行代码之前，先想清楚系统该怎么组织。</p>
+<p><strong>本文的叙事方式</strong>参考了《凤凰架构》的思路：先讲"是怎么走到今天这一步的"（架构演进史），再讲"具体该怎么做"（CRUD → MVC → DDD 及更广阔的方法论版图），最后深入领域驱动设计——这是本文的重头戏。</p>
+</div>
+
+<blockquote>
+<p><strong>阅读建议：</strong> 对架构没有概念的读者，建议从头读到尾。已了解 MVC 的读者，可以直接跳到<a href="#ch3">第三章</a>。每章都有代码示例。</p>
+</blockquote>
+
+<!-- ====================== 第一章 ====================== -->
+<h2 id="ch1">第一章：架构演进史</h2>
+
+<p>回顾历史是理解今天架构的最佳途径。每一种架构风格都为了解决前一种架构留下的问题而产生。本章沿着时间线走一遍。</p>
+
+<h3 id="sec1-1">1.1 软件架构的本质</h3>
+
+<p>在开始之前，需要先明确一个问题：<strong>软件架构到底是什么？</strong></p>
+
+<p>IEEE 给过一个定义：</p>
+
+<blockquote>架构是系统在其所处环境中的<em>基本概念或属性</em>，体现在其<em>元素</em>、<em>关系</em>，以及其<em>设计与演进的原则</em>中。</blockquote>
+
+<p>简单来说：<strong>架构是把系统拆成几块、每块干什么、块和块之间怎么打交道，以及为什么要这么拆。</strong></p>
+
+<p>比"拆成几块"更重要的是——<strong>为什么要拆？</strong> 答案只有一个词：</p>
+
+<h4>控制复杂性</h4>
+
+<p>所有软件架构演进的动力，都来自于同一个源头：<strong>业务复杂度的增长</strong>。</p>
+
+<ul>
+<li>代码从 100 行涨到 10000 行 → 需要分层</li>
+<li>团队从 1 人涨到 50 人 → 需要拆分服务</li>
+<li>用户从 100 涨到 100 万 → 需要分布式</li>
+</ul>
+
+<p>后续每一种架构风格，都源于这个动因。</p>
+
+<hr>
+
+<h3 id="sec1-2">1.2 原始单体时代</h3>
+
+<p>回到 2000 年代初。假设一家电商公司，负责订单系统。业务很简单：用户下单、查看订单、取消订单。</p>
+
+<p>代码大概长这样：</p>
+
+<pre><code class="language-java">// 📛 典型的"大泥球"（Big Ball of Mud）
+public class OrderSystem {
+
+    // 下单
+    public void placeOrder(String userId, List&lt;String&gt; productIds, String address) {
+        // 1. 查用户
+        Connection conn = DriverManager.getConnection("jdbc:mysql://...");
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM users WHERE id = ?");
+        ps.setString(1, userId);
+        ResultSet rs = ps.executeQuery();
+        // ... 一堆校验逻辑
+
+        // 2. 查商品、算价格
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (String pid : productIds) {
+            ps = conn.prepareStatement("SELECT * FROM products WHERE id = ?");
+            ps.setString(1, pid);
+            rs = ps.executeQuery();
+            // ... 累加价格
+
+            // 3. 扣库存
+            ps = conn.prepareStatement("UPDATE products SET stock = stock - 1 WHERE id = ?");
+            ps.setString(1, pid);
+            ps.executeUpdate();
+        }
+
+        // 4. 创建订单
+        String orderId = UUID.randomUUID().toString();
+        ps = conn.prepareStatement("INSERT INTO orders (id, user_id, total_price, address) VALUES (?, ?, ?, ?)");
+        // ...
+
+        // 5. 发短信通知
+        SmsClient.send(userId, "您的订单已创建");
+
+        // 6. 记日志
+        logger.info("订单创建成功: {}", orderId);
+    }
+
+    // 取消订单、查询订单... 每个方法都是同样的"一锅端"
+}
+</code></pre>
+
+<p>这段代码能跑，而且在<strong>初期非常好用</strong>——逻辑集中、一目了然、不需要跳来跳去。</p>
+
+<p>但好景不长。随着业务增长：</p>
+
+<table>
+<tr><th>问题</th><th>表现</th></tr>
+<tr><td>代码膨胀</td><td>一个类从 200 行涨到 5000 行，找个方法要 Ctrl+F 半天</td></tr>
+<tr><td>职责混乱</td><td>SQL 查询、业务逻辑、发短信、记日志全混在一个方法里</td></tr>
+<tr><td>修改扩散</td><td>改一个短信模板，要在 10 个地方找短信发送的代码</td></tr>
+<tr><td>无法测试</td><td>方法里直接 new 数据库连接，没法 Mock，只能连真数据库测</td></tr>
+<tr><td>协作冲突</td><td>5 个人同时改这个文件，Git 合并冲突到怀疑人生</td></tr>
+</table>
+
+<p>这就是"大泥球"（Big Ball of Mud）反模式。其核心问题是：<strong>没有分离关注点</strong>。</p>
+
+<div class="callout callout-tip">
+<strong>阈值效应：</strong> 当代码量超过一定规模（通常是一个文件 500 行左右），就需要引入结构。这个"结构"，就是架构。
+</div>
+
+<hr>
+
+<h3 id="sec1-3">1.3 分层架构的诞生</h3>
+
+<p>大泥球的问题催生了一个朴素的想法：<strong>把不同关注点的代码放到不同的层里</strong>。这就是分层架构。</p>
+
+<p>1979 年，Trygve Reenskaug 在 Smalltalk 项目中提出了 <strong>MVC（Model-View-Controller）</strong>模式，这是分层思想的最早实践之一。后来演化为更通用的<strong>三层架构</strong>（Three-Tier Architecture）。</p>
+
+<div class="diagram">
+<pre>┌─────────────────────────────────────────┐
+│         表现层 (Presentation)              │  ← 处理 HTTP 请求/响应、参数校验
+│    Controller / View / API               │
+├─────────────────────────────────────────┤
+│         业务逻辑层 (Business Logic)        │  ← 核心业务规则
+│    Service / Domain Logic                │
+├─────────────────────────────────────────┤
+│         数据访问层 (Data Access)           │  ← 数据库操作
+│    DAO / Repository / Mapper             │
+├─────────────────────────────────────────┤
+│         数据库 (Database)                 │  ← MySQL / Redis
+└─────────────────────────────────────────┘
+
+  规则：上层依赖下层，下层不知道上层存在
+</pre>
+</div>
+
+<p>分层架构的核心原则是<strong>单向依赖</strong>：上层可以调用下层，但下层不能反向调用上层。这样一来，修改数据库从 MySQL 换成 PostgreSQL，只需要改 DAO 层，上面的业务逻辑完全不用动。</p>
+
+<p>第二章会详细讲 CRUD 和 MVC 的具体写法，这里先了解它的历史定位。</p>
+
+<div class="callout callout-note">
+<strong>分层的价值：</strong> 分层的核心价值是<strong>隔离变化</strong>。每一层的变化频率不同（UI 变化最快，数据库变化最慢），分层让快变的东西不影响慢变的东西。
+</div>
+
+<hr>
+
+<h3 id="sec1-4">1.4 面向服务架构（SOA）</h3>
+
+<p>随着系统继续增长，单个应用即使分了层，也变得越来越大。于是人们想到了另一个办法：<strong>把大应用拆成多个服务</strong>。</p>
+
+<p>这就是 <strong>SOA（Service-Oriented Architecture，面向服务架构）</strong>。它的核心思想是：把系统拆成若干个独立的服务，服务之间通过标准协议通信。</p>
+
+<div class="diagram">
+<pre>                    ┌──────────┐
+                    │   ESB    │  ← 企业服务总线（笨重！）
+                    │  总线     │
+            ┌───────┴────┬─────┴───────┐
+            │            │              │
+     ┌──────┴──┐  ┌──────┴──┐  ┌───────┴──┐
+     │ 订单服务  │  │ 用户服务 │  │ 商品服务  │
+     └─────────┘  └─────────┘  └──────────┘
+
+  通信方式：SOAP / XML / WSDL（非常重！）
+</pre>
+</div>
+
+<p>SOA 的问题是<strong>太重了</strong>：</p>
+
+<ul>
+<li>通信协议用 <strong>SOAP/XML</strong>，报文冗长、解析慢</li>
+<li>强依赖 <strong>ESB（企业服务总线）</strong>，所有服务通信都要经过它，ESB 成了性能瓶颈和单点故障</li>
+<li><strong>WSDL</strong> 接口定义复杂，改一个接口要走一套繁琐的流程</li>
+<li>服务粒度通常较大，一个"服务"内部可能还是一个巨型单体</li>
+</ul>
+
+<p>结果就是：SOA 在企业级领域（如银行、电信）有一些应用，但在互联网公司中很少成功落地。<strong>它想解决的问题是正确的，但给出的方案太重了。</strong></p>
+
+<hr>
+
+<h3 id="sec1-5">1.5 微服务架构</h3>
+
+<p>2014 年左右，Martin Fowler 和 James Lewis 发表了《Microservices》一文，正式定义了<strong>微服务架构</strong>。</p>
+
+<p>微服务继承了 SOA"拆分服务"的思路，但完全抛弃了 SOA 的笨重基础设施：</p>
+
+<table>
+<tr><th>维度</th><th>SOA</th><th>微服务</th></tr>
+<tr><td>通信协议</td><td>SOAP / XML（重）</td><td>REST / gRPC / JSON（轻）</td></tr>
+<tr><td>服务总线</td><td>强依赖 ESB</td><td>无 ESB，去中心化</td></tr>
+<tr><td>服务粒度</td><td>较大，按业务域粗分</td><td>小而专注，围绕单一能力</td></tr>
+<tr><td>数据存储</td><td>共享数据库</td><td>每个服务独享数据库</td></tr>
+<tr><td>部署方式</td><td>集中式部署</td><td>独立部署、独立演进</td></tr>
+<tr><td>技术栈</td><td>统一技术栈</td><td>技术异构（允许不同语言）</td></tr>
+</table>
+
+<div class="diagram">
+<pre>  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐
+  │ 订单服务  │  │ 商品服务  │  │ 用户服务  │  │ 支付服务  │
+  │  Java    │  │   Go    │  │ Python  │  │  Java   │
+  │ MySQL    │  │ MySQL   │  │  Redis  │  │ MySQL   │
+  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘
+       │              │              │              │
+       └──────────────┴──────┬───────┴──────────────┘
+                             │
+                    ┌────────┴────────┐
+                    │  API Gateway    │  ← 统一入口、路由、限流
+                    └─────────────────┘
+</pre>
+</div>
+
+<p>微服务带来的好处是显而易见的：</p>
+
+<ul>
+<li><strong>独立部署</strong>：改了支付服务，只发布支付服务，不影响商品服务</li>
+<li><strong>故障隔离</strong>：商品服务挂了，用户还能下单（只是看不到商品图）</li>
+<li><strong>团队自治</strong>：不同团队负责不同服务，减少协作摩擦</li>
+<li><strong>弹性伸缩</strong>：大促时只扩容订单服务和支付服务</li>
+</ul>
+
+<p>但代价也很沉重——<strong>分布式系统的问题全部涌了进来</strong>：</p>
+
+<div class="callout callout-warning">
+<strong>微服务的"七宗罪"：</strong>
+<ul style="margin-bottom:0">
+<li><strong>分布式事务</strong>：下单扣库存+扣余额，跨服务怎么保证一致性？</li>
+<li><strong>服务发现</strong>：服务实例动态变化，怎么找到对方？</li>
+<li><strong>链路追踪</strong>：一个请求经过 8 个服务，出问题怎么定位？</li>
+<li><strong>数据一致性</strong>：每个服务有独立数据库，怎么保持数据同步？</li>
+<li><strong>网络不可靠</strong>：服务调用变成网络调用，超时、重试、熔断？</li>
+<li><strong>运维复杂度</strong>：从部署 1 个应用变成部署 20 个服务</li>
+<li><strong>测试困难</strong>：端到端测试需要拉起所有依赖服务</li>
+</ul>
+</div>
+
+<p>这些问题的解决方案催生了一整套中间件：服务注册发现（Nacos/Consul）、配置中心、API 网关、分布式追踪（Jaeger/SkyWalking）、熔断器（Sentinel/Hystrix）……</p>
+
+<div class="callout callout-note">
+<strong>微服务的本质：</strong> 微服务不是"把大单体拆成小单体"那么简单。它是一种<strong>用分布式复杂性换取可扩展性和团队自治</strong>的架构选择。只有当业务复杂度和团队规模到了一定程度，这个交换才是值得的。
+</div>
+
+<hr>
+
+<h3 id="sec1-6">1.6 云原生时代</h3>
+
+<p>微服务解决了业务拆分的问题，但把基础设施的复杂性甩给了开发者。每个团队都要自己处理服务发现、熔断、限流、追踪……</p>
+
+<p>于是<strong>云原生（Cloud Native）</strong>应运而生，核心思想是：<strong>把这些基础设施能力从业务代码中剥离出来，交给平台层</strong>。</p>
+
+<table>
+<tr><th>能力</th><th>微服务时代（开发者自行处理）</th><th>云原生时代（平台层处理）</th></tr>
+<tr><td>部署</td><td>虚拟机 + 脚本</td><td>容器（Docker）+ 编排（K8s）</td></tr>
+<tr><td>服务发现</td><td>代码里集成 Nacos/Eureka</td><td>K8s Service + DNS</td></tr>
+<tr><td>熔断/限流</td><td>代码里集成 Sentinel/Hystrix</td><td>Service Mesh（Istio/Linkerd）</td></tr>
+<tr><td>链路追踪</td><td>代码里集成 SDK</td><td>Sidecar 自动注入</td></tr>
+<tr><td>配置管理</td><td>配置中心（Apollo/Nacos）</td><td>ConfigMap + 声明式配置</td></tr>
+</table>
+
+<div class="diagram">
+<pre>  云原生架构 = 容器 + 微服务 + DevOps + 持续交付
+
+  ┌─────────────────────────────────────────────┐
+  │            应用层（业务代码）                   │
+  │     只关注业务逻辑，不关心基础设施               │
+  ├─────────────────────────────────────────────┤
+  │         Service Mesh（服务网格）               │
+  │    Sidecar 代理：熔断/限流/追踪/加密             │
+  ├─────────────────────────────────────────────┤
+  │         容器编排层（Kubernetes）                │
+  │    调度/自愈/弹性伸缩/滚动发布                   │
+  ├─────────────────────────────────────────────┤
+  │         基础设施层（云）                       │
+  │    计算/存储/网络/数据库（按需分配）              │
+  └─────────────────────────────────────────────┘
+</pre>
+</div>
+
+<p>云原生的演进方向是：<strong>让开发者越来越只关注业务本身</strong>。从"自己管服务器"到"容器化部署"，从"自己写熔断逻辑"到"Sidecar 自动处理"，基础设施的复杂性被一层层地向下封装。</p>
+
+<hr>
+
+<h3 id="sec1-7">1.7 演进的启示</h3>
+
+<p>回顾这段历史，我们可以得出几条非常重要的认知：</p>
+
+<h4>启示一：没有银弹</h4>
+
+<p>每种架构都有它解决的问题，也有它引入的新问题：</p>
+
+<table>
+<tr><th>架构</th><th>解决了什么</th><th>引入了什么新问题</th></tr>
+<tr><td>单体</td><td>—</td><td>代码膨胀、协作困难</td></tr>
+<tr><td>分层</td><td>关注点分离</td><td>层次多了跳转复杂</td></tr>
+<tr><td>SOA</td><td>服务复用</td><td>ESB 笨重、协议复杂</td></tr>
+<tr><td>微服务</td><td>独立部署、团队自治</td><td>分布式事务、运维复杂</td></tr>
+<tr><td>云原生</td><td>基础设施下沉</td><td>学习曲线陡峭、平台依赖</td></tr>
+</table>
+
+<p><strong>架构选择的本质，就是选择承担哪种复杂性。</strong></p>
+
+<h4>启示二：复杂性守恒</h4>
+
+<blockquote>复杂性不会消失，只会转移。—— Larry Constantine</blockquote>
+
+<p>微服务把单体内部的复杂性转移到了网络层面，云原生把网络层面的复杂性转移到了平台层面。<strong>总复杂性没有减少，只是换了你更擅长处理的形式。</strong></p>
+
+<h4>启示三：架构是演进的</h4>
+
+<p>没有任何系统一上来就是微服务架构。好的架构是<strong>渐进式演化</strong>的：</p>
+
+<div class="diagram">
+<pre>
+单体 ──→ 分层单体 ──→ 模块化单体 ──→ 微服务 ──→ 云原生
+
+  ↑          ↑             ↑            ↑          ↑
+ 业务小    业务增长      团队扩大     团队多到    基础设施
+          需要分层      需要模块化    需要自治    复杂到需要平台
+</pre>
+</div>
+
+<p><strong>适合当前业务规模和团队能力的架构，才是好架构。</strong></p>
+
+<h4>启示四：DDD 是拆分的依据</h4>
+
+<p>微服务要拆得好，关键问题是"<strong>在哪拆</strong>"。拆早了，服务太小，分布式事务满天飞；拆晚了，服务太大，又回到单体的问题。</p>
+
+<p>这就是<strong>领域驱动设计（DDD）</strong>的定位——它提供了一套方法论来回答"系统的边界在哪里"。详见第三章。</p>
+
+<!-- 第一章总结图 -->
+<div class="chapter-summary">
+<svg viewBox="0 0 680 514" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>架构演进史总结图</title>
+  <desc>从原始单体到云原生的五阶段架构演进，以及四条核心启示</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">架构演进史</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">从原始单体到云原生，复杂性如何被层层封装</text>
+
+  <line x1="70" y1="78" x2="70" y2="378" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="80" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="80" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="75" font-size="14" font-weight="500" fill="#712B13">原始单体时代</text>
+  <text x="100" y="93" font-size="13" font-weight="400" fill="#5F5E5A">大泥球反模式 — 代码集中、快速开发，但膨胀混乱、难以协作</text>
+
+  <circle cx="70" cy="155" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="155" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="150" font-size="14" font-weight="500" fill="#633806">分层架构诞生</text>
+  <text x="100" y="168" font-size="13" font-weight="400" fill="#5F5E5A">MVC / 三层 — 关注点分离、隔离变化，但单体仍臃肿</text>
+
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">面向服务架构 SOA</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">服务复用 — 但 ESB 笨重、SOAP/XML 协议复杂</text>
+
+  <circle cx="70" cy="305" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="305" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="300" font-size="14" font-weight="500" fill="#0C447C">微服务架构</text>
+  <text x="100" y="318" font-size="13" font-weight="400" fill="#5F5E5A">独立部署、团队自治、技术异构 — 引入分布式复杂性</text>
+
+  <circle cx="70" cy="380" r="13" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="70" y="380" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">5</text>
+  <text x="100" y="375" font-size="14" font-weight="500" fill="#085041">云原生时代</text>
+  <text x="100" y="393" font-size="13" font-weight="400" fill="#5F5E5A">容器化、Service Mesh — 基础设施下沉，开发者只关注业务</text>
+
+  <line x1="40" y1="415" x2="640" y2="415" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="435" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">演进启示</text>
+
+  <rect x="40" y="450" width="141" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="110" y="466" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">没有银弹</text>
+  <text x="110" y="484" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">每种架构都有代价</text>
+
+  <rect x="193" y="450" width="141" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="263" y="466" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">复杂性守恒</text>
+  <text x="263" y="484" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">复杂性只会转移</text>
+
+  <rect x="346" y="450" width="141" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="416" y="466" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">架构是演进的</text>
+  <text x="416" y="484" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">渐进式演化</text>
+
+  <rect x="499" y="450" width="141" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="569" y="466" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">DDD 是拆分依据</text>
+  <text x="569" y="484" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">限界上下文≈服务边界</text>
+</svg>
+</div>
+
+<!-- ====================== 第二章 ====================== -->
+<h2 id="ch2">第二章：架构方法论基础</h2>
+
+<p>架构演进的历史脉络理清后，进入实操层面。本章讲代码组织的多种方法论：从事务脚本、MVC 分层、贫血/充血模型，到更广阔的方法论版图——Active Record、六边形架构、整洁架构、CQRS、事件驱动、微内核等。CRUD/MVC/DDD 是三条主线，但不是全部。它们解决不同维度的问题，组合使用才是常态。</p>
+
+<hr>
+
+<h3 id="sec2-1">2.1 CRUD：最朴素的工程实践</h3>
+
+<p><strong>CRUD</strong> 是 Create、Read、Update、Delete 的缩写，代表对数据的四种基本操作。它是几乎所有业务系统的基础。</p>
+
+<p>围绕 CRUD 的一种典型代码模式叫<strong>事务脚本（Transaction Script）</strong>：每个方法就是一个"脚本"，从头到尾执行一系列步骤，完成一个业务操作。</p>
+
+<pre><code class="language-java">// 事务脚本模式：一个方法搞定一切
+public class OrderService {
+
+    @Autowired
+    private OrderDao orderDao;
+    @Autowired
+    private ProductDao productDao;
+    @Autowired
+    private SmsClient smsClient;
+
+    // 创建订单 —— 一个"脚本"从上到下执行
+    @Transactional
+    public String createOrder(String userId, List&lt;OrderItemRequest&gt; items, String address) {
+        // 1. 查商品、算总价
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (OrderItemRequest item : items) {
+            ProductDO product = productDao.findById(item.getProductId());
+            BigDecimal itemPrice = product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalPrice = totalPrice.add(itemPrice);
+            // 扣库存
+            productDao.decreaseStock(item.getProductId(), item.getQuantity());
+        }
+
+        // 2. 创建订单
+        OrderDO order = new OrderDO();
+        order.setId(UUID.randomUUID().toString());
+        order.setUserId(userId);
+        order.setTotalPrice(totalPrice);
+        order.setAddress(address);
+        order.setStatus("CREATED");
+        order.setCreatedAt(new Date());
+        orderDao.insert(order);
+
+        // 3. 发短信
+        smsClient.send(userId, "订单已创建: " + order.getId());
+
+        return order.getId();
+    }
+
+    // 查询、更新、取消... 同样的"脚本"风格
+    public OrderDO getOrder(String orderId) {
+        return orderDao.findById(orderId);
+    }
+
+    @Transactional
+    public void cancelOrder(String orderId) {
+        OrderDO order = orderDao.findById(orderId);
+        if (order == null) throw new RuntimeException("订单不存在");
+        order.setStatus("CANCELLED");
+        orderDao.update(order);
+        // 还库存...
+    }
+}
+</code></pre>
+
+<h4>事务脚本的优缺点</h4>
+
+<table>
+<tr><th>优点</th><th>缺点</th></tr>
+<tr><td>简单直接，上手门槛极低</td><td>业务逻辑分散在各个 Service 方法中，没有内聚</td></tr>
+<tr><td>一个方法一个流程，容易理解</td><td>相同的校验逻辑在多处重复</td></tr>
+<tr><td>适合简单 CRUD 场景</td><td>业务复杂后，Service 膨胀成几千行的"上帝类"</td></tr>
+<tr><td></td><td>领域知识散落在代码各处，没有"模型"的概念</td></tr>
+</table>
+
+<div class="callout callout-tip">
+<strong>适用场景：</strong> 业务逻辑确实简单（主要是增删改查），没有复杂的状态流转和业务规则时，事务脚本是最务实的选择。
+</div>
+
+<hr>
+
+<h3 id="sec2-2">2.2 MVC 分层架构</h3>
+
+<p>事务脚本的下一个进化方向就是<strong>分层</strong>。MVC 是最经典的分层模式。</p>
+
+<h4>MVC 的三个角色</h4>
+
+<table>
+<tr><th>角色</th><th>职责</th><th>对应后端</th></tr>
+<tr><td><strong>Model</strong>（模型）</td><td>数据 + 业务逻辑</td><td>Service + Entity/DO</td></tr>
+<tr><td><strong>View</strong>（视图）</td><td>展示数据</td><td>前端页面 / JSON 响应</td></tr>
+<tr><td><strong>Controller</strong>（控制器）</td><td>接收请求、调度、返回响应</td><td>Controller</td></tr>
+</table>
+
+<p>在后端开发中，MVC 通常演化为<strong>三层架构</strong>：Controller → Service → DAO。这是 Java Web 开发的"标准姿势"。</p>
+
+<div class="callout callout-note">
+<strong>MVC 的本质：</strong> <strong>关注点分离</strong>。Controller 不应该包含业务逻辑，Service 不应该包含 SQL，DAO 不应该包含业务规则。每层只做自己的事。
+</div>
+
+<hr>
+
+<h3 id="sec2-3">2.3 经典三层架构</h3>
+
+<p>用一个完整的电商订单示例来看三层架构的代码：</p>
+
+<h4>表现层：Controller</h4>
+
+<pre><code class="language-java">@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    @Autowired
+    private OrderService orderService;
+
+    @PostMapping
+    public Result&lt;String&gt; createOrder(@RequestBody @Valid CreateOrderRequest request) {
+        // Controller 只做：参数接收 + 调用 Service + 返回结果
+        String orderId = orderService.createOrder(
+            request.getUserId(),
+            request.getItems(),
+            request.getAddress()
+        );
+        return Result.success(orderId);
+    }
+
+    @GetMapping("/{orderId}")
+    public Result&lt;OrderVO&gt; getOrder(@PathVariable String orderId) {
+        OrderVO order = orderService.getOrder(orderId);
+        return Result.success(order);
+    }
+}
+</code></pre>
+
+<h4>业务层：Service</h4>
+
+<pre><code class="language-java">@Service
+public class OrderService {
+
+    @Autowired
+    private OrderDao orderDao;
+    @Autowired
+    private ProductDao productDao;
+    @Autowired
+    private SmsClient smsClient;
+
+    @Transactional
+    public String createOrder(String userId, List&lt;OrderItemRequest&gt; items, String address) {
+        // 业务逻辑在这里
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        List&lt;OrderItemDO&gt; orderItems = new ArrayList&lt;&gt;();
+
+        for (OrderItemRequest item : items) {
+            ProductDO product = productDao.findById(item.getProductId());
+            if (product.getStock() &lt; item.getQuantity()) {
+                throw new BizException("库存不足: " + product.getName());
+            }
+            BigDecimal itemPrice = product.getPrice()
+                .multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalPrice = totalPrice.add(itemPrice);
+
+            orderItems.add(new OrderItemDO(
+                item.getProductId(),
+                item.getQuantity(),
+                product.getPrice()
+            ));
+
+            productDao.decreaseStock(item.getProductId(), item.getQuantity());
+        }
+
+        OrderDO order = new OrderDO();
+        order.setId(UUID.randomUUID().toString());
+        order.setUserId(userId);
+        order.setTotalPrice(totalPrice);
+        order.setAddress(address);
+        order.setStatus("CREATED");
+        order.setCreatedAt(new Date());
+        order.setItems(orderItems);
+
+        orderDao.insert(order);
+        smsClient.send(userId, "订单已创建: " + order.getId());
+
+        return order.getId();
+    }
+
+    public OrderVO getOrder(String orderId) {
+        OrderDO order = orderDao.findById(orderId);
+        if (order == null) {
+            throw new BizException("订单不存在");
+        }
+        return OrderVO.from(order);
+    }
+}
+</code></pre>
+
+<h4>数据访问层：DAO</h4>
+
+<pre><code class="language-java">@Repository
+public class OrderDao {
+
+    @Autowired
+    private OrderMapper orderMapper;  // MyBatis Mapper
+
+    public OrderDO findById(String orderId) {
+        return orderMapper.selectById(orderId);
+    }
+
+    public void insert(OrderDO order) {
+        orderMapper.insert(order);
+        for (OrderItemDO item : order.getItems()) {
+            item.setOrderId(order.getId());
+            orderMapper.insertItem(item);
+        }
+    }
+
+    public void update(OrderDO order) {
+        orderMapper.update(order);
+    }
+}
+</code></pre>
+
+<h4>三层架构的数据流</h4>
+
+<div class="diagram">
+<pre>
+HTTP 请求
+    │
+    ▼
+┌──────────┐     ┌──────────────┐     ┌──────────┐     ┌────────┐
+│Controller│ ──→ │   Service    │ ──→ │   DAO    │ ──→ │ MySQL  │
+│ 参数校验  │     │  业务逻辑     │     │ 数据操作   │     │        │
+│ 响应封装  │ ←── │  事务管理     │ ←── │ 数据映射   │ ←── │        │
+└──────────┘     └──────────────┘     └──────────┘     └────────┘
+    │                  │
+    │                  ├──→ SmsClient（发短信）
+    │                  └──→ 其他外部调用
+    │
+    ▼
+HTTP 响应（JSON）
+</pre>
+</div>
+
+<div class="callout callout-tip">
+<strong>层次清晰的判断标准：</strong> Controller 里不应该有 SQL 字符串或 <code>BigDecimal</code> 计算；DAO 里不应该有 <code>if (status.equals("PAID"))</code> 这样的业务判断。每层只做自己该做的事。
+</div>
+
+<hr>
+
+<h3 id="sec2-4">2.4 贫血模型 vs 充血模型</h3>
+
+<p>在三层架构中，我们通常会有一个 <code>OrderDO</code>（Data Object），它长这样：</p>
+
+<pre><code class="language-java">// ❌ 贫血模型：只有数据，没有行为
+public class OrderDO {
+    private String id;
+    private String userId;
+    private BigDecimal totalPrice;
+    private String address;
+    private String status;   // CREATED, PAID, SHIPPED, CANCELLED
+    private Date createdAt;
+
+    // 只有 getter / setter，没有任何业务方法
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    // ... 其余 getter / setter
+}
+</code></pre>
+
+<p>这个对象只是一个<strong>数据袋子</strong>——它知道自己叫 <code>Order</code>，但不知道订单能做什么、不能做什么。所有的业务逻辑都写在 <code>OrderService</code> 里。</p>
+
+<p>这就叫<strong>贫血模型（Anemic Domain Model）</strong>。Martin Fowler 将其称为一个<strong>反模式</strong>。</p>
+
+<h4>为什么贫血模型普遍存在？</h4>
+
+<ol>
+<li><strong>ORM 框架的推波助澜</strong>：MyBatis、Hibernate 生成的实体类天然就是贫血的</li>
+<li><strong>开发习惯</strong>：大家习惯了"Service 写逻辑，DO 只存数据"</li>
+<li><strong>框架约束</strong>：Spring MVC 的分层结构天然鼓励这种模式</li>
+</ol>
+
+<h4>贫血模型的问题</h4>
+
+<pre><code class="language-java">// 贫血模型下，取消订单的逻辑在哪里？
+// 散落在 Service 的某个方法里：
+
+public void cancelOrder(String orderId) {
+    OrderDO order = orderDao.findById(orderId);
+    // 业务规则：只有未支付的订单才能取消
+    if (!"CREATED".equals(order.getStatus())) {
+        throw new BizException("当前状态不可取消");
+    }
+    order.setStatus("CANCELLED");
+    orderDao.update(order);
+}
+
+// 后来了个新需求：已发货的订单可以"申请退款"
+// 你又在 Service 的另一个方法里写了类似的逻辑
+// 问题：状态规则散落在 Service 的各个方法里，没有集中管理
+</code></pre>
+
+<h4>充血模型：让对象自己管理行为</h4>
+
+<pre><code class="language-java">// ✅ 充血模型：数据 + 行为内聚在同一个对象中
+public class Order {
+    private String id;
+    private String userId;
+    private BigDecimal totalPrice;
+    private Address address;          // 值对象
+    private OrderStatus status;       // 枚举，而非魔法字符串
+    private List&lt;OrderItem&gt; items;    // 聚合内的实体
+    private Date createdAt;
+
+    // ====== 构造方法（工厂） ======
+    public Order(String userId, List&lt;OrderItem&gt; items, Address address) {
+        this.id = UUID.randomUUID().toString();
+        this.userId = userId;
+        this.items = items;
+        this.address = address;
+        this.totalPrice = calculateTotalPrice();
+        this.status = OrderStatus.CREATED;
+        this.createdAt = new Date();
+    }
+
+    // ====== 业务行为 ======
+
+    // 取消订单：业务规则内聚在对象内部
+    public void cancel() {
+        if (this.status != OrderStatus.CREATED &amp;&amp;
+            this.status != OrderStatus.PAID) {
+            throw new BizException("当前状态不可取消: " + this.status);
+        }
+        this.status = OrderStatus.CANCELLED;
+        // 恢复库存
+        for (OrderItem item : items) {
+            item.restoreStock();
+        }
+    }
+
+    // 支付
+    public void pay() {
+        if (this.status != OrderStatus.CREATED) {
+            throw new BizException("订单状态不允许支付");
+        }
+        this.status = OrderStatus.PAID;
+    }
+
+    // 发货
+    public void ship() {
+        if (this.status != OrderStatus.PAID) {
+            throw new BizException("未支付订单不可发货");
+        }
+        this.status = OrderStatus.SHIPPED;
+    }
+
+    // 内部计算
+    private BigDecimal calculateTotalPrice() {
+        return items.stream()
+            .map(OrderItem::getSubtotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // getter（不提供 setter，保证不变性）
+    public String getId() { return id; }
+    public OrderStatus getStatus() { return status; }
+}
+</code></pre>
+
+<p>对比一下两种模型下 Service 的变化：</p>
+
+<pre><code class="language-java">// 充血模型下的 Service 变得很薄——只做"编排"，不做"业务"
+
+@Service
+public class OrderService {
+
+    @Autowired
+    private OrderRepository orderRepository;  // 注意：是 Repository 不是 DAO
+
+    @Transactional
+    public void cancelOrder(String orderId) {
+        Order order = orderRepository.findById(orderId);
+        if (order == null) {
+            throw new BizException("订单不存在");
+        }
+        order.cancel();  // ← 业务规则在 Order 对象内部
+        orderRepository.save(order);
+    }
+}
+</code></pre>
+
+<h4>对比总结</h4>
+
+<table>
+<tr><th>维度</th><th>贫血模型</th><th>充血模型</th></tr>
+<tr><td>业务逻辑在哪</td><td>Service 层</td><td>领域对象内部</td></tr>
+<tr><td>对象的角色</td><td>数据容器</td><td>数据和行为的统一体</td></tr>
+<tr><td>状态修改</td><td>外部直接 setter</td><td>通过业务方法修改</td></tr>
+<tr><td>规则集中度</td><td>散落各处</td><td>内聚在对象中</td></tr>
+<tr><td>可测试性</td><td>需 Mock DAO</td><td>可纯单元测试</td></tr>
+<tr><td>适合场景</td><td>简单 CRUD</td><td>复杂业务领域</td></tr>
+</table>
+
+<div class="callout callout-warning">
+<strong>注意：</strong> 充血模型不是万能的。对于简单的 CRUD 系统，贫血模型反而更高效。充血模型的价值在<strong>业务复杂度高</strong>时才真正体现——而这正是 DDD 的切入点。
+</div>
+
+<hr>
+
+<h3 id="sec2-5">2.5 更广阔的方法论版图</h3>
+
+<p>前面三节讲了 CRUD 事务脚本、MVC 分层、贫血/充血模型——这是理解 DDD 的三级认知台阶。但业界的方法论远不止这些。不同的模式解决不同层面的问题，很多可以组合使用。下面按问题维度梳理。</p>
+
+<div class="diagram">
+<pre>
+┌──────────────────────────────────────────────────────────────────┐
+│                      架构方法论全景                                │
+│                                                                    │
+│  问题维度            代表模式                                      │
+│  ──────────         ──────────────────────────                      │
+│  数据怎么访问       CRUD / Active Record / Table Module / Repository │
+│  代码怎么分层       MVC 三层 / 六边形 / 整洁架构 / 洋葱架构           │
+│  读写怎么分离       CQRS / Event Sourcing                           │
+│  组件怎么通信       事件驱动 / 响应式                                 │
+│  系统怎么扩展       微内核(插件) / 管道-过滤器                         │
+│  业务怎么建模       DDD（战略+战术）← 本文重点                        │
+│  服务怎么拆分       SOA / 微服务 / 云原生 ← 第一章                    │
+└──────────────────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<div class="callout callout-note">
+<strong>关键认知：</strong> 这些模式之间是<strong>正交关系</strong>。一个系统可以同时用 MVC 分层 + Repository + 六边形架构 + 事件驱动。它们的关注点不同，组合使用互不冲突。
+</div>
+
+<hr>
+
+<h4 id="sec2-5-1">2.5.1 数据访问模式：Active Record vs Table Module vs Repository</h4>
+
+<p>CRUD 事务脚本的核心问题是：对象和数据表之间是什么关系？业界有三种主流答案。</p>
+
+<table>
+<tr><th>模式</th><th>核心思想</th><th>代表框架</th><th>特点</th></tr>
+<tr><td><strong>Active Record</strong>（活动记录）</td><td>对象即表行，自带持久化方法</td><td>Rails, Laravel, Django ORM</td><td>简单高效，但对象承担了业务+持久化双重职责</td></tr>
+<tr><td><strong>Table Module</strong>（表模块）</td><td>一个类对应一张表，封装表级操作</td><td>.NET DataSet, MyBatis Mapper</td><td>面向表而非面向对象，适合报表类场景</td></tr>
+<tr><td><strong>Repository</strong>（仓储）</td><td>面向聚合根，以领域对象为单位</td><td>Spring Data JPA, DDD 实践</td><td>业务与持久化解耦，但抽象成本高</td></tr>
+</table>
+
+<pre><code class="language-java">// ── Active Record 风格 ──
+// 对象自带 find/save，直接操作数据库
+Order order = Order.find(123);       // 静态方法查
+order.setStatus("PAID");
+order.save();                        // 自带持久化
+
+// ── Table Module 风格 ──
+// Mapper 封装表级操作，返回的是数据结构而非领域对象
+OrderDO orderDO = orderMapper.selectById(123);
+orderDO.setStatus("PAID");
+orderMapper.update(orderDO);
+
+// ── Repository 风格 ──
+// 以聚合为单位，隐藏持久化细节
+Order order = orderRepository.findById(123); // 返回领域对象
+order.pay();                                  // 业务方法
+orderRepository.save(order);                  // 保存整个聚合</code>
+</pre>
+
+<div class="callout callout-tip">
+<strong>选择建议：</strong> Active Record 适合快速开发中小型项目（Rails/Django 生态繁荣就是因为这个）。Repository 适合复杂业务——它让领域层完全不依赖持久化技术，但这层抽象有成本。Table Module 是 MyBatis 等框架的默认模式，务实但缺少领域内聚。
+</div>
+
+<hr>
+
+<h4 id="sec2-5-2">2.5.2 架构边界模式：六边形 / 整洁 / 洋葱</h4>
+
+<p>三层架构（Controller-Service-DAO）解决了关注点分离，但它有一个根本缺陷：<strong>依赖方向是自上而下的</strong>。Controller 依赖 Service，Service 依赖 DAO——DAO 是基础设施，却处在依赖链的底端。这意味着业务逻辑间接地"知道"了数据库的存在。</p>
+
+<p>有三种模式专门解决这个问题，核心思想一致：<strong>依赖倒置——让业务核心不依赖任何基础设施</strong>。</p>
+
+<h4>① 六边形架构（Hexagonal Architecture / Ports &amp; Adapters）</h4>
+
+<p>由 Alistair Cockburn 于 2005 年提出。核心概念：</p>
+
+<ul>
+<li><strong>端口（Port）</strong>：业务核心定义的接口。比如"订单存储端口"、"支付端口"。</li>
+<li><strong>适配器（Adapter）</strong>：基础设施层的实现。比如 MySQL 适配器、Stripe 支付适配器。</li>
+<li><strong>业务核心只依赖端口</strong>，不依赖任何具体适配器。适配器"插入"端口，所以也叫"端口与适配器"。</li>
+</ul>
+
+<div class="diagram">
+<pre>
+              ┌─────────────────────────────────┐
+              │          应用核心                  │
+              │   (领域模型 + 应用服务)              │
+              │                                   │
+              │   ┌─────────┐  ┌─────────┐        │
+              │   │ Port:   │  │ Port:   │        │
+              │   │ 订单存储 │  │ 支付网关 │        │
+              │   └────┬────┘  └────┬────┘        │
+              └────────┼─────────────┼────────────┘
+                       │             │
+            ┌──────────┘             └──────────┐
+            ▼                                   ▼
+     ┌──────────────┐                   ┌──────────────┐
+     │ MySQL Adapter│                   │ Stripe Adapter│
+     │(实现订单存储)  │                   │ (实现支付端口) │
+     └──────────────┘                   └──────────────┘
+
+  核心不知道端口背后是 MySQL 还是 MongoDB
+  测试时可以插入 Mock 适配器</pre>
+</div>
+
+<pre><code class="language-java">// 六边形架构代码示例
+
+// ── 端口（业务核心定义的接口） ──
+// 在领域层，不依赖任何基础设施
+public interface OrderRepositoryPort {
+    Order findById(String orderId);
+    void save(Order order);
+}
+
+public interface PaymentGatewayPort {
+    PaymentResult charge(Money amount, String customerId);
+}
+
+// ── 应用核心 ──
+// 只依赖端口接口，不知道具体实现
+public class OrderApplicationService {
+    private final OrderRepositoryPort orderRepo;  // 接口
+    private final PaymentGatewayPort paymentGateway;  // 接口
+
+    public OrderApplicationService(OrderRepositoryPort orderRepo,
+                                    PaymentGatewayPort paymentGateway) {
+        this.orderRepo = orderRepo;
+        this.paymentGateway = paymentGateway;
+    }
+
+    public void payOrder(String orderId) {
+        Order order = orderRepo.findById(orderId);
+        order.pay();
+        paymentGateway.charge(order.getTotalAmount(), order.getUserId());
+        orderRepo.save(order);
+    }
+}
+
+// ── 适配器（基础设施层实现端口） ──
+public class MySQLOrderRepositoryAdapter implements OrderRepositoryPort {
+    @Override
+    public Order findById(String orderId) {
+        OrderDO orderDO = orderMapper.selectById(orderId);
+        return orderDOToDomainConverter.convert(orderDO);
+    }
+
+    @Override
+    public void save(Order order) {
+        OrderDO orderDO = domainToOrderDOConverter.convert(order);
+        orderMapper.update(orderDO);
+    }
+}</code>
+</pre>
+
+<h4>② 整洁架构（Clean Architecture）</h4>
+
+<p>由 Robert C. Martin（Uncle Bob）于 2012 年提出。用同心圆表达依赖规则：</p>
+
+<div class="diagram">
+<pre>
+     ┌──────────────────────────────────────────────┐
+     │  4. Frameworks &amp; Drivers                      │  ← 最外层
+     │     Web 框架, 数据库, UI, 第三方库                │
+     │  ┌──────────────────────────────────────────┐ │
+     │  │  3. Interface Adapters                   │ │
+     │  │     Controller, Presenter, Gateway      │ │
+     │  │  ┌──────────────────────────────────┐   │ │
+     │  │  │  2. Use Cases (Application)      │   │ │
+     │  │  │     应用服务、用例编排             │   │ │
+     │  │  │  ┌──────────────────────────┐    │   │ │
+     │  │  │  │  1. Entities (Domain)    │    │   │ │  ← 最内层
+     │  │  │  │     领域模型、业务规则      │    │   │ │
+     │  │  │  └──────────────────────────┘    │   │ │
+     │  │  └──────────────────────────────────┘   │ │
+     │  └──────────────────────────────────────────┘ │
+     └──────────────────────────────────────────────┘
+
+  依赖规则：外层 → 内层（箭头永远指向内）
+  内层不知道外层的存在</pre>
+</div>
+
+<h4>③ 洋葱架构（Onion Architecture）</h4>
+
+<p>由 Jeffrey Palermo 于 2008 年提出。与整洁架构理念几乎一致，分四层：</p>
+
+<table>
+<tr><th>层</th><th>洋葱架构</th><th>整洁架构对应</th></tr>
+<tr><td>最内层</td><td>Domain Model（领域模型）</td><td>Entities</td></tr>
+<tr><td>第二层</td><td>Domain Services（领域服务）</td><td>Use Cases</td></tr>
+<tr><td>第三层</td><td>Application Services（应用服务）</td><td>Interface Adapters</td></tr>
+<tr><td>最外层</td><td>Infrastructure（基础设施）</td><td>Frameworks &amp; Drivers</td></tr>
+</table>
+
+<div class="callout callout-note">
+<strong>三者关系：</strong> 六边形、整洁、洋葱架构本质上是<strong>同一个思想的三个表达</strong>——依赖倒置、核心不依赖外围。区别仅在表达方式和分层粒度。实际项目中选一个理解即可，不需要纠结"用哪个"。
+</div>
+
+<hr>
+
+<h4 id="sec2-5-3">2.5.3 读写分离模式：CQRS + Event Sourcing</h4>
+
+<p>前面所有模式都假设读写共用一套模型。但在很多高流量系统中，读和写的需求差异巨大：</p>
+
+<ul>
+<li>写：需要保证业务一致性，用 DDD 聚合、事务控制</li>
+<li>读：需要查询性能，用宽表、物化视图、搜索引擎</li>
+</ul>
+
+<h4>CQRS（Command Query Responsibility Segregation）</h4>
+
+<p>CQRS 由 Greg Young 提出，核心思想：<strong>把命令（写操作）和查询（读操作）拆成两套独立模型</strong>。</p>
+
+<div class="diagram">
+<pre>
+                    ┌───────────┐
+                    │   客户端    │
+                    └─────┬──────┘
+                Command   │    Query
+                    ┌────┴────┐
+                    ▼         ▼
+             ┌──────────┐ ┌──────────────┐
+             │  Command │ │    Query     │
+             │   Side   │ │    Side      │
+             │          │ │              │
+             │ 写模型    │ │  读模型       │
+             │(DDD聚合)  │ │ (宽表/ES/   │
+             │ 面向一致  │ │  物化视图)   │
+             │ 性       │ │ 面向查询性能   │
+             └────┬─────┘ └──────────────┘
+                  │             ▲
+                  │  同步/事件  │
+                  └─────────────┘
+                     数据同步</pre>
+</div>
+
+<pre><code class="language-java">// CQRS：写模型和读模型完全分离
+
+// ── 写模型：面向业务一致性 ──
+// 用 DDD 聚合，通过 Repository 持久化
+public class OrderCommandHandler {
+    private final OrderRepository orderRepository;  // 写库
+
+    @Transactional
+    public void handle(PayOrderCommand cmd) {
+        Order order = orderRepository.findById(cmd.getOrderId());
+        order.pay();   // 业务规则在聚合内
+        orderRepository.save(order);
+        // 发布事件，触发读模型更新
+        eventBus.publish(new OrderPaidEvent(order.getId()));
+    }
+}
+
+// ── 读模型：面向查询性能 ──
+// 不走 DDD 聚合，直接查宽表
+public class OrderQueryService {
+    private final OrderQueryDao orderQueryDao;  // 读库（可能是另一个数据库）
+
+    public OrderListVO queryOrders(OrderQueryCondition condition) {
+        // 直接查预构建的宽表，不需要 JOIN，不需要聚合
+        return orderQueryDao.queryWideTable(condition);
+    }
+}</code>
+</pre>
+
+<h4>Event Sourcing（事件溯源）</h4>
+
+<p>Event Sourcing 与 CQRS 天然搭配：<strong>不存储当前状态，存储所有变更事件</strong>。当前状态通过重放事件得到。</p>
+
+<div class="diagram">
+<pre>
+  传统方式：直接存当前状态
+  ┌────────────────┐
+  │ orders 表       │
+  │ id=123          │
+  │ status=PAID     │  ← 只知道"现在"，丢了"过程"
+  │ total=295.00    │
+  └────────────────┘
+
+  事件溯源：存所有事件
+  ┌──────────────────────────────────┐
+  │ event_store 表                    │
+  │                                    │
+  │ 1. OrderCreated  {items, total}   │
+  │ 2. CouponApplied {discount}       │
+  │ 3. OrderPaid     {paidAt, method}  │
+  │                                    │
+  │ 重放 1+2+3 → 得到当前状态           │
+  └──────────────────────────────────┘
+
+  优点：完整审计轨迹、可时间旅行、天然适配 CQRS
+  缺点：查询复杂（需建读模型）、事件版本演进麻烦</pre>
+</div>
+
+<div class="callout callout-warning">
+<strong>使用门槛：</strong> CQRS 和 Event Sourcing 都引入了显著的架构复杂度。Greg Young 自己都说："只在你的系统真的有严重的读写不平衡时才上 CQRS。"对于普通的增删改查系统，这是杀鸡用牛刀。
+</div>
+
+<hr>
+
+<h4 id="sec2-5-4">2.5.4 通信范式：事件驱动与响应式</h4>
+
+<p>前面所有模式的通信方式都是"直接调用"——A 调 B，B 返回给 A。这种方式简单，但存在紧耦合：A 必须知道 B 的存在，B 挂了 A 也跟着失败。</p>
+
+<h4>事件驱动架构（Event-Driven Architecture, EDA）</h4>
+
+<p>组件通过<strong>事件</strong>通信，而非直接调用。生产者发布事件，消费者订阅事件，两者互不感知。</p>
+
+<div class="diagram">
+<pre>
+  直接调用（同步、紧耦合）：
+  ┌────────┐  调用   ┌────────┐
+  │ 订单服务 │ ──────→ │ 支付服务 │  支付挂了 → 订单也失败
+  └────────┘          └────────┘
+
+  事件驱动（异步、松耦合）：
+  ┌────────┐          ┌──────────┐          ┌────────┐
+  │ 订单服务 │ ─发布→  │ 消息队列   │ ──订阅→  │ 支付服务 │
+  └────────┘  事件     │ (Kafka)  │          └────────┘
+                          └──订阅──→ ┌────────┐
+                                     │ 通知服务 │  支付挂了不影响订单
+                                     └────────┘  恢复后补消费</pre>
+</div>
+
+<p>EDA 在微服务架构中非常普遍。DDD 的"领域事件"配合消息队列（Kafka/RocketMQ），就是 EDA 的落地方式。第一章提到的事件溯源也天然契合 EDA。</p>
+
+<h4>响应式架构（Reactive Architecture）</h4>
+
+<p>基于<strong>响应式宣言</strong>（Reactive Manifesto）的系统设计，四个特征：</p>
+
+<table>
+<tr><th>特征</th><th>含义</th></tr>
+<tr><td>Responsive（响应性）</td><td>系统始终及时响应，即使在高负载或故障下</td></tr>
+<tr><td>Resilient（韧性）</td><td>部分失败不会波及整体——通过隔离和委托实现</td></tr>
+<tr><td>Elastic（弹性伸缩）</td><td>资源随负载自动伸缩，无并发瓶颈</td></tr>
+<tr><td>Message-Driven（消息驱动）</td><td>异步消息作为组件间通信方式</td></tr>
+</table>
+
+<p>Java 生态的 Project Reactor、Spring WebFlux、Akka 是响应式架构的代表实现。</p>
+
+<hr>
+
+<h4 id="sec2-5-5">2.5.5 扩展模式：微内核与管道</h4>
+
+<h4>微内核架构（Microkernel / Plugin Architecture）</h4>
+
+<p>核心只提供最小运行时，所有功能通过插件扩展。</p>
+
+<div class="diagram">
+<pre>
+  ┌────────────────────────────────┐
+  │        插件 A (语法高亮)         │
+  ├────────────────────────────────┤
+  │  插件 B (Git)  │  插件 C (调试)  │
+  │─────────────────────────────────│
+  │         微内核 Core             │
+  │   只做：插件加载 / 生命周期管理   │
+  │        / 基础事件总线             │
+  └────────────────────────────────┘
+
+  代表：VS Code, Eclipse, Webpack, Jenkins
+  优点：极高的可扩展性，第三方可以贡献插件
+  缺点：插件间依赖管理复杂，性能可能受影响</pre>
+</div>
+
+<h4>管道-过滤器架构（Pipeline / Pipe-Filter）</h4>
+
+<p>数据流经过一系列处理阶段，每个阶段（过滤器）做一件事，阶段之间通过管道连接。</p>
+
+<div class="diagram">
+<pre>
+  数据 → [过滤器1] → [过滤器2] → [过滤器3] → 结果
+         解析        校验        转换
+
+  代表：Unix 管道 (cat | grep | sort)
+        ETL Pipeline
+        Web 中间件链 (Filter Chain)
+        编译器 Pipeline (词法→语法→语义→优化→生成)
+
+  优点：每个过滤器独立可测试、可复用、可并行
+  缺点：不适合需要回溯或分支的复杂流程</pre>
+</div>
+
+<hr>
+
+<h4 id="sec2-5-6">2.5.6 全景对照</h4>
+
+<p>把本章讲到的所有模式放在一起对比：</p>
+
+<table>
+<tr><th>模式</th><th>解决的问题</th><th>类比</th><th>与 DDD 关系</th></tr>
+<tr><td>CRUD 事务脚本</td><td>最简单的数据操作</td><td>把所有代码写在一个函数里</td><td>DDD 的反面参照</td></tr>
+<tr><td>Active Record</td><td>对象自带持久化</td><td>对象既是数据又是 DAO</td><td>与 DDD Repository 互斥</td></tr>
+<tr><td>MVC 三层</td><td>关注点分离</td><td>把代码分文件夹</td><td>DDD 的分层基础</td></tr>
+<tr><td>六边形/整洁/洋葱</td><td>依赖倒置、核心不依赖外围</td><td>MVC 三层的进化版</td><td>DDD 落地的推荐架构</td></tr>
+<tr><td>CQRS</td><td>读写模型分离</td><td>读用只读副本、写用主库</td><td>可叠加在 DDD 之上</td></tr>
+<tr><td>Event Sourcing</td><td>不存状态，存事件</td><td>Git 的提交历史</td><td>领域事件的极致形式</td></tr>
+<tr><td>事件驱动</td><td>异步解耦</td><td>发邮件通知 vs 当面说</td><td>领域事件的传输方式</td></tr>
+<tr><td>微内核</td><td>核心+插件</td><td>VS Code</td><td>与 DDD 正交</td></tr>
+<tr><td>管道-过滤器</td><td>数据流水线</td><td>Unix 管道</td><td>与 DDD 正交</td></tr>
+</table>
+
+<div class="callout callout-note">
+<strong>正交关系：</strong> 上表最后一列很重要——这些模式不是互斥的。一个真实的电商系统可能是：DDD 战略设计划限界上下文 + 六边形架构做分层 + CQRS 分离读写 + 事件驱动做跨上下文通信 + 管道模式做数据处理。它们解决的是不同维度的问题，组合使用才是常态。
+</div>
+
+<!-- 第二章总结图 -->
+<div class="chapter-summary">
+<svg viewBox="0 0 680 620" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>架构方法论全景总结图</title>
+  <desc>从 CRUD 到 DDD 以及更广阔的方法论版图，按问题维度分类展示各架构模式</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">架构方法论全景</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">不止 CRUD/MVC/DDD — 按问题维度梳理业界主流模式</text>
+
+  <!-- Dimension 1: Data Access -->
+  <text x="40" y="85" font-size="14" font-weight="500" fill="#712B13">数据访问</text>
+  <line x1="40" y1="93" x2="640" y2="93" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="100" width="145" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="112" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">CRUD 事务脚本</text>
+  <rect x="195" y="100" width="145" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="267" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Active Record</text>
+  <rect x="350" y="100" width="145" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="422" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Table Module</text>
+  <rect x="505" y="100" width="135" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="572" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Repository</text>
+
+  <!-- Dimension 2: Layering -->
+  <text x="40" y="155" font-size="14" font-weight="500" fill="#633806">代码分层</text>
+  <line x1="40" y1="163" x2="640" y2="163" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="170" width="145" height="28" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="112" y="188" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">MVC 三层</text>
+  <rect x="195" y="170" width="145" height="28" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="267" y="188" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">六边形架构</text>
+  <rect x="350" y="170" width="145" height="28" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="422" y="188" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">整洁架构</text>
+  <rect x="505" y="170" width="135" height="28" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="572" y="188" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">洋葱架构</text>
+
+  <!-- Dimension 3: Read/Write -->
+  <text x="40" y="225" font-size="14" font-weight="500" fill="#3C3489">读写分离</text>
+  <line x1="40" y1="233" x2="640" y2="233" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="240" width="280" height="28" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="180" y="258" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">CQRS（命令查询职责分离）</text>
+  <rect x="330" y="240" width="310" height="28" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="485" y="258" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">Event Sourcing（事件溯源）</text>
+
+  <!-- Dimension 4: Communication -->
+  <text x="40" y="295" font-size="14" font-weight="500" fill="#0C447C">通信范式</text>
+  <line x1="40" y1="303" x2="640" y2="303" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="310" width="290" height="28" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="185" y="328" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C">事件驱动架构 (EDA)</text>
+  <rect x="340" y="310" width="300" height="28" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="490" y="328" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C">响应式架构 (Reactive)</text>
+
+  <!-- Dimension 5: Extensibility -->
+  <text x="40" y="365" font-size="14" font-weight="500" fill="#085041">系统扩展</text>
+  <line x1="40" y1="373" x2="640" y2="373" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="380" width="290" height="28" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="185" y="398" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">微内核 / 插件架构</text>
+  <rect x="340" y="380" width="300" height="28" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="490" y="398" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">管道 - 过滤器</text>
+
+  <!-- Dimension 6: Business Modeling -->
+  <text x="40" y="435" font-size="14" font-weight="500" fill="#444441">业务建模</text>
+  <line x1="40" y1="443" x2="640" y2="443" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="450" width="600" height="28" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="340" y="468" text-anchor="middle" font-size="12" font-weight="500" fill="#444441">DDD（战略设计 + 战术设计）← 本文重点</text>
+
+  <!-- Key insight -->
+  <line x1="40" y1="500" x2="640" y2="500" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="340" y="520" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">核心认知</text>
+
+  <rect x="40" y="535" width="280" height="64" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="555" font-size="12" font-weight="500" fill="#444441">这些模式是正交的</text>
+  <text x="55" y="573" font-size="11" font-weight="400" fill="#5F5E5A">解决不同维度的问题</text>
+  <text x="55" y="589" font-size="11" font-weight="400" fill="#5F5E5A">按需组合使用，正交叠加</text>
+
+  <rect x="340" y="535" width="300" height="64" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="355" y="555" font-size="12" font-weight="500" fill="#444441">CRUD → MVC → DDD 是主线</text>
+  <text x="355" y="573" font-size="11" font-weight="400" fill="#5F5E5A">其余模式按需叠加</text>
+  <text x="355" y="589" font-size="11" font-weight="400" fill="#5F5E5A">没有银弹，适合的才是好的</text>
+</svg>
+</div>
+
+<!-- ====================== 第三章 ====================== -->
+<h2 id="ch3">第三章：领域驱动设计（DDD）<span class="badge badge-hot">重点</span></h2>
+
+<div class="chapter-intro">
+<p>前面两章走了从"大泥球"到"分层"再到"充血模型"的路线。但一个关键问题始终没有被系统性地回答：<strong>系统的边界在哪里？哪些概念应该放在一起？</strong></p>
+<p>这一章就是 DDD（Domain-Driven Design，领域驱动设计）的主场。DDD 由 Eric Evans 在 2003 年提出，它不仅是一套设计模式，更是一种<strong>思考方式</strong>——先理解业务领域，再设计软件模型。</p>
+<p>本章是全文的重点，深入讲清楚 DDD 的战略设计和战术设计，贯穿电商交易的完整示例。</p>
+</div>
+
+<hr>
+
+<h3 id="sec3-1">3.1 为什么需要 DDD</h3>
+
+<p>回到一个真实场景：</p>
+
+<blockquote>
+<p>一家电商系统里有一个 <code>Product</code>（商品）类。</p>
+<p>商品中心团队说：商品有名称、价格、类目、图片、描述。</p>
+<p>库存团队说：商品有 SKU、库存数量、仓库位置。</p>
+<p>营销团队说：商品有促销价、标签、推荐权重。</p>
+<p>搜索团队说：商品有关键词、搜索分词、热度值。</p>
+<p>大家说的都对，但它们是<strong>同一个"商品"吗</strong>？</p>
+</blockquote>
+
+<p>这就是<strong>贫血模型 + 三层架构</strong>在复杂业务中的困境：</p>
+
+<ul>
+<li><strong>概念混乱</strong>：一个 <code>Product</code> 类被塞进了所有团队关心的字段，变成一个有 80 个字段的"上帝对象"</li>
+<li><strong>边界模糊</strong>：商品中心改了 <code>Product</code> 的价格字段，结果影响了营销团队的促销价逻辑</li>
+<li><strong>逻辑外泄</strong>：订单状态的流转规则散落在 5 个 Service 里，没有统一的"真相来源"</li>
+<li><strong>沟通鸿沟</strong>：产品经理说"优惠券"，开发说 <code>discount_record</code> 表，双方对不上</li>
+</ul>
+
+<p>DDD 要解决的核心问题就是：<strong>让软件模型反映业务的真实面貌，让代码结构和业务结构对齐。</strong></p>
+
+<div class="callout callout-note">
+<strong>DDD 的哲学：</strong> 软件的核心价值在于它所承载的<strong>领域知识</strong>。技术只是载体，业务才是灵魂。先把业务理解透了，代码自然就清晰了。
+</div>
+
+<hr>
+
+<h3 id="sec3-2">3.2 DDD 全景</h3>
+
+<p>DDD 分为两大层次：<strong>战略设计</strong>和<strong>战术设计</strong>。</p>
+
+<div class="diagram">
+<pre>
+                    DDD
+                    / \
+          ┌────────┘   └────────┐
+          ▼                      ▼
+     战略设计                  战术设计
+  (宏观·划边界)             (微观·建模型)
+          │                      │
+     ┌────┼────┐           ┌──────┼──────┐
+     ▼    ▼    ▼           ▼      ▼      ▼
+   领域  限界  上下文      实体  值对象  聚合
+   子域  上下文 映射        │      │      │
+                        ┌──┴──┐   │   ┌──┴──┐
+                        ▼     ▼   ▼   ▼     ▼
+                     领域  领域  仓储  工厂  领域
+                     服务  事件            事件
+</pre>
+</div>
+
+<table>
+<tr><th>维度</th><th>战略设计</th><th>战术设计</th></tr>
+<tr><td>关注层面</td><td>宏观——系统的整体结构</td><td>微观——代码层面的建模</td></tr>
+<tr><td>核心概念</td><td>领域、子域、限界上下文、上下文映射</td><td>实体、值对象、聚合、领域服务、领域事件、仓储、工厂</td></tr>
+<tr><td>解决的问题</td><td>系统怎么拆？边界在哪？</td><td>代码怎么写？模型怎么建？</td></tr>
+<tr><td>与微服务关系</td><td>限界上下文 ≈ 微服务边界</td><td>聚合 ≈ 微服务内的代码组织单元</td></tr>
+</table>
+
+<p>战略设计告诉你<strong>在哪切</strong>，战术设计告诉你<strong>切完之后怎么写</strong>。两者缺一不可。</p>
+
+<hr>
+
+<h3 id="sec3-3">3.3 战略设计</h3>
+
+<p>战略设计是 DDD 中最容易被忽视、但价值最高的部分。它从业务全局视角确定系统该怎么划分。</p>
+
+<h4 id="sec3-3-1">3.3.1 领域与子域</h4>
+
+<p><strong>领域（Domain）</strong>是指一个业务范围。比如"电商"就是一个领域。但电商太大了，需要拆分成<strong>子域（Subdomain）</strong>。</p>
+
+<p>子域分三种类型：</p>
+
+<table>
+<tr><th>类型</th><th>含义</th><th>电商示例</th><th>策略</th></tr>
+<tr><td><strong>核心域</strong></td><td>业务核心竞争力，决定成败</td><td>交易（下单、支付、履约）</td><td>投入最精锐兵力</td></tr>
+<tr><td><strong>支撑域</strong></td><td>支撑核心业务，但不是核心竞争力</td><td>商品管理、库存管理</td><td>自研，但不必做到极致</td></tr>
+<tr><td><strong>通用域</strong></td><td>所有公司都需要，无差异化</td><td>用户认证、权限、消息通知</td><td>直接用开源/采购方案</td></tr>
+</table>
+
+<div class="diagram">
+<pre>
+        电商领域 (Domain)
+       ┌───────┼───────┐
+       ▼       ▼       ▼
+    核心域    支撑域    通用域
+   ┌─────┐  ┌─────┐  ┌──────┐
+   │ 交易  │  │ 商品  │  │ 用户   │
+   │ 履约  │  │ 库存  │  │ 权限   │
+   │ 支付  │  │ 物流  │  │ 消息   │
+   └─────┘  └─────┘  └──────┘
+   ★ 最重要   支持核心   通用能力
+   投入最好   够用就行   买就行
+</pre>
+</div>
+
+<div class="callout callout-tip">
+<strong>实践建议：</strong> 在做技术方案时，先把业务拆成子域，标注哪些是核心域。核心域投入最好的设计和最精锐的人力，通用域能买就买、能用开源就用开源。
+</div>
+
+<h4 id="sec3-3-2">3.3.2 限界上下文（Bounded Context）</h4>
+
+<p><strong>限界上下文是 DDD 战略设计中最核心的概念。</strong></p>
+
+<p>回到开头那个问题：商品中心、库存、营销、搜索团队眼中的"商品"是同一个东西吗？</p>
+
+<p>答案是：<strong>不是</strong>。每个团队对"商品"有不同的理解，不同的上下文。</p>
+
+<table>
+<tr><th>限界上下文</th><th>"商品"的含义</th><th>关注属性</th></tr>
+<tr><td>商品目录上下文</td><td>一个可售卖的东西</td><td>名称、类目、图片、描述</td></tr>
+<tr><td>库存上下文</td><td>一个有库存的 SKU</td><td>SKU 编码、数量、仓库</td></tr>
+<tr><td>营销上下文</td><td>一个可被促销的对象</td><td>促销价、活动标签</td></tr>
+<tr><td>搜索上下文</td><td>一个可被搜索的文档</td><td>关键词、权重、热度</td></tr>
+</table>
+
+<p>每个上下文里有自己的 <code>Product</code> 模型，它们<strong>同名但不同义</strong>。限界上下文就是给每个模型划定一个"语义边界"：<strong>在这个边界内，语言是明确且统一的。</strong></p>
+
+<div class="diagram">
+<pre>
+┌──────────────────────────────────────────────────────┐
+│                    电商系统                            │
+│                                                       │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐          │
+│  │ 商品目录   │   │  库存     │   │  营销     │          │
+│  │ 上下文     │   │ 上下文    │   │ 上下文    │          │
+│  │           │   │           │   │           │          │
+│  │ Product { │   │ Product {│   │ Product {│          │
+│  │  name     │   │  sku     │   │  promoPrice│         │
+│  │  category │   │  stock   │   │  tags     │          │
+│  │  images   │   │  warehouse│  │  weight   │          │
+│  │ }         │   │ }        │   │ }         │          │
+│  └──────────┘   └──────────┘   └──────────┘          │
+│                                                       │
+│  每个上下文内的"Product"含义不同，各自独立演化          │
+└──────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<p><strong>限界上下文的判断标准：</strong></p>
+
+<ol>
+<li>这个范围内有一套<strong>统一的领域语言</strong>（Ubiquitous Language）</li>
+<li>它与外部有相对<strong>清晰的边界</strong></li>
+<li>它可以<strong>独立部署</strong>（通常对应一个微服务）</li>
+<li>它有<strong>独立的数据库</strong>（数据不共享）</li>
+</ol>
+
+<div class="callout callout-note">
+<strong>限界上下文 ≈ 微服务边界。</strong> 这就是 DDD 对微服务的指导意义：拆分依据是<strong>业务语义边界</strong>。
+</div>
+
+<h4 id="sec3-3-3">3.3.3 上下文映射（Context Mapping）</h4>
+
+<p>限界上下文不是孤岛，它们之间需要协作。<strong>上下文映射</strong>就是描述上下文之间关系的方式。</p>
+
+<p>DDD 定义了 8 种上下文映射模式，实际开发中最常用的有以下几种：</p>
+
+<h4>① 防腐层（ACL, Anti-Corruption Layer）</h4>
+
+<p><strong>最重要的模式。</strong> 当一个上下文需要调用另一个上下文（特别是遗留系统）时，直接调用会让外部模型"污染"领域模型。防腐层就是一个翻译层，把外部模型转换成自己的模型。</p>
+
+<pre><code class="language-java">// 订单上下文需要调用用户中心（遗留系统）
+// 不直接用用户中心的 UserDTO，而是通过防腐层翻译
+
+// 用户中心的模型（外部，不可控）
+public class LegacyUserDTO {
+    private String uid;
+    private String mobile;    // 手机号
+    private Integer level;    // 1=普通, 2=vip, 3=svip（魔法值）
+}
+
+// 订单上下文自己的模型（可控）
+public class Customer {
+    private String customerId;
+    private Phone phone;           // 值对象
+    private CustomerLevel level;  // 枚举
+}
+
+// 防腐层：翻译
+public class UserAntiCorruptionLayer {
+
+    public Customer toCustomer(LegacyUserDTO legacyUser) {
+        Customer customer = new Customer();
+        customer.setCustomerId(legacyUser.getUid());
+        customer.setPhone(new Phone(legacyUser.getMobile()));
+        customer.setLevel(CustomerLevel.fromCode(legacyUser.getLevel()));
+        return customer;
+    }
+}
+</code></pre>
+
+<div class="callout callout-tip">
+<strong>适用场景：</strong> 对接外部系统、遗留系统、第三方 API 时，加防腐层隔离外部模型，避免其渗透到领域层。
+</div>
+
+<h4>② 开放主机服务（OHS, Open Host Service）</h4>
+
+<p>当对外提供服务时，定义一套<strong>标准化的开放协议</strong>（如 REST API），让所有调用方都通过这套协议来访问。</p>
+
+<pre><code class="language-java">// 商品上下文对外提供开放主机服务
+// 所有需要商品信息的上下文都走这套 API
+
+@RestController
+@RequestMapping("/api/products")
+public class ProductOHSController {
+
+    @Autowired
+    private ProductQueryService productQueryService;
+
+    @GetMapping("/{productId}")
+    public ProductDTO getProduct(@PathVariable String productId) {
+        // 返回标准化的 DTO，不暴露内部领域模型
+        return productQueryService.toDTO(productId);
+    }
+}
+</code></pre>
+
+<h4>③ 发布语言（PL, Published Language）</h4>
+
+<p>与 OHS 配合使用，定义一套<strong>公开的数据契约</strong>（如 JSON Schema、Protocol Buffers），作为上下文之间通信的标准格式。</p>
+
+<h4>④ 客户-供应商（Customer-Supplier）</h4>
+
+<p>两个上下文有明确的上下游关系。<strong>供应商</strong>（上游）提供服务，<strong>客户</strong>（下游）消费服务。供应商优先考虑客户的需求。</p>
+
+<pre><code class="language-java">// 订单上下文（客户/下游） ← 依赖 ← 商品上下文（供应商/上游）
+// 商品上下文提供 API，订单上下文消费
+
+// 供应商：商品上下文提供库存查询 API
+@GetMapping("/api/products/{sku}/stock")
+public Integer getStock(@PathVariable String sku) { ... }
+
+// 客户：订单上下文调用
+Integer stock = productClient.getStock(sku);
+</code></pre>
+
+<h4>⑤ 共享内核（Shared Kernel）</h4>
+
+<p>两个上下文<strong>共享一部分模型</strong>。风险较高——修改共享部分会影响双方，需谨慎使用。</p>
+
+<pre><code class="language-java">// 订单上下文和支付上下文共享 Money 值对象
+// 共享内核模块：shared-kernel.jar
+public class Money implements ValueObject {
+    private final BigDecimal amount;
+    private final Currency currency;
+    // ...
+}
+</code></pre>
+
+<div class="callout callout-warning">
+<strong>共享内核需谨慎：</strong> 只有在两个上下文高度耦合、频繁协作时才考虑。修改共享内核需要双方共同协商，否则容易产生"牵一发而动全身"的问题。
+</div>
+
+<h4>⑥ 遵奉者（Conformist）</h4>
+
+<p>下游团队无条件遵循上游团队的模型。通常发生在下游团队没有话语权时（如对接第三方支付平台）。</p>
+
+<h4>其他模式</h4>
+
+<table>
+<tr><th>模式</th><th>含义</th></tr>
+<tr><td>合作关系（Partnership）</td><td>两个上下文紧密协作，共同演进</td></tr>
+<tr><td>各行其道（Separate Ways）</td><td>两个上下文没有关系，各自独立</td></tr>
+</table>
+
+<div class="diagram">
+<pre>
+  电商系统的上下文映射示例：
+
+  ┌──────────┐    OHS+PL     ┌──────────┐
+  │  商品     │ ──────────→  │  订单     │
+  │ 上下文    │  提供商品API   │ 上下文    │
+  │(供应商)   │              │ (客户)    │
+  └──────────┘              └────┬─────┘
+       ↑                        │ ACL
+       │ ACL                    │ (防腐层)
+       │ (防腐层)                ▼
+  ┌──────────┐              ┌──────────┐
+  │  搜索     │              │ 用户中心   │
+  │ 上下文    │              │ (遗留系统) │
+  └──────────┘              └──────────┘
+</pre>
+</div>
+
+<hr>
+
+<h3 id="sec3-4">3.4 战术设计</h3>
+
+<p>战略设计划定了边界，战术设计就是在边界内部构建代码模型。这是 DDD 落地到代码的核心。</p>
+
+<p>先看一张全景图，再逐个讲解：</p>
+
+<div class="diagram">
+<pre>
+┌─── 限界上下文（如：订单上下文）──────────────────────┐
+│                                                       │
+│   ┌─── 聚合（Aggregate）──────────────────────┐      │
+│   │                                             │      │
+│   │   ┌─ 聚合根 ─────────────┐                 │      │
+│   │   │  Order（实体）         │                 │      │
+│   │   │  - id, status, userId  │                 │      │
+│   │   │  - pay(), cancel()     │                 │      │
+│   │   │  - items: List&lt;Item&gt;   │                 │      │
+│   │   └──────────┬─────────────┘                 │      │
+│   │              │ 包含                            │      │
+│   │   ┌──────────┴─────────────┐                 │      │
+│   │   │  OrderItem（实体）      │                 │      │
+│   │   │  - productId, quantity │                 │      │
+│   │   │  - subtotal             │                 │      │
+│   │   └─────────────────────────┘                 │      │
+│   │                                             │      │
+│   │   值对象: Money, Address, OrderStatus        │      │
+│   └─────────────────────────────────────────────┘      │
+│                                                       │
+│   领域服务: PricingService（跨聚合计算）               │
+│   领域事件: OrderPlacedEvent, OrderPaidEvent           │
+│   仓储: OrderRepository（持久化聚合）                   │
+│   工厂: OrderFactory（创建复杂聚合）                    │
+│                                                       │
+└───────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<h4 id="sec3-4-1">3.4.1 实体（Entity）</h4>
+
+<p><strong>实体</strong>是具有唯一标识的对象。两个实体即使所有属性都相同，只要 ID 不同就是不同的实体。</p>
+
+<p>实体的特征：</p>
+<ul>
+<li>有<strong>唯一标识</strong>（通常是 ID）</li>
+<li>有<strong>生命周期</strong>（创建 → 修改 → 销毁）</li>
+<li>属性可以<strong>变化</strong>（mutable）</li>
+<li>通过 ID 判断相等性，而非属性</li>
+</ul>
+
+<pre><code class="language-java">// 订单实体
+public class Order {
+    // 唯一标识
+    private String id;
+
+    // 业务属性
+    private String userId;
+    private OrderStatus status;
+    private Money totalAmount;
+    private Address shippingAddress;
+    private List&lt;OrderItem&gt; items;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    // 构造方法（私有，通过工厂创建）
+    private Order(String userId, List&lt;OrderItem&gt; items, Address address) {
+        this.id = IdGenerator.next();
+        this.userId = userId;
+        this.items = new ArrayList&lt;&gt;(items);  // 防御性拷贝
+        this.shippingAddress = address;
+        this.totalAmount = calculateTotal();
+        this.status = OrderStatus.CREATED;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // 业务方法：支付
+    public void pay(PaymentMethod method) {
+        if (this.status != OrderStatus.CREATED) {
+            throw new DomainException("订单状态不允许支付: " + this.status);
+        }
+        this.status = OrderStatus.PAID;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 业务方法：取消
+    public void cancel(String reason) {
+        if (!canCancel()) {
+            throw new DomainException("订单当前状态不可取消: " + this.status);
+        }
+        this.status = OrderStatus.CANCELLED;
+        this.updatedAt = LocalDateTime.now();
+        // 取消是一个重要的领域事件触发点
+    }
+
+    // 业务方法：发货
+    public void ship(String trackingNo) {
+        if (this.status != OrderStatus.PAID) {
+            throw new DomainException("未支付订单不可发货");
+        }
+        this.status = OrderStatus.SHIPPED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    private boolean canCancel() {
+        return this.status == OrderStatus.CREATED
+            || this.status == OrderStatus.PAID;
+    }
+
+    private Money calculateTotal() {
+        BigDecimal total = items.stream()
+            .map(item -&gt; item.getUnitPrice().getAmount()
+                .multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return new Money(total, Currency.getInstance("CNY"));
+    }
+
+    // 相等性判断：只看 ID
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order)) return false;
+        Order other = (Order) o;
+        return this.id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    // getter（无 setter）
+    public String getId() { return id; }
+    public OrderStatus getStatus() { return status; }
+    // ...
+}
+</code></pre>
+
+<div class="callout callout-tip">
+<strong>实体设计原则：</strong> 实体应该通过行为方法来改变状态，而不是直接暴露 setter。<code>order.setStatus("PAID")</code> 是贫血写法；<code>order.pay()</code> 是 DDD 写法。
+</div>
+
+<h4 id="sec3-4-2">3.4.2 值对象（Value Object）</h4>
+
+<p><strong>值对象</strong>是没有唯一标识的对象，完全由它的属性值来定义。两个值对象只要属性完全相同，就是"相等"的。</p>
+
+<p>值对象的特征：</p>
+<ul>
+<li><strong>无唯一标识</strong>——靠属性值判断相等性</li>
+<li><strong>不可变（immutable）</strong>——创建后不能修改</li>
+<li>通常是<strong>简单概念</strong>：金额、地址、日期范围、颜色等</li>
+<li>可以<strong>自由替换</strong>——因为不可变，替换等于创建新的</li>
+</ul>
+
+<pre><code class="language-java">// 金额值对象
+public final class Money implements ValueObject {
+    private final BigDecimal amount;
+    private final Currency currency;
+
+    public Money(BigDecimal amount, Currency currency) {
+        if (amount.compareTo(BigDecimal.ZERO) &lt; 0) {
+            throw new DomainException("金额不能为负: " + amount);
+        }
+        this.amount = amount.setScale(2, RoundingMode.HALF_UP);
+        this.currency = currency;
+    }
+
+    // 便捷构造
+    public static Money of(BigDecimal amount, String currencyCode) {
+        return new Money(amount, Currency.getInstance(currencyCode));
+    }
+
+    public static Money zero(String currencyCode) {
+        return new Money(BigDecimal.ZERO, Currency.getInstance(currencyCode));
+    }
+
+    // 运算：返回新的 Money（不可变！）
+    public Money add(Money other) {
+        ensureSameCurrency(other);
+        return new Money(this.amount.add(other.amount), this.currency);
+    }
+
+    public Money subtract(Money other) {
+        ensureSameCurrency(other);
+        return new Money(this.amount.subtract(other.amount), this.currency);
+    }
+
+    public Money multiply(int quantity) {
+        return new Money(this.amount.multiply(BigDecimal.valueOf(quantity)),
+                         this.currency);
+    }
+
+    private void ensureSameCurrency(Money other) {
+        if (!this.currency.equals(other.currency)) {
+            throw new DomainException("货币不一致");
+        }
+    }
+
+    // 相等性：只看值
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Money)) return false;
+        Money money = (Money) o;
+        return amount.equals(money.amount)
+            &amp;&amp; currency.equals(money.currency);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, currency);
+    }
+
+    @Override
+    public String toString() {
+        return amount + " " + currency.getCurrencyCode();
+    }
+
+    public BigDecimal getAmount() { return amount; }
+    public Currency getCurrency() { return currency; }
+}
+
+// 地址值对象
+public final class Address implements ValueObject {
+    private final String province;
+    private final String city;
+    private final String district;
+    private final String detail;
+
+    public Address(String province, String city, String district, String detail) {
+        this.province = requireNonBlank(province, "省份不能为空");
+        this.city = requireNonBlank(city, "城市不能为空");
+        this.district = requireNonBlank(district, "区县不能为空");
+        this.detail = requireNonBlank(detail, "详细地址不能为空");
+    }
+
+    public String fullAddress() {
+        return province + city + district + detail;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Address)) return false;
+        Address a = (Address) o;
+        return Objects.equals(province, a.province)
+            &amp;&amp; Objects.equals(city, a.city)
+            &amp;&amp; Objects.equals(district, a.district)
+            &amp;&amp; Objects.equals(detail, a.detail);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(province, city, district, detail);
+    }
+}
+
+// 订单状态枚举（也是一种值对象）
+public enum OrderStatus {
+    CREATED,      // 已创建
+    PAID,         // 已支付
+    SHIPPED,      // 已发货
+    DELIVERED,    // 已签收
+    CANCELLED,    // 已取消
+    REFUNDED;     // 已退款
+
+    public boolean canCancel() {
+        return this == CREATED || this == PAID;
+    }
+
+    public boolean canShip() {
+        return this == PAID;
+    }
+}
+</code></pre>
+
+<div class="callout callout-tip">
+<strong>值对象的威力：</strong> 用 <code>Money</code> 值对象代替 <code>BigDecimal price</code> + <code>String currency</code>，货币一致性校验内聚在对象里，不会出现"金额对了但币种搞错了"的低级 bug。
+</div>
+
+<h4 id="sec3-4-3">3.4.3 聚合与聚合根（Aggregate & Aggregate Root）</h4>
+
+<p><strong>这是 DDD 战术设计中最核心、也最难掌握的概念。</strong></p>
+
+<p><strong>聚合（Aggregate）</strong>是一组相关对象的集合，它们作为一个整体被操作和持久化。</p>
+
+<p><strong>聚合根（Aggregate Root）</strong>是聚合的入口点，外部只能通过聚合根来访问聚合内部的对象。</p>
+
+<div class="diagram">
+<pre>
+  聚合：订单（Order Aggregate）
+
+  ┌───────────────────────────────────────────┐
+  │              聚合根: Order                  │
+  │                                             │
+  │  - id: String                               │
+  │  - userId: String                            │
+  │  - status: OrderStatus                       │
+  │  - totalAmount: Money                       │
+  │  - shippingAddress: Address                  │
+  │                                             │
+  │  方法:                                       │
+  │  - pay()                                    │
+  │  - cancel(reason)                           │
+  │  - ship(trackingNo)                         │
+  │  - addItem(product, qty)                    │
+  │  - removeItem(itemId)                       │
+  │                                             │
+  │  ┌──────────────────────────────────────┐  │
+  │  │     OrderItem（内部实体）              │  │
+  │  │  - itemId                              │  │
+  │  │  - productId                           │  │
+  │  │  - productName                         │  │
+  │  │  - unitPrice: Money                    │  │
+  │  │  - quantity: int                       │  │
+  │  │  - subtotal: Money                    │  │
+  │  │                                       │  │
+  │  │  方法:                                 │  │
+  │  │  - changeQuantity(newQty)             │  │
+  │  │  - getSubtotal()                     │  │
+  │  └──────────────────────────────────────┘  │
+  │                                             │
+  │  规则：外部不能直接拿到 OrderItem 引用       │
+  │       只能通过 Order 操作                    │
+  └───────────────────────────────────────────┘
+</pre>
+</div>
+
+<p><strong>聚合设计的 4 条原则：</strong></p>
+
+<ol>
+<li><strong>通过聚合根访问内部</strong>：外部不能直接引用 OrderItem，必须通过 Order</li>
+<li><strong>聚合内强一致</strong>：聚合内的操作要么全部成功，要么全部失败</li>
+<li><strong>聚合间弱一致</strong>：不同聚合之间通过领域事件最终一致</li>
+<li><strong>聚合要小</strong>：只包含必须一起修改的对象</li>
+</ol>
+
+<pre><code class="language-java">// 聚合根：Order
+public class Order {
+    private String id;
+    private String userId;
+    private OrderStatus status;
+    private Money totalAmount;
+    private Address shippingAddress;
+    private List&lt;OrderItem&gt; items = new ArrayList&lt;&gt;();
+    private List&lt;DomainEvent&gt; events = new ArrayList&lt;&gt;();
+
+    // 添加商品项 —— 通过聚合根操作内部实体
+    public void addItem(ProductInfo product, int quantity) {
+        if (this.status != OrderStatus.CREATED) {
+            throw new DomainException("订单状态不允许修改");
+        }
+        if (quantity &lt;= 0) {
+            throw new DomainException("数量必须大于0");
+        }
+
+        // 检查是否已存在相同商品
+        Optional&lt;OrderItem&gt; existing = items.stream()
+            .filter(item -&gt; item.getProductId().equals(product.getId()))
+            .findFirst();
+
+        if (existing.isPresent()) {
+            existing.get().addQuantity(quantity);
+        } else {
+            items.add(new OrderItem(
+                IdGenerator.next(),
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                quantity
+            ));
+        }
+        // 重新计算总价
+        recalculateTotal();
+    }
+
+    // 移除商品项
+    public void removeItem(String itemId) {
+        if (this.status != OrderStatus.CREATED) {
+            throw new DomainException("订单状态不允许修改");
+        }
+        boolean removed = items.removeIf(item -&gt; item.getItemId().equals(itemId));
+        if (!removed) {
+            throw new DomainException("商品项不存在: " + itemId);
+        }
+        recalculateTotal();
+    }
+
+    // 支付
+    public void pay() {
+        if (this.status != OrderStatus.CREATED) {
+            throw new DomainException("订单状态不允许支付");
+        }
+        if (items.isEmpty()) {
+            throw new DomainException("空订单不可支付");
+        }
+        this.status = OrderStatus.PAID;
+        // 发布领域事件
+        this.events.add(new OrderPaidEvent(this.id, this.userId, this.totalAmount));
+    }
+
+    // 取消
+    public void cancel(String reason) {
+        if (!this.status.canCancel()) {
+            throw new DomainException("订单当前状态不可取消");
+        }
+        this.status = OrderStatus.CANCELLED;
+        this.events.add(new OrderCancelledEvent(this.id, reason));
+    }
+
+    // 内部方法：重算总价
+    private void recalculateTotal() {
+        this.totalAmount = items.stream()
+            .map(OrderItem::getSubtotal)
+            .reduce(Money.zero("CNY"), Money::add);
+    }
+
+    // 获取领域事件（供基础设施层发布）
+    public List&lt;DomainEvent&gt; pullEvents() {
+        List&lt;DomainEvent&gt; pulled = new ArrayList&lt;&gt;(events);
+        events.clear();
+        return pulled;
+    }
+
+    // 内部实体只能返回只读视图
+    public List&lt;OrderItem&gt; getItems() {
+        return Collections.unmodifiableList(items);
+    }
+
+    // ... getter, equals, hashCode
+}
+
+// 聚合内部实体：OrderItem
+public class OrderItem {
+    private String itemId;
+    private String productId;
+    private String productName;
+    private Money unitPrice;
+    private int quantity;
+
+    // 包级可见，外部不能直接创建
+    OrderItem(String itemId, String productId, String productName,
+              Money unitPrice, int quantity) {
+        this.itemId = itemId;
+        this.productId = productId;
+        this.productName = productName;
+        this.unitPrice = unitPrice;
+        this.quantity = quantity;
+    }
+
+    void addQuantity(int qty) {
+        this.quantity += qty;
+    }
+
+    public Money getSubtotal() {
+        return unitPrice.multiply(quantity);
+    }
+
+    // getter（无 setter）
+    public String getItemId() { return itemId; }
+    public String getProductId() { return productId; }
+    // ...
+}
+</code></pre>
+
+<div class="callout callout-warning">
+<strong>聚合大小的判断标准：</strong> 如果删除 Order 时，OrderItem 也应该一起删除 → 放同一个聚合。如果删除 Order 时，Product 不受影响 → Product 是独立聚合。聚合越小越好，只包含<strong>必须一起修改和删除</strong>的对象。
+</div>
+
+<h4 id="sec3-4-4">3.4.4 领域服务（Domain Service）</h4>
+
+<p>有些业务逻辑<strong>不属于任何一个实体或值对象</strong>，而是涉及多个对象的协作。这种逻辑放在<strong>领域服务</strong>中。</p>
+
+<p>典型场景：</p>
+<ul>
+<li>跨聚合的业务操作（如：下单时需要同时操作订单聚合和库存聚合）</li>
+<li>无状态的计算逻辑</li>
+<li>涉及外部资源的领域判断</li>
+</ul>
+
+<div class="callout callout-danger">
+<strong>领域服务 ≠ 应用服务。</strong> 领域服务包含<strong>业务规则</strong>，应用服务只做<strong>流程编排</strong>（调谁、传什么参数、存到哪）。详见 3.5 节的分层架构。
+</div>
+
+<pre><code class="language-java">// 领域服务：定价服务
+// 涉及多个领域对象的计算逻辑
+public class PricingService {
+
+    /**
+     * 计算订单最终价格（含优惠）
+     * 涉及：订单金额、优惠券、会员折扣
+     */
+    public Money calculateFinalPrice(Order order, Coupon coupon, CustomerLevel level) {
+        Money basePrice = order.getTotalAmount();
+
+        // 1. 应用优惠券
+        Money afterCoupon = applyCoupon(basePrice, coupon);
+
+        // 2. 应用会员折扣
+        Money afterDiscount = applyMemberDiscount(afterCoupon, level);
+
+        // 3. 计算运费
+        Money shippingFee = calculateShippingFee(order.getShippingAddress());
+        Money finalPrice = afterDiscount.add(shippingFee);
+
+        // 确保最低消费
+        if (finalPrice.getAmount().compareTo(new BigDecimal("0.01")) &lt; 0) {
+            throw new DomainException("订单金额异常");
+        }
+
+        return finalPrice;
+    }
+
+    private Money applyCoupon(Money price, Coupon coupon) {
+        if (coupon == null || !coupon.isValid()) {
+            return price;
+        }
+        if (price.getAmount().compareTo(coupon.getThreshold()) &lt; 0) {
+            throw new DomainException("不满足优惠券使用门槛");
+        }
+        return price.subtract(coupon.getDiscountAmount());
+    }
+
+    private Money applyMemberDiscount(Money price, CustomerLevel level) {
+        return switch (level) {
+            case NORMAL -&gt; price;
+            case VIP -&gt; price.multiply(95).divide(100, 2, RoundingMode.HALF_UP);  // 95折
+            case SVIP -&gt; price.multiply(90).divide(100, 2, RoundingMode.HALF_UP); // 9折
+        };
+    }
+
+    private Money calculateShippingFee(Address address) {
+        // 偏远地区加运费等业务规则
+        if (isRemoteArea(address)) {
+            return Money.of(new BigDecimal("25.00"), "CNY");
+        }
+        return Money.of(new BigDecimal("10.00"), "CNY");
+    }
+
+    private boolean isRemoteArea(Address address) {
+        // 业务规则...
+        return false;
+    }
+}
+</code></pre>
+
+<h4 id="sec3-4-5">3.4.5 领域事件（Domain Event）</h4>
+
+<p><strong>领域事件</strong>表示领域中发生的、有业务意义的事情。它的核心作用是<strong>解耦</strong>——让事件的发布者不需要知道谁在消费这个事件。</p>
+
+<p>典型场景：</p>
+<ul>
+<li>订单支付成功后 → 通知库存扣减、通知物流发货、给用户加积分</li>
+<li>订单取消后 → 恢复库存、退还优惠券、发通知</li>
+<li>用户注册后 → 发欢迎邮件、初始化积分账户</li>
+</ul>
+
+<pre><code class="language-java">// 领域事件基类
+public interface DomainEvent {
+    String getAggregateId();
+    LocalDateTime getOccurredOn();
+}
+
+// 订单已支付事件
+public class OrderPaidEvent implements DomainEvent {
+    private final String orderId;
+    private final String userId;
+    private final Money amount;
+    private final LocalDateTime occurredOn;
+
+    public OrderPaidEvent(String orderId, String userId, Money amount) {
+        this.orderId = orderId;
+        this.userId = userId;
+        this.amount = amount;
+        this.occurredOn = LocalDateTime.now();
+    }
+
+    @Override
+    public String getAggregateId() { return orderId; }
+
+    @Override
+    public LocalDateTime getOccurredOn() { return occurredOn; }
+
+    public String getUserId() { return userId; }
+    public Money getAmount() { return amount; }
+}
+
+// 订单已取消事件
+public class OrderCancelledEvent implements DomainEvent {
+    private final String orderId;
+    private final String reason;
+    private final LocalDateTime occurredOn;
+
+    public OrderCancelledEvent(String orderId, String reason) {
+        this.orderId = orderId;
+        this.reason = reason;
+        this.occurredOn = LocalDateTime.now();
+    }
+
+    @Override
+    public String getAggregateId() { return orderId; }
+
+    @Override
+    public LocalDateTime getOccurredOn() { return occurredOn; }
+
+    public String getReason() { return reason; }
+}
+</code></pre>
+
+<p>领域事件的处理方式有两种：</p>
+
+<h4>方式一：同步处理（进程内）</h4>
+
+<pre><code class="language-java">// 事件发布器（进程内）
+@Component
+public class DomainEventPublisher {
+
+    @Autowired
+    private ApplicationEventPublisher springPublisher;
+
+    public void publish(DomainEvent event) {
+        springPublisher.publishEvent(event);
+    }
+
+    public void publishAll(List&lt;DomainEvent&gt; events) {
+        events.forEach(this::publish);
+    }
+}
+
+// 事件处理器：库存扣减
+@Component
+public class InventoryEventHandler {
+
+    @Autowired
+    private InventoryService inventoryService;
+
+    @EventListener
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onOrderPaid(OrderPaidEvent event) {
+        // 扣减库存
+        inventoryService.deductStock(event.getOrderId());
+    }
+}
+
+// 事件处理器：发积分
+@Component
+public class PointsEventHandler {
+
+    @Autowired
+    private PointsService pointsService;
+
+    @EventListener
+    public void onOrderPaid(OrderPaidEvent event) {
+        // 给用户加积分
+        pointsService.awardPoints(event.getUserId(), event.getAmount());
+    }
+}
+</code></pre>
+
+<h4>方式二：异步处理（消息队列）</h4>
+
+<pre><code class="language-java">// 通过消息队列（如 Kafka/RocketMQ）异步处理
+@Component
+public class DomainEventPublisher {
+
+    @Autowired
+    private RocketMQTemplate mqTemplate;
+
+    public void publish(DomainEvent event) {
+        String topic = "order-domain-events";
+        String tag = event.getClass().getSimpleName();
+        mqTemplate.convertAndSend(topic + ":" + tag, event);
+    }
+
+    public void publishAll(List&lt;DomainEvent&gt; events) {
+        events.forEach(this::publish);
+    }
+}
+
+// 消费者：物流系统监听订单支付事件
+@RocketMQMessageListener(
+    topic = "order-domain-events",
+    consumerGroup = "logistics-consumer-group",
+    selectorExpression = "OrderPaidEvent"
+)
+@Component
+public class LogisticsEventListener implements RocketMQListener&lt;OrderPaidEvent&gt; {
+
+    @Autowired
+    private ShippingService shippingService;
+
+    @Override
+    public void onMessage(OrderPaidEvent event) {
+        shippingService.createShipment(event.getOrderId());
+    }
+}
+</code></pre>
+
+<div class="callout callout-tip">
+<strong>同步 vs 异步的选择：</strong>
+<ul style="margin-bottom:0">
+<li><strong>同事务强一致</strong>：如果扣库存必须和下单在同一事务中，用同步</li>
+<li><strong>跨服务最终一致</strong>：如果发积分可以晚几秒，用异步消息队列</li>
+<li><strong>原则</strong>：能异步就异步，减少事务范围，提高系统吞吐</li>
+</ul>
+</div>
+
+<h4 id="sec3-4-6">3.4.6 仓储（Repository）</h4>
+
+<p><strong>仓储</strong>是对聚合根持久化的抽象。它让领域层不关心数据存在 MySQL 还是 MongoDB，不关心用 MyBatis 还是 JPA。</p>
+
+<p>仓储与 DAO 的关键区别：</p>
+
+<table>
+<tr><th>维度</th><th>DAO</th><th>Repository</th></tr>
+<tr><td>面向对象</td><td>数据表（面向 SQL）</td><td>聚合根（面向领域）</td></tr>
+<tr><td>操作粒度</td><td>单表 CRUD</td><td>整个聚合（聚合根 + 内部实体）</td></tr>
+<tr><td>职责</td><td>数据存取</td><td>聚合的持久化与重建</td></tr>
+<tr><td>所属层</td><td>数据访问层</td><td>领域层定义接口，基础设施层实现</td></tr>
+<tr><td>使用方式</td><td><code>orderDao.insert(order)</code></td><td><code>orderRepo.save(order)</code></td></tr>
+</table>
+
+<pre><code class="language-java">// 仓储接口（定义在领域层，依赖倒置）
+public interface OrderRepository {
+    void save(Order order);        // 保存整个聚合
+    Order findById(String id);     // 根据ID查找聚合根
+    List&lt;Order&gt; findByUserId(String userId);  // 按用户查找
+}
+
+// 仓储实现（定义在基础设施层）
+@Repository
+public class OrderRepositoryImpl implements OrderRepository {
+
+    @Autowired
+    private OrderMapper orderMapper;       // 订单表
+    @Autowired
+    private OrderItemMapper orderItemMapper; // 订单明细表
+    @Autowired
+    private DomainEventPublisher eventPublisher;
+
+    @Override
+    @Transactional
+    public void save(Order order) {
+        // 1. 持久化聚合根
+        OrderDO orderDO = OrderConverter.toDO(order);
+        if (orderMapper.existsById(orderDO.getId())) {
+            orderMapper.update(orderDO);
+            // 更新子实体：先删后插（简单策略）
+            orderItemMapper.deleteByOrderId(orderDO.getId());
+        } else {
+            orderMapper.insert(orderDO);
+        }
+
+        // 2. 持久化内部实体
+        for (OrderItem item : order.getItems()) {
+            OrderItemDO itemDO = OrderItemConverter.toDO(item, order.getId());
+            orderItemMapper.insert(itemDO);
+        }
+
+        // 3. 发布领域事件
+        eventPublisher.publishAll(order.pullEvents());
+    }
+
+    @Override
+    public Order findById(String id) {
+        OrderDO orderDO = orderMapper.selectById(id);
+        if (orderDO == null) {
+            return null;
+        }
+        List&lt;OrderItemDO&gt; itemDOs = orderItemMapper.selectByOrderId(id);
+
+        // 重建聚合根（从数据模型 → 领域模型）
+        return OrderConverter.toDomain(orderDO, itemDOs);
+    }
+
+    @Override
+    public List&lt;Order&gt; findByUserId(String userId) {
+        List&lt;OrderDO&gt; orderDOs = orderMapper.selectByUserId(userId);
+        return orderDOs.stream()
+            .map(orderDO -&gt; {
+                List&lt;OrderItemDO&gt; items = orderItemMapper.selectByOrderId(orderDO.getId());
+                return OrderConverter.toDomain(orderDO, items);
+            })
+            .collect(Collectors.toList());
+    }
+}
+</code></pre>
+
+<div class="callout callout-note">
+<strong>依赖倒置原则（DIP）：</strong> 仓储接口定义在<strong>领域层</strong>，实现在<strong>基础设施层</strong>。领域层不依赖基础设施层，而是基础设施层依赖领域层的接口。这就是"依赖倒置"——传统架构是上层依赖下层，DDD 反过来让下层依赖上层的抽象。
+</div>
+
+<h4 id="sec3-4-7">3.4.7 工厂（Factory）</h4>
+
+<p>当创建一个聚合根比较复杂（需要组装多个对象、需要校验前置条件、需要初始化默认值）时，用<strong>工厂</strong>来封装创建逻辑。</p>
+
+<pre><code class="language-java">// 订单工厂
+public class OrderFactory {
+
+    /**
+     * 创建新订单
+     */
+    public static Order createOrder(
+            String userId,
+            List&lt;ProductInfo&gt; products,
+            Address shippingAddress,
+            Coupon coupon) {
+
+        // 1. 前置校验
+        if (products == null || products.isEmpty()) {
+            throw new DomainException("订单必须包含至少一个商品");
+        }
+        if (shippingAddress == null) {
+            throw new DomainException("收货地址不能为空");
+        }
+
+        // 2. 构建订单项
+        List&lt;OrderItem&gt; items = products.stream()
+            .map(p -&gt; new OrderItem(
+                IdGenerator.next(),
+                p.getId(),
+                p.getName(),
+                p.getPrice(),
+                p.getQuantity()
+            ))
+            .collect(Collectors.toList());
+
+        // 3. 创建聚合根
+        Order order = new Order(userId, items, shippingAddress);
+
+        // 4. 如果有优惠券，绑定
+        if (coupon != null &amp;&amp; coupon.isValid()) {
+            order.bindCoupon(coupon);
+        }
+
+        return order;
+    }
+
+    /**
+     * 从持久化数据重建订单
+     * （供 Repository 使用，不走业务校验）
+     */
+    public static Order rebuild(
+            String id,
+            String userId,
+            OrderStatus status,
+            Money totalAmount,
+            Address address,
+            List&lt;OrderItem&gt; items,
+            LocalDateTime createdAt) {
+
+        Order order = new Order();
+        order.id = id;
+        order.userId = userId;
+        order.status = status;
+        order.totalAmount = totalAmount;
+        order.shippingAddress = address;
+        order.items = new ArrayList&lt;&gt;(items);
+        order.createdAt = createdAt;
+        return order;
+    }
+}
+</code></pre>
+
+<h4 id="sec3-4-8">3.4.8 四色建模法（Four-Color Modeling）</h4>
+
+<p><strong>四色建模法</strong>（Four-Color Modeling / Color Modeling in Domain Models）由 Peter Coad 提出，是一种<strong>领域分析技术</strong>。它通过将领域对象分为四种"原型"（Archetype），在需求分析阶段快速识别和分类领域概念，为后续的战术设计建模打下基础。</p>
+
+<div class="callout callout-note">
+<strong>四色建模法与 DDD 的关系：</strong> 四色建模法是 DDD 战术设计的"前置分析工具"。它用颜色标记法在写代码之前把领域对象分类——哪些是实体、哪些是值对象、哪些是事件、哪些是描述。比直接面对一堆业务名词要清晰得多。
+</div>
+
+<p>四种原型及对应颜色：</p>
+
+<div class="diagram">
+<pre>
+  ┌──────────────────────────────────────────────────────────┐
+  │                    四色原型分类                            │
+  │                                                           │
+  │   🟢 PPT (Party-Place-Thing)     事物/实体               │
+  │      有唯一标识，有生命周期                                 │
+  │      → 对应 DDD 的 Entity                                  │
+  │                                                           │
+  │   🔵 Description                  描述                    │
+  │      分类/类型信息，被多个实体共享                           │
+  │      → 对应 DDD 的 Value Object                            │
+  │                                                           │
+  │   🟡 Role                         角色                    │
+  │      实体在特定上下文中扮演的角色                             │
+  │      → 对应 DDD 的 Entity（带角色语义）                      │
+  │                                                           │
+  │   🔴 MI (Moment-Interval)         时刻-时段/事件           │
+  │      在特定时刻或时段发生的业务活动                           │
+  │      → 对应 DDD 的 Domain Event / 聚合根                    │
+  │                                                           │
+  └──────────────────────────────────────────────────────────┘
+</pre>
+</div>
+
+<h4>四种原型详解</h4>
+
+<table>
+<tr><th>原型</th><th>颜色</th><th>含义</th><th>特征</th><th>电商示例</th><th>DDD 映射</th></tr>
+<tr><td><strong>PPT</strong><br>事物/实体</td><td style="background:#d1fae5">🟢 绿</td><td>业务中核心的"谁"和"什么"</td><td>有唯一标识、有生命周期、属性可变</td><td>用户、商品、店铺、订单</td><td>Entity / Aggregate Root</td></tr>
+<tr><td><strong>Description</strong><br>描述</td><td style="background:#dbeafe">🔵 蓝</td><td>对事物的分类和描述</td><td>不可变、可共享、多个实体引用同一个</td><td>商品类目、品牌、会员等级定义</td><td>Value Object</td></tr>
+<tr><td><strong>Role</strong><br>角色</td><td style="background:#fef3c7">🟡 黄</td><td>实体在特定业务场景中的角色</td><td>依附于实体、随上下文变化</td><td>买家、卖家、收货人、发货员</td><td>Entity（带角色属性）</td></tr>
+<tr><td><strong>MI</strong><br>时刻-时段</td><td style="background:#fee2e2">🔴 红</td><td>在特定时间发生的业务活动</td><td>有时间戳、记录业务事实</td><td>下单、支付、发货、退款</td><td>Domain Event / Aggregate</td></tr>
+</table>
+
+<h4>用四色建模法分析电商交易场景</h4>
+
+<p>用四色建模法分析"用户下单"这个业务场景，看看如何快速识别领域对象：</p>
+
+<p><strong>业务故事：</strong>买家（Role）张三（PPT）在店铺（PPT）购买了两件商品（PPT），商品属于手机类目（Description），下单时（MI）选择了收货地址，使用了满减优惠券，支付成功后（MI），卖家（Role）李四（PPT）收到通知并发货（MI）。</p>
+
+<div class="diagram">
+<pre>
+  四色分析结果：
+
+  🟢 PPT (实体)：
+     User(张三)、User(李四)、Shop(店铺)、Product(商品)、Order(订单)、Coupon(优惠券)
+
+  🔵 Description (描述)：
+     Category(手机类目)、Brand(品牌)、MemberLevel(会员等级定义)、CouponRule(满减规则)
+
+  🟡 Role (角色)：
+     Buyer(买家) ← 张三在下单时扮演
+     Seller(卖家) ← 李四在接单时扮演
+     Consignee(收货人) ← 张三在收货时扮演
+     Shipper(发货员) ← 仓库人员在发货时扮演
+
+  🔴 MI (时刻-时段/事件)：
+     PlaceOrder(下单)、Payment(支付)、Shipment(发货)、Delivery(签收)、Refund(退款)
+</pre>
+</div>
+
+<h4>从四色到代码</h4>
+
+<p>四色建模法的价值在于：分析完之后，几乎可以直接映射到 DDD 的代码结构。一个 Role 原型的代码示例：</p>
+
+<pre><code class="language-java">// 🟡 Role 原型：买家角色
+// 一个用户在"购物"这个上下文中扮演的角色
+public class Buyer {
+    private String userId;          // 关联的 PPT 实体
+    private MemberLevel level;      // 🔵 Description：会员等级
+    private BigDecimal totalSpent;  // 累计消费（角色特有属性）
+
+    // 角色行为：作为买家，能否使用某优惠券
+    public boolean canUseCoupon(CouponRule rule) {
+        return level.compareTo(rule.getRequiredLevel()) &gt;= 0
+            &amp;&amp; totalSpent.compareTo(rule.getThreshold()) &gt;= 0;
+    }
+}
+
+// 🔴 MI 原型：下单事件（时刻-时段）
+// 记录"谁在什么时间下了什么单"这个业务事实
+public class PlaceOrderEvent implements DomainEvent {
+    private final String orderId;
+    private final String buyerId;       // 🟡 买家角色
+    private final String sellerId;      // 🟡 卖家角色
+    private final List&lt;String&gt; productIds;  // 🟢 商品 PPT
+    private final Money amount;
+    private final LocalDateTime occurredAt;  // 时刻
+
+    public PlaceOrderEvent(String orderId, String buyerId, String sellerId,
+                           List&lt;String&gt; productIds, Money amount) {
+        this.orderId = orderId;
+        this.buyerId = buyerId;
+        this.sellerId = sellerId;
+        this.productIds = productIds;
+        this.amount = amount;
+        this.occurredAt = LocalDateTime.now();
+    }
+    // ... getter
+}
+
+// 🔵 Description 原型：商品类目
+// 被多个商品共享的描述信息
+public final class Category implements ValueObject {
+    private final String code;        // "PHONE"
+    private final String name;        // "手机通讯"
+    private final String parentCode;  // 父类目
+
+    public Category(String code, String name, String parentCode) {
+        this.code = code;
+        this.name = name;
+        this.parentCode = parentCode;
+    }
+    // 不可变，equals/hashCode 基于属性值
+}
+</code></pre>
+
+<div class="callout callout-tip">
+<strong>四色建模法的实践流程：</strong>
+<ol style="margin-bottom:0">
+<li><strong>读需求/讲故事</strong>：用业务语言描述场景，标注名词和动词</li>
+<li><strong>标 PPT</strong>：找出核心业务实体（谁？什么？）→ 绿色</li>
+<li><strong>标 Description</strong>：找出分类/描述信息 → 蓝色</li>
+<li><strong>标 Role</strong>：找出实体在不同场景中的角色 → 黄色</li>
+<li><strong>标 MI</strong>：找出业务事件/交易记录 → 红色</li>
+<li><strong>映射 DDD</strong>：PPT→Entity、Description→VO、Role→Entity（带角色）、MI→DomainEvent</li>
+</ol>
+</div>
+
+<div class="callout callout-warning">
+<strong>注意：</strong> 四色建模法是<strong>分析辅助工具</strong>，提供分析框架。同一个对象在不同上下文中可能属于不同原型——比如"订单"在下单上下文中是 MI（事件），但在订单管理上下文中是 PPT（实体）。用它来<strong>加速分析</strong>即可，无需死扣分类。
+</div>
+
+<hr>
+
+<h3 id="sec3-5">3.5 DDD 分层架构</h3>
+
+<p>把前面讲的所有战术设计元素组合起来，就是 DDD 的<strong>四层架构</strong>。它比传统的三层架构多了一层"领域层"，并且依赖方向被翻转了。</p>
+
+<div class="diagram">
+<pre>
+┌─────────────────────────────────────────────────────┐
+│  用户接口层 (Interface Layer)                         │
+│  Controller / DTO / Assembler                       │
+│  职责：接收请求、参数校验、返回响应                      │
+├─────────────────────────────────────────────────────┤
+│  应用层 (Application Layer)                          │
+│  ApplicationService / DTO                           │
+│  职责：流程编排、事务管理、安全认证                      │
+│  ✗ 不含业务规则                                        │
+├─────────────────────────────────────────────────────┤
+│  领域层 (Domain Layer)              ★ 核心            │
+│  Entity / ValueObject / Aggregate                   │
+│  DomainService / DomainEvent / Repository接口        │
+│  职责：业务规则、领域模型                               │
+│  ✗ 不依赖任何外部框架                                   │
+├─────────────────────────────────────────────────────┤
+│  基础设施层 (Infrastructure Layer)                    │
+│  Repository实现 / Mapper / MQ / 外部API              │
+│  职责：技术细节、持久化、消息、缓存                      │
+└─────────────────────────────────────────────────────┘
+
+依赖方向：上层 → 下层（但领域层不依赖基础设施层）
+          基础设施层 → 领域层（实现领域层定义的接口）= 依赖倒置
+</pre>
+</div>
+
+<p>与三层架构对比：</p>
+
+<table>
+<tr><th>层</th><th>三层架构</th><th>DDD 四层架构</th></tr>
+<tr><td>用户接口层</td><td>Controller</td><td>Controller + DTO + Assembler（对象转换）</td></tr>
+<tr><td>应用层</td><td>（Service 的一部分）</td><td>ApplicationService（纯编排，无业务逻辑）</td></tr>
+<tr><td>领域层</td><td>（混在 Service 里）</td><td>Entity + VO + Aggregate + DomainService + Repository接口</td></tr>
+<tr><td>基础设施层</td><td>DAO</td><td>Repository实现 + Mapper + MQ + 外部客户端</td></tr>
+</table>
+
+<p>代码示例——各层的职责：</p>
+
+<pre><code class="language-java">// ====== 1. 用户接口层 (Interface) ======
+@RestController
+@RequestMapping("/api/orders")
+public class OrderController {
+
+    @Autowired
+    private OrderApplicationService orderAppService;
+
+    @PostMapping
+    public Result&lt;String&gt; createOrder(@RequestBody @Valid CreateOrderRequest request) {
+        String orderId = orderAppService.createOrder(request);
+        return Result.success(orderId);
+    }
+
+    @PostMapping("/{orderId}/pay")
+    public Result&lt;Void&gt; pay(@PathVariable String orderId) {
+        orderAppService.pay(orderId);
+        return Result.success(null);
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public Result&lt;Void&gt; cancel(@PathVariable String orderId,
+                                  @RequestParam String reason) {
+        orderAppService.cancel(orderId, reason);
+        return Result.success(null);
+    }
+}
+
+// ====== 2. 应用层 (Application) ======
+// 注意：应用层只做编排，不含业务规则
+@Service
+@Transactional
+public class OrderApplicationService {
+
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private PricingService pricingService;   // 领域服务
+    @Autowired
+    private DomainEventPublisher eventPublisher;
+
+    public String createOrder(CreateOrderRequest request) {
+        // 1. 查商品信息（基础设施调用）
+        List&lt;ProductInfo&gt; products = productRepository
+            .findByIds(request.getProductIds());
+
+        // 2. 工厂创建聚合根
+        Order order = OrderFactory.createOrder(
+            request.getUserId(),
+            products,
+            request.getAddress(),
+            request.getCoupon()
+        );
+
+        // 3. 定价（领域服务）
+        Money finalPrice = pricingService.calculateFinalPrice(
+            order, request.getCoupon(), request.getCustomerLevel());
+        order.setFinalPrice(finalPrice);
+
+        // 4. 持久化
+        orderRepository.save(order);
+
+        return order.getId();
+    }
+
+    public void pay(String orderId) {
+        // 1. 加载聚合
+        Order order = orderRepository.findById(orderId);
+        if (order == null) {
+            throw new BizException("订单不存在");
+        }
+        // 2. 调用聚合根的业务方法（业务规则在领域层）
+        order.pay();
+        // 3. 持久化（仓储会自动发布领域事件）
+        orderRepository.save(order);
+    }
+
+    public void cancel(String orderId, String reason) {
+        Order order = orderRepository.findById(orderId);
+        if (order == null) {
+            throw new BizException("订单不存在");
+        }
+        order.cancel(reason);   // ← 业务规则在 Order 内部
+        orderRepository.save(order);
+    }
+}
+
+// ====== 3. 领域层 (Domain) ======
+// Order, OrderItem, Money, Address, OrderStatus
+// OrderFactory, PricingService, OrderRepository(接口), DomainEvent
+// （前面已经展示了完整代码，这里不重复）
+
+// ====== 4. 基础设施层 (Infrastructure) ======
+// OrderRepositoryImpl, OrderMapper, OrderItemMapper
+// DomainEventPublisherImpl, ProductApiClient
+// （前面已经展示了 Repository 实现，这里不重复）
+</code></pre>
+
+<div class="callout callout-tip">
+<strong>判断应用层是否写对了的标准：</strong> 看应用层方法里有没有 <code>if</code> 判断业务条件。如果有（比如 <code>if (order.getStatus() == PAID)</code>），说明业务规则泄漏到了应用层，应该下沉到领域层。
+</div>
+
+<hr>
+
+<h3 id="sec3-6">3.6 从需求到代码：DDD 实践流程</h3>
+
+<p>理论讲完了，实际工作中应该怎么落地？以下是一个推荐的 DDD 实践流程：</p>
+
+<div class="diagram">
+<pre>
+需求文档
+    │
+    ▼
+┌──────────────────────────────────────┐
+│ Step 1: 领域故事讲述                    │
+│ 用业务语言描述场景，提取领域名词和动词     │
+└───────────────┬──────────────────────┘
+                ▼
+┌──────────────────────────────────────┐
+│ Step 2: 识别限界上下文                  │
+│ 划分语义边界，确定微服务边界             │
+└───────────────┬──────────────────────┘
+                ▼
+┌──────────────────────────────────────┐
+│ Step 3: 划分聚合                       │
+│ 在上下文内识别聚合根、实体、值对象        │
+└───────────────┬──────────────────────┘
+                ▼
+┌──────────────────────────────────────┐
+│ Step 4: 设计领域事件                   │
+│ 识别关键业务事件，设计事件流             │
+└───────────────┬──────────────────────┘
+                ▼
+┌──────────────────────────────────────┐
+│ Step 5: 编码实现                       │
+│ 按四层架构落地代码                      │
+└───────────────┬──────────────────────┘
+                ▼
+┌──────────────────────────────────────┐
+│ Step 6: 持续重构                       │
+│ 随着业务理解加深，持续调整模型            │
+└──────────────────────────────────────┘
+</pre>
+</div>
+
+<h4>实战演示：以"用户下单"为例</h4>
+
+<p><strong>Step 1：领域故事</strong></p>
+
+<blockquote>
+<p>用户在购物车中选择商品，点击"去结算"。<br>
+系统检查商品库存是否充足。<br>
+系统计算订单金额（商品价格 × 数量 + 运费 - 优惠券抵扣）。<br>
+用户确认收货地址后提交订单。<br>
+订单状态变为"待支付"。<br>
+库存被预扣减。<br>
+系统发送"订单已创建"通知。<br>
+用户在 30 分钟内完成支付，否则订单自动取消。</p>
+</blockquote>
+
+<p><strong>Step 2：识别限界上下文</strong></p>
+
+<table>
+<tr><th>限界上下文</th><th>职责</th></tr>
+<tr><td>订单上下文</td><td>订单创建、状态管理</td></tr>
+<tr><td>商品上下文</td><td>商品信息、价格</td></tr>
+<tr><td>库存上下文</td><td>库存查询、扣减、预扣</td></tr>
+<tr><td>支付上下文</td><td>支付发起、回调处理</td></tr>
+<tr><td>营销上下文</td><td>优惠券、促销活动</td></tr>
+</table>
+
+<p><strong>Step 3：划分聚合（以订单上下文为例）</strong></p>
+
+<table>
+<tr><th>聚合</th><th>聚合根</th><th>内部实体</th><th>值对象</th></tr>
+<tr><td>订单聚合</td><td>Order</td><td>OrderItem</td><td>Money, Address, OrderStatus</td></tr>
+</table>
+
+<p><strong>Step 4：领域事件</strong></p>
+
+<table>
+<tr><th>事件</th><th>触发时机</th><th>消费者</th></tr>
+<tr><td>OrderCreatedEvent</td><td>订单创建</td><td>库存（预扣）、通知（发短信）</td></tr>
+<tr><td>OrderPaidEvent</td><td>支付成功</td><td>库存（确认扣减）、物流（创建运单）、积分（加积分）</td></tr>
+<tr><td>OrderCancelledEvent</td><td>订单取消</td><td>库存（恢复）、优惠券（退还）</td></tr>
+<tr><td>OrderShippedEvent</td><td>发货</td><td>通知（发物流信息）</td></tr>
+</table>
+
+<p><strong>Step 5：编码</strong></p>
+
+<p>按照 3.5 节的四层架构，从领域层开始写，然后应用层，最后基础设施层和接口层。（前面已展示完整代码）</p>
+
+<hr>
+
+<h3 id="sec3-7">3.7 常见陷阱与最佳实践</h3>
+
+<h4>陷阱一：贫血模型伪装成 DDD</h4>
+
+<pre><code class="language-java">// ❌ 看起来用了 DDD 的包结构，但模型还是贫血的
+public class Order {
+    private String id;
+    private String status;
+    // 全是 getter/setter，没有业务方法
+    public void setStatus(String status) { this.status = status; }
+}
+
+// Service 里还是事务脚本
+public class OrderService {
+    public void pay(String orderId) {
+        Order order = repo.findById(orderId);
+        order.setStatus("PAID");  // ← 贫血！直接改属性
+        repo.save(order);
+    }
+}
+
+// ✅ 正确的 DDD
+public class Order {
+    public void pay() {  // ← 业务方法封装规则
+        if (this.status != CREATED) throw ...;
+        this.status = PAID;
+        this.events.add(new OrderPaidEvent(...));
+    }
+}
+</code></pre>
+
+<h4>陷阱二：聚合设计过大</h4>
+
+<div class="callout callout-danger">
+<strong>错误示例：</strong> 把 Order、OrderItem、Product、User、Address、Coupon 全放进一个"订单聚合"。这会导致：加载一个订单要联表查 6 张表，修改一个商品名要锁整个聚合。
+</div>
+
+<p>正确做法：Product、User、Coupon 都是<strong>独立聚合</strong>。Order 聚合只包含 Order 和 OrderItem。需要 Product 信息时，通过 ID 引用或通过领域事件同步。</p>
+
+<h4>陷阱三：过度设计</h4>
+
+<p>不是所有系统都需要 DDD。以下场景用三层架构 + 贫血模型更高效：</p>
+<ul>
+<li>以 CRUD 为主，业务逻辑简单</li>
+<li>团队只有 2-3 个人</li>
+<li>没有复杂的领域规则和状态流转</li>
+</ul>
+
+<p><strong>DDD 是用来解决复杂性的，不是用来制造复杂性的。</strong></p>
+
+<h4>陷阱四：领域层依赖框架</h4>
+
+<pre><code class="language-java">// ❌ 领域层依赖了 Spring 框架
+@Entity
+@Table(name = "orders")
+public class Order {
+    @Id
+    @Column(name = "order_id")
+    private String id;
+}
+
+// ✅ 领域层应该是纯 POJO
+public class Order {
+    private String id;
+    // 没有任何框架注解
+}
+</code></pre>
+
+<p>领域层应该<strong>零框架依赖</strong>。JPA 注解、Spring 注解都应该放在基础设施层的 DO 对象上，而不是领域实体上。</p>
+
+<h4>最佳实践清单</h4>
+
+<table>
+<tr><th>原则</th><th>说明</th></tr>
+<tr><td>统一语言</td><td>代码中的命名和业务术语一致，如产品说"优惠券"代码就叫 <code>Coupon</code> 而非 <code>DiscountRecord</code></td></tr>
+<tr><td>聚合要小</td><td>一个聚合只包含必须一起修改的对象，宁多勿大</td></tr>
+<tr><td>充血模型</td><td>业务逻辑内聚在实体/值对象中，Service 只做编排</td></tr>
+<tr><td>领域层纯净</td><td>不依赖框架、不依赖数据库、可独立单元测试</td></tr>
+<tr><td>事件驱动</td><td>跨聚合/跨上下文用领域事件解耦</td></tr>
+<tr><td>防腐层</td><td>对接外部系统一律加防腐层翻译</td></tr>
+<tr><td>持续重构</td><td>领域模型不是一次设计完，随着业务理解持续调整</td></tr>
+</table>
+
+<!-- 第三章总结图 -->
+<div class="chapter-summary">
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>领域驱动设计总结图</title>
+  <desc>DDD 战略设计与战术设计全景，含四色建模法与四层架构</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">领域驱动设计（DDD）</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">战略设计划边界，战术设计建模型，四色建模法做分析</text>
+
+  <!-- Strategic Design -->
+  <text x="60" y="80" font-size="14" font-weight="500" fill="#3C3489">战略设计（宏观 · 划边界）</text>
+
+  <circle cx="70" cy="105" r="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="90" y="100" font-size="13" font-weight="500" fill="#3C3489">子域划分</text>
+  <text x="90" y="116" font-size="12" font-weight="400" fill="#5F5E5A">核心域 ★（竞争力） · 支撑域（辅助） · 通用域（通用能力）</text>
+
+  <circle cx="70" cy="145" r="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="90" y="140" font-size="13" font-weight="500" fill="#3C3489">限界上下文</text>
+  <text x="90" y="156" font-size="12" font-weight="400" fill="#5F5E5A">语义边界 — "商品"在目录/库存/营销团队中含义不同</text>
+
+  <circle cx="70" cy="185" r="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="90" y="180" font-size="13" font-weight="500" fill="#3C3489">上下文映射（8 种模式）</text>
+  <text x="90" y="196" font-size="12" font-weight="400" fill="#5F5E5A">ACL 防腐层 ★ · OHS 开放主机 · 客户-供应商 · 共享内核 …</text>
+
+  <text x="90" y="214" font-size="12" font-weight="400" fill="#888780">→ 限界上下文 ≈ 微服务边界</text>
+
+  <line x1="40" y1="235" x2="640" y2="235" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- Tactical Design -->
+  <text x="60" y="260" font-size="14" font-weight="500" fill="#0C447C">战术设计（微观 · 建模型）</text>
+
+  <circle cx="70" cy="285" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="280" font-size="13" font-weight="500" fill="#0C447C">聚合 ★ 核心概念</text>
+  <text x="90" y="296" font-size="12" font-weight="400" fill="#5F5E5A">聚合根（Order）→ 实体（OrderItem）+ 值对象（Money/Address）</text>
+  <text x="90" y="314" font-size="12" font-weight="400" fill="#888780">外部只能通过聚合根访问内部</text>
+
+  <circle cx="70" cy="335" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="330" font-size="13" font-weight="500" fill="#0C447C">领域服务</text>
+  <text x="90" y="346" font-size="12" font-weight="400" fill="#5F5E5A">跨聚合的领域逻辑 — PricingService 计算多聚合优惠</text>
+
+  <circle cx="70" cy="375" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="370" font-size="13" font-weight="500" fill="#0C447C">领域事件</text>
+  <text x="90" y="386" font-size="12" font-weight="400" fill="#5F5E5A">解耦利器 — OrderPaidEvent 触发库存扣减/通知</text>
+
+  <circle cx="70" cy="415" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="410" font-size="13" font-weight="500" fill="#0C447C">仓储 · 工厂</text>
+  <text x="90" y="426" font-size="12" font-weight="400" fill="#5F5E5A">Repository 持久化聚合 · Factory 封装复杂创建</text>
+
+  <circle cx="70" cy="455" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="450" font-size="13" font-weight="500" fill="#0C447C">四色建模法</text>
+  <text x="90" y="466" font-size="12" font-weight="400" fill="#5F5E5A">PPT(事物🟢) · Description(描述🔵) · Role(角色🟡) · MI(时刻-时段🔴)</text>
+
+  <line x1="40" y1="485" x2="640" y2="485" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- DDD Four-layer architecture -->
+  <text x="340" y="505" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">DDD 四层架构</text>
+
+  <rect x="40" y="520" width="130" height="30" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="105" y="540" text-anchor="middle" font-size="12" font-weight="500" fill="#5F5E5A">Interface 接口层</text>
+  <text x="180" y="540" font-size="14" fill="#888780">→</text>
+  <rect x="195" y="520" width="130" height="30" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="260" y="540" text-anchor="middle" font-size="12" font-weight="500" fill="#5F5E5A">Application 应用层</text>
+  <text x="335" y="540" font-size="14" fill="#888780">→</text>
+  <rect x="350" y="520" width="130" height="30" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="415" y="540" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">★ Domain 领域层</text>
+  <text x="490" y="540" font-size="14" fill="#888780">→</text>
+  <rect x="505" y="520" width="135" height="30" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="572" y="540" text-anchor="middle" font-size="12" font-weight="500" fill="#5F5E5A">Infrastructure 基础设施</text>
+</svg>
+</div>
+
+<!-- ====================== 第四章 ====================== -->
+<h2 id="ch4">第四章：如何写好技术方案</h2>
+
+<p>前面三章讲了架构知识，但实际工作中你更需要的可能是：<strong>接到一个需求后，怎么写出一份好的技术方案文档？</strong></p>
+
+<p>这一章不讲理论，只讲实操。</p>
+
+<hr>
+
+<h3 id="sec4-1">4.1 技术方案核心要素</h3>
+
+<p>一份合格的技术方案应该回答以下问题：</p>
+
+<table>
+<tr><th>要素</th><th>回答什么</th><th>常见错误</th></tr>
+<tr><td>1. 背景与目标</td><td>为什么要做？做成什么样？</td><td>只抄需求文档，没有技术视角</td></tr>
+<tr><td>2. 需求分析</td><td>核心业务流程是什么？有哪些边界条件？</td><td>跳过分析直接给方案</td></tr>
+<tr><td>3. 架构设计</td><td>在哪个限界上下文？涉及哪些聚合？</td><td>只画一张系统架构图就完了</td></tr>
+<tr><td>4. 详细设计</td><td>数据模型、接口设计、核心流程</td><td>只写接口列表，不写业务规则</td></tr>
+<tr><td>5. 异常与边界</td><td>异常怎么处理？并发怎么控制？</td><td>完全不考虑异常场景</td></tr>
+<tr><td>6. 影响面评估</td><td>改了哪些系统？影响哪些功能？</td><td>不评估影响面导致线上故障</td></tr>
+<tr><td>7. 排期</td><td>分几个阶段？各阶段产出什么？</td><td>只给一个总工期</td></tr>
+</table>
+
+<hr>
+
+<h3 id="sec4-2">4.2 技术方案模板</h3>
+
+<p>以下是一个可以直接使用的技术方案模板，以"订单超时自动取消"为例：</p>
+
+<pre><code class="language-markdown"># 技术方案：订单超时自动取消
+
+## 1. 背景与目标
+- **背景**：用户下单后 30 分钟未支付，需要自动取消订单并恢复库存
+- **目标**：实现订单超时自动取消，保证库存及时释放
+- **非目标**：不处理已支付订单的退款流程（属于另一个需求）
+
+## 2. 需求分析
+### 2.1 核心流程
+用户下单 → 30分钟未支付 → 自动取消 → 恢复预扣库存 → 退还优惠券
+
+### 2.2 边界条件
+- 订单状态为 CREATED 的才需要超时取消
+- 已支付/已取消/已发货的订单不受影响
+- 超时时间可配置（运营可调整，默认 30 分钟）
+- 需要支持批量处理（不能一条一条查）
+
+## 3. 架构设计
+### 3.1 所属限界上下文
+订单上下文（Order Context）
+
+### 3.2 涉及聚合
+- Order 聚合（状态变更 + 事件发布）
+- Inventory 聚合（库存恢复，通过事件触发）
+
+### 3.3 方案选型
+| 方案 | 优点 | 缺点 | 结论 |
+|------|------|------|------|
+| 定时任务轮询 | 实现简单 | 延迟高、数据库压力大 | ✗ |
+| 延迟队列（MQ） | 精准触发、解耦 | 需要引入 MQ | ✓ 推荐 |
+| Redis 过期通知 | 实时性好 | 可靠性差（Redis 重启丢失） | ✗ |
+
+**最终方案**：RocketMQ 延迟消息 + 兜底定时任务
+
+### 3.4 领域事件流
+OrderCreatedEvent → 延迟30分钟 → OrderTimeoutCheckEvent
+  → 检查订单状态 → 仍为 CREATED → Order.cancel()
+  → OrderCancelledEvent → 库存恢复 + 优惠券退还
+
+## 4. 详细设计
+### 4.1 数据模型变更
+无新增表，Order 实体新增 expireTime 字段（记录过期时间）
+
+### 4.2 核心接口
+- 内部接口：OrderTimeoutService.checkAndCancel(orderId)
+- 由 MQ 消费者触发，不对外暴露 HTTP 接口
+
+### 4.3 核心代码逻辑
+（伪代码）
+```
+// 消费延迟消息
+onMessage(OrderTimeoutMessage msg) {
+    Order order = repo.findById(msg.orderId);
+    if (order.getStatus() == CREATED) {
+        order.cancel("超时未支付自动取消");
+        repo.save(order);  // 触发 OrderCancelledEvent
+    }
+    // 如果已支付，忽略即可
+}
+```
+
+## 5. 异常与边界处理
+- MQ 消费失败：重试 3 次，仍失败则告警
+- 兜底定时任务：每 5 分钟扫描一次 CREATED 状态且超时的订单
+- 并发控制：消息可能重复投递，cancel() 方法需幂等
+  （已 CANCELLED 状态再取消直接返回成功）
+
+## 6. 影响面评估
+| 影响系统 | 影响点 | 风险 |
+|---------|--------|------|
+| 订单服务 | 新增超时取消逻辑 | 低 |
+| 库存服务 | 消费 OrderCancelledEvent 恢复库存 | 已有逻辑，无改动 |
+| 优惠券服务 | 消费 OrderCancelledEvent 退还优惠券 | 已有逻辑，无改动 |
+| 通知服务 | 发送"订单已取消"通知 | 需新增模板 |
+
+## 7. 排期
+| 阶段 | 内容 | 工期 |
+|------|------|------|
+| 设计评审 | 方案评审 + 修改 | 1天 |
+| 编码 | 领域层 + 应用层 + MQ 消费者 | 2天 |
+| 联调 | 与库存/优惠券/通知联调 | 1天 |
+| 测试 | 自测 + 提测 | 2天 |
+| 上线 | 灰度发布 + 监控 | 1天 |
+</code></pre>
+
+<div class="callout callout-tip">
+<strong>核心原则：</strong> 另一个工程师按方案就能实现，不需要追问任何问题。方案中出现"到时候再说"和"这里大概"，说明设计尚未完成。
+</div>
+
+<!-- 第四章总结图 -->
+<div class="chapter-summary">
+<svg viewBox="0 0 680 460" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>如何写好技术方案总结图</title>
+  <desc>技术方案 7 大核心要素流程及常见错误与正确做法</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">如何写好技术方案</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">7 大核心要素，按方案可实现无需追问</text>
+
+  <!-- 7 elements as vertical timeline -->
+  <line x1="70" y1="78" x2="70" y2="348" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="90" r="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="90" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#712B13">1</text>
+  <text x="95" y="85" font-size="13" font-weight="500" fill="#712B13">背景与目标</text>
+  <text x="95" y="101" font-size="12" font-weight="400" fill="#5F5E5A">为什么做？做成什么样？— 理解业务目标，而非复述需求</text>
+
+  <circle cx="70" cy="130" r="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="130" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#633806">2</text>
+  <text x="95" y="125" font-size="13" font-weight="500" fill="#633806">需求分析</text>
+  <text x="95" y="141" font-size="12" font-weight="400" fill="#5F5E5A">核心流程？边界条件？— 用技术视角解读业务</text>
+
+  <circle cx="70" cy="170" r="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="170" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#3C3489">3</text>
+  <text x="95" y="165" font-size="13" font-weight="500" fill="#3C3489">架构设计</text>
+  <text x="95" y="181" font-size="12" font-weight="400" fill="#5F5E5A">哪个上下文？哪些聚合？— 限界上下文界定系统边界</text>
+
+  <circle cx="70" cy="210" r="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="210" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#3C3489">4</text>
+  <text x="95" y="205" font-size="13" font-weight="500" fill="#3C3489">详细设计</text>
+  <text x="95" y="221" font-size="12" font-weight="400" fill="#5F5E5A">数据模型 + 接口定义 + 核心流程伪代码</text>
+
+  <circle cx="70" cy="250" r="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="250" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#0C447C">5</text>
+  <text x="95" y="245" font-size="13" font-weight="500" fill="#0C447C">异常与边界</text>
+  <text x="95" y="261" font-size="12" font-weight="400" fill="#5F5E5A">异常处理？并发控制？幂等？— 最见功力的部分</text>
+
+  <circle cx="70" cy="290" r="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="290" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#0C447C">6</text>
+  <text x="95" y="285" font-size="13" font-weight="500" fill="#0C447C">影响面评估</text>
+  <text x="95" y="301" font-size="12" font-weight="400" fill="#5F5E5A">改了哪些模块？影响哪些下游？回滚方案？</text>
+
+  <circle cx="70" cy="330" r="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="70" y="330" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="500" fill="#085041">7</text>
+  <text x="95" y="325" font-size="13" font-weight="500" fill="#085041">排期与里程碑</text>
+  <text x="95" y="341" font-size="12" font-weight="400" fill="#5F5E5A">分阶段交付，每阶段有明确产出</text>
+
+  <line x1="40" y1="365" x2="640" y2="365" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- Common mistakes vs correct approach -->
+  <text x="340" y="385" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">常见错误 vs 正确做法</text>
+
+  <rect x="40" y="400" width="290" height="48" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="418" font-size="12" font-weight="500" fill="#712B13">常见错误</text>
+  <text x="55" y="436" font-size="11" font-weight="400" fill="#5F5E5A">只抄需求 · 跳过分析 · 只列接口 · 不考虑异常并发</text>
+
+  <rect x="350" y="400" width="290" height="48" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="418" font-size="12" font-weight="500" fill="#085041">正确做法</text>
+  <text x="365" y="436" font-size="11" font-weight="400" fill="#5F5E5A">技术视角解读 · 先分析再设计 · 写清规则 · 评估异常幂等</text>
+</svg>
+</div>
+
+
+<h2>总结：从 CRUD 到 DDD 的认知升级</h2>
+
+<p>全文串联：</p>
+
+<table>
+<tr><th>阶段</th><th>思维模式</th><th>关键词</th></tr>
+<tr><td>CRUD</td><td>"数据怎么存"</td><td>表、字段、增删改查</td></tr>
+<tr><td>MVC 分层</td><td>"代码怎么组织"</td><td>Controller/Service/DAO、关注点分离</td></tr>
+<tr><td>充血模型</td><td>"对象应该有行为"</td><td>封装、内聚、不暴露 setter</td></tr>
+<tr><td>更多架构模式</td><td>"不同维度的问题"</td><td>六边形/整洁/洋葱、CQRS、事件驱动、微内核</td></tr>
+<tr><td>DDD 战略设计</td><td>"系统边界在哪"</td><td>限界上下文、子域、上下文映射</td></tr>
+<tr><td>DDD 战术设计</td><td>"领域模型怎么建"</td><td>聚合、实体、值对象、领域事件</td></tr>
+</table>
+
+<p>这个认知升级路径呈现<strong>层层叠加</strong>的特征：</p>
+<ul>
+<li>再复杂的 DDD 系统，底层也有 CRUD</li>
+<li>再好的领域模型，也需要 MVC 分层来组织代码</li>
+<li>再清晰的限界上下文，也需要充血模型来落地</li>
+<li>再好的分层，也可以叠加六边形架构、CQRS、事件驱动——它们是正交的</li>
+</ul>
+
+<p><strong>架构能力不是背概念背出来的，是在一个个需求中磨出来的。</strong></p>
+
+<div class="footer">
+  <p>技术方案设计指南 v1.0 &nbsp;|&nbsp; 电商交易场景</p>
+  <p>参考：《凤凰架构》周志明 &nbsp;|&nbsp; 《领域驱动设计》Eric Evans &nbsp;|&nbsp; 《实现领域驱动设计》Vaughn Vernon</p>
+</div>
+
+</div></div>
+
+<script src="/assets/vendor/prism/prism-core.min.js"></script>
+<script src="/assets/vendor/prism/prism-clike.min.js"></script>
+<script src="/assets/vendor/prism/prism-java.min.js"></script>
+<script src="/assets/vendor/prism/prism-markdown.min.js"></script>
+<script src="/assets/vendor/prism/prism-bash.min.js"></script>
+
+<script src="/assets/js/article.js"></script>
+
+</body>
+</html>

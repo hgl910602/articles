@@ -1,0 +1,17 @@
+{
+  "site": {
+    "name": "技术知识库",
+    "description": "个人技术文章与知识分享：架构设计、后端开发与方法论沉淀。",
+    "footer": "© 2026 技术知识库 · Powered by Cloudflare Pages"
+  },
+  "articles": [
+    {
+      "slug": "tech-design-guide",
+      "title": "技术方案设计指南：从架构演进到领域建模",
+      "description": "从架构演进史讲起，经过 CRUD、MVC、三层架构等方法论，深入 DDD 战略与战术设计，最后落到如何写好一份技术方案。电商交易场景 + Java 代码示例。",
+      "date": "2026-08-12",
+      "category": "架构设计",
+      "tags": ["架构", "DDD", "技术方案", "Java"]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!-- 本文件由 scripts/build-index.mjs 生成，请勿手改；修改 articles.json 后重新运行脚本。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技术知识库</title>
+<meta name="description" content="个人技术文章与知识分享：架构设计、后端开发与方法论沉淀。">
+<link href="/assets/css/theme.css" rel="stylesheet" />
+<link href="/assets/css/site.css" rel="stylesheet" />
+</head>
+<body>
+
+<header class="site-header">
+  <h1>技术知识库</h1>
+  <p class="site-desc">个人技术文章与知识分享：架构设计、后端开发与方法论沉淀。</p>
+</header>
+
+<main class="article-list">
+  <div class="chips">
+      <button class="chip active" data-tag="">全部</button>
+      <button class="chip" data-tag="技术方案">技术方案<small>1</small></button>
+      <button class="chip" data-tag="架构">架构<small>1</small></button>
+      <button class="chip" data-tag="DDD">DDD<small>1</small></button>
+      <button class="chip" data-tag="Java">Java<small>1</small></button>
+  </div>
+  <p class="empty" id="empty" hidden>该标签下暂无文章</p>
+    <a class="card" href="/articles/tech-design-guide/" data-tags="架构,DDD,技术方案,Java">
+      <div class="card-head">
+        <h2>技术方案设计指南：从架构演进到领域建模</h2>
+        <time>2026-08-12</time>
+      </div>
+      <p class="card-desc">从架构演进史讲起，经过 CRUD、MVC、三层架构等方法论，深入 DDD 战略与战术设计，最后落到如何写好一份技术方案。电商交易场景 + Java 代码示例。</p>
+      <div class="card-tags"><span class="tag">架构</span><span class="tag">DDD</span><span class="tag">技术方案</span><span class="tag">Java</span></div>
+    </a>
+</main>
+
+<footer class="site-footer">© 2026 技术知识库 · Powered by Cloudflare Pages</footer>
+
+<script>
+(function () {
+  var chips = document.querySelectorAll('.chip');
+  var cards = document.querySelectorAll('.card');
+  var empty = document.getElementById('empty');
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      var tag = chip.dataset.tag;
+      var visible = 0;
+      cards.forEach(function (card) {
+        var show = !tag || card.dataset.tags.split(',').indexOf(tag) !== -1;
+        card.hidden = !show;
+        if (show) visible++;
+      });
+      empty.hidden = visible > 0;
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
