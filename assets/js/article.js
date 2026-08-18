@@ -42,3 +42,46 @@ document.querySelectorAll('#sidebar nav a').forEach(link => {
     }
   });
 });
+
+// Lightbox: click any article image to view full size
+(function() {
+  // Build lightbox DOM once
+  const box = document.createElement('div');
+  box.className = 'lightbox';
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-label', '图片预览');
+  const img = document.createElement('img');
+  img.alt = '';
+  const hint = document.createElement('div');
+  hint.className = 'lightbox-hint';
+  hint.textContent = '点击任意处或按 ESC 关闭';
+  box.appendChild(img);
+  box.appendChild(hint);
+  document.body.appendChild(box);
+
+  function open(trigger) {
+    img.src = trigger.currentSrc || trigger.src;
+    img.alt = trigger.alt || '';
+    box.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function close() {
+    box.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Covers both .article-figure and .article-figure.table-figure images
+  document.querySelectorAll('.article-figure img').forEach(el => {
+    el.addEventListener('click', function(e) {
+      e.preventDefault();
+      open(this);
+    });
+  });
+
+  // Close on backdrop click (clicking the image itself also closes)
+  box.addEventListener('click', close);
+  // Close with ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && box.classList.contains('open')) close();
+  });
+})();

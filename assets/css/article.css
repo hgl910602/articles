@@ -77,10 +77,23 @@ h2 {
 h3 { font-size: 19px; font-weight: 700; margin-top: 40px; margin-bottom: 12px; color: var(--text); }
 h4 { font-size: 16px; font-weight: 700; margin-top: 28px; margin-bottom: 10px; color: var(--accent); }
 p { margin-bottom: 14px; color: var(--text); }
+/* 中文排版：正文段落首行缩进两个字符（标题/列表/表格/引用框内的段落不缩进） */
+#content .inner > p { text-indent: 2em; }
 strong { font-weight: 700; }
 em { font-style: normal; color: var(--accent); font-weight: 500; }
 ul, ol { margin-bottom: 16px; padding-left: 24px; }
 li { margin-bottom: 6px; }
+
+/* 附录引用列表 */
+.appendix-list li { margin-bottom: 10px; line-height: 1.8; }
+.appendix-list li a {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-left: 4px;
+  text-decoration: none;
+  border-bottom: 1px dashed var(--border);
+}
+.appendix-list li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 
 /* Code */
 pre[class*="language-"] {
@@ -189,6 +202,12 @@ blockquote {
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   border: 1px solid var(--border);
+  cursor: zoom-in;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.article-figure img:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.14);
 }
 .article-figure figcaption {
   margin-top: 8px;
@@ -235,6 +254,7 @@ blockquote {
   border-radius: 6px;
   border: 1px solid var(--border);
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  cursor: zoom-in;
 }
 
 /* Price comparison gallery intro */
@@ -290,4 +310,54 @@ hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
   display: inline-block; padding: 2px 8px; border-radius: 4px;
   background: #f0f0f5; border: 1px solid var(--border);
   font-size: 12px; font-family: monospace;
+}
+
+/* Lightbox (click image to zoom) */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.lightbox.open {
+  opacity: 1;
+  visibility: visible;
+}
+.lightbox img {
+  max-width: 94vw;
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+  cursor: zoom-out;
+  transform: scale(0.96);
+  transition: transform 0.2s ease;
+}
+.lightbox.open img {
+  transform: scale(1);
+}
+.lightbox .lightbox-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.55);
+  user-select: none;
+  pointer-events: none;
+}
+@media (max-width: 1024px) {
+  .lightbox { padding: 12px; }
+  .lightbox img { max-width: 96vw; max-height: 84vh; }
 }

@@ -6,7 +6,7 @@
  * 产出：articles/<slug>/index.html，做四件事：
  *   1. cdnjs 的 Prism 引用替换为本地 /assets/vendor/prism/（缺的组件自动下载）
  *   2. 删除内联 <style> 块，改为引用全站公共 theme.css / article.css
- *   3. 删除内联 <script>（目录高亮等由公共 /assets/js/article.js 提供）
+ *   3. 删除内联 <script>（目录高亮等由公共 /assets/js/article.js?v=2 提供）
  *   4. 侧边栏顶部插入「← 返回首页」链接
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
@@ -50,19 +50,19 @@ html = html.replace(/[ \t]*<script>[\s\S]*?<\/script>\n?/g, '');
 
 // 4) head 中插入公共样式（保持 theme → prism → article 的加载顺序）
 const prismCssLink = /<link href="\/assets\/vendor\/prism\/[^"]*" rel="stylesheet" \/>/;
-if (!html.includes('/assets/css/article.css')) {
+if (!html.includes('/assets/css/article.css?v=5')) {
   if (prismCssLink.test(html)) {
     html = html.replace(prismCssLink, (m) =>
-      `<link href="/assets/css/theme.css" rel="stylesheet" />\n${m}\n<link href="/assets/css/article.css" rel="stylesheet" />`);
+      `<link href="/assets/css/theme.css" rel="stylesheet" />\n${m}\n<link href="/assets/css/article.css?v=5" rel="stylesheet" />`);
   } else {
     html = html.replace('</head>',
-      '<link href="/assets/css/theme.css" rel="stylesheet" />\n<link href="/assets/css/article.css" rel="stylesheet" />\n</head>');
+      '<link href="/assets/css/theme.css" rel="stylesheet" />\n<link href="/assets/css/article.css?v=5" rel="stylesheet" />\n</head>');
   }
 }
 
 // 5) 底部加载公共文章脚本
-if (!html.includes('/assets/js/article.js')) {
-  html = html.replace('</body>', '<script src="/assets/js/article.js"></script>\n\n</body>');
+if (!html.includes('/assets/js/article.js?v=2')) {
+  html = html.replace('</body>', '<script src="/assets/js/article.js?v=2"></script>\n\n</body>');
 }
 
 // 6) 侧边栏插入返回首页链接
