@@ -52,8 +52,8 @@ const chips = [
 ].join('\n      ');
 
 const cards = sorted.map((a) => {
-  const cardTags = (a.tags ?? []).map((t) => `<span class="tag">${esc(t)}</span>`).join('');
-  return `    <a class="card" href="/articles/${encodeURIComponent(a.slug)}/" data-tags="${esc((a.tags ?? []).join(','))}">
+  const cardTags = (a.tags ?? []).map((t) => `<span class="tag" data-tag="${esc(t)}">${esc(t)}</span>`).join('');
+  return `    <a class="card" href="/articles/${encodeURIComponent(a.slug)}/" data-tags="${esc((a.tags ?? []).join(','))}" data-title="${esc(a.title)}" data-desc="${esc(a.description ?? '')}">
       <div class="card-head">
         <h2>${esc(a.title)}</h2>
         <time>${esc(a.date)}</time>
@@ -72,7 +72,7 @@ const html = `<!DOCTYPE html>
 <title>${esc(site.name)}</title>
 <meta name="description" content="${esc(site.description ?? '')}">
 <link href="/assets/css/theme.css" rel="stylesheet" />
-<link href="/assets/css/site.css" rel="stylesheet" />
+<link href="/assets/css/site.css?v=1" rel="stylesheet" />
 </head>
 <body>
 
@@ -82,36 +82,19 @@ const html = `<!DOCTYPE html>
 </header>
 
 <main class="article-list">
+  <div class="search-box">
+    <input id="search" type="search" placeholder="搜索文章标题、描述或标签…" autocomplete="off" />
+  </div>
   <div class="chips">
       ${chips}
   </div>
-  <p class="empty" id="empty" hidden>该标签下暂无文章</p>
+  <p class="empty" id="empty" hidden>没有匹配的文章，换个关键词或标签试试</p>
 ${cards}
 </main>
 
 <footer class="site-footer">${esc(site.footer ?? '')}</footer>
 
-<script>
-(function () {
-  var chips = document.querySelectorAll('.chip');
-  var cards = document.querySelectorAll('.card');
-  var empty = document.getElementById('empty');
-  chips.forEach(function (chip) {
-    chip.addEventListener('click', function () {
-      chips.forEach(function (c) { c.classList.remove('active'); });
-      chip.classList.add('active');
-      var tag = chip.dataset.tag;
-      var visible = 0;
-      cards.forEach(function (card) {
-        var show = !tag || card.dataset.tags.split(',').indexOf(tag) !== -1;
-        card.hidden = !show;
-        if (show) visible++;
-      });
-      empty.hidden = visible > 0;
-    });
-  });
-})();
-</script>
+<script src="/assets/js/home.js?v=1"></script>
 
 </body>
 </html>

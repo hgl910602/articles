@@ -1,6 +1,13 @@
 /* 首页样式：文章列表 + 标签筛选。
    设计变量与基础样式（字体、链接色等）在 theme.css，需先于本文件加载。 */
 
+/* 关键兜底：JS 通过 hidden 属性隐藏卡片时，
+   .card 的 display:block 会覆盖浏览器默认的 [hidden]{display:none}，
+   必须用 !important 强制优先，否则筛选/搜索在视觉上完全无效 */
+[hidden] {
+  display: none !important;
+}
+
 /* Header */
 .site-header {
   max-width: var(--content-max);
@@ -36,6 +43,28 @@
 }
 
 /* Tag filter chips */
+.search-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.search-box input {
+  width: min(480px, 100%);
+  padding: 9px 18px 9px 38px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.5' y2='16.5'/%3E%3C/svg%3E") no-repeat 14px center;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-box input::placeholder { color: var(--text-muted); }
+.search-box input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -104,7 +133,10 @@
   font-weight: 600;
   background: var(--primary-light);
   color: var(--primary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
+.tag:hover { background: var(--primary); color: #fff; }
 
 /* Empty state */
 .empty { text-align: center; color: var(--text-muted); font-size: 14px; padding: 40px 0; }
