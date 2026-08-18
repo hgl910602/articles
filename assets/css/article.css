@@ -178,6 +178,24 @@ blockquote {
 .badge-hot { background: #fee2e2; color: #dc2626; }
 .badge-new { background: #dbeafe; color: #2563eb; }
 
+/* Images / figures */
+.article-figure {
+  margin: 20px 0 24px 0;
+  text-align: center;
+}
+.article-figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid var(--border);
+}
+.article-figure figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
 /* Footer */
 .footer {
   margin-top: 80px;
