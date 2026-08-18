@@ -196,6 +196,53 @@ blockquote {
   color: var(--text-muted);
 }
 
+/* Tables */
+.article-table-wrap {
+  overflow-x: auto;
+  margin: 20px 0 24px 0;
+}
+.article-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.article-table th,
+.article-table td {
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+.article-table thead th {
+  background: var(--bg-elevated, #f6f8fa);
+  font-weight: 600;
+  color: var(--text);
+}
+.article-table tbody tr:nth-child(even) {
+  background: var(--bg-soft, #fafbfc);
+}
+
+/* Images embedded inside table cells */
+.article-table .table-figure {
+  margin: 8px 0 0 0;
+  text-align: center;
+}
+.article-table .table-figure img {
+  max-width: 190px;
+  max-height: 260px;
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Price comparison gallery intro */
+.gallery-intro {
+  font-weight: 600;
+  margin: 24px 0 4px 0;
+}
+
 /* Footer */
 .footer {
   margin-top: 80px;
