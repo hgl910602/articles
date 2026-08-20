@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="330" viewBox="0 0 1200 330" role="img" aria-labelledby="title desc">
+  <title id="title">&#x6700;&#x7B80;&#x5355;&#x7684;&#x94F6;&#x884C;&#x4E1A;&#x52A1;</title>
+  <desc id="desc">Card Number &#x540C;&#x65F6;&#x627F;&#x62C5;&#x51ED;&#x8BC1;&#x3001;&#x5BA2;&#x6237;&#x3001;&#x8D26;&#x6237;&#x548C;&#x4EA4;&#x6613;&#x5165;&#x53E3;&#x804C;&#x8D23;</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#333333" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrow" orient="auto" markerWidth="10" markerHeight="8" refX="9" refY="4" viewBox="0 0 10 8">
+      <path d="M0 0L10 4L0 8Z" fill="#666666"/>
+    </marker>
+    <style>text{font-family:PingFang SC,Microsoft YaHei,sans-serif}.t{fill:#333333;font-size:22px;font-weight:700}.s{fill:#666666;font-size:15px}.n{fill:#333333;font-size:17px;font-weight:700}.v{fill:#666666;font-size:14px}.k{fill:#666666;font-size:13px;font-weight:700}.box{fill:#fff;stroke:#CCCCCC;stroke-width:1.25}.desc{fill:#fff;stroke:#CCCCCC;stroke-width:1.15;stroke-dasharray:7 5}.line{fill:none;stroke:#666666;stroke-width:1.35}</style>
+  </defs>
+  <rect width="1200" height="330" fill="#FFFFFF"/>
+  <text x="40" y="44" class="t">&#x6700;&#x7B80;&#x5355;&#x7684;&#x94F6;&#x884C;&#x4E1A;&#x52A1;</text>
+  <text x="40" y="68" class="s">Card Number &#x540C;&#x65F6;&#x627F;&#x62C5;&#x51ED;&#x8BC1;&#x3001;&#x5BA2;&#x6237;&#x3001;&#x8D26;&#x6237;&#x548C;&#x4EA4;&#x6613;&#x5165;&#x53E3;&#x804C;&#x8D23;</text>
+  <g filter="url(#shadow)">
+    <rect x="55" y="120" width="270" height="90" rx="2" fill="#6699CC" stroke="#336699" stroke-width="1.4"/>
+    <text x="190.0" y="151" text-anchor="middle" class="n" style="fill:#333333">Card Number</text>
+    <text x="190.0" y="174" text-anchor="middle" class="v" style="fill:#333333">&#x94F6;&#x884C;&#x5361;&#x7269;&#x7406;&#x51ED;&#x8BC1;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="390" y="105" width="440" height="120" rx="12" class="desc"/>
+    <text x="610.0" y="136" text-anchor="middle" class="n">&#x8D26;&#x6237;&#x4E0E;&#x5BA2;&#x6237;&#x4FE1;&#x606F;</text>
+    <text x="610.0" y="159" text-anchor="middle" class="v">&#x4F59;&#x989D; &#xB7; &#x7528;&#x6237;&#x4FE1;&#x606F; &#xB7; &#x53D6;&#x6B3E;&#x67E5;&#x8BE2;&#x5BC6;&#x7801;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="895" y="120" width="250" height="90" rx="12" class="desc"/>
+    <text x="1020.0" y="151" text-anchor="middle" class="n">&#x4EA4;&#x6613;&#x8BB0;&#x5F55;</text>
+    <text x="1020.0" y="174" text-anchor="middle" class="v">&#x6D41;&#x6C34;&#x4E0E;&#x5386;&#x53F2;&#x4EA4;&#x6613;</text>
+  </g>
+  <line x1="325" y1="165" x2="390" y2="165" class="line" marker-end="url(#arrow)"/>
+  <line x1="830" y1="165" x2="895" y2="165" class="line" marker-end="url(#arrow)"/>
+  <text x="600" y="285" text-anchor="middle" class="s">&#x4E00;&#x4E2A;&#x7F16;&#x53F7;&#x627F;&#x8F7D;&#x591A;&#x7C7B;&#x72EC;&#x7ACB;&#x53D8;&#x5316;&#x7684;&#x4FE1;&#x606F;</text>
+</svg>
