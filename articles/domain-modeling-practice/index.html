@@ -66,7 +66,7 @@
 <p style="font-size:14px;color:var(--text-muted);text-indent:0">统一客户 ID、资质生命周期与四色建模</p>
 <div class="chapter-intro">
 <p><strong>姊妹篇：</strong>本文是<a href="../tech-design-guide/">《技术方案设计指南：从架构演进到领域建模》</a>的案例实践篇。前者系统介绍架构演进、DDD 与四色建模方法，本文用统一客户平台和资质中心展示这些方法如何落到具体业务模型中。</p>
-<p>本文使用一个抽象案例：苹果品牌经营主体申请进入平台，在电商开设苹果官方旗舰店，同时在商业化平台开户投放广告。案例只用于表述模型，不对应实际平台合作关系。</p>
+<p>本文使用一个抽象案例：苹果品牌经营主体申请进入平台，在电商开设苹果官方旗舰店，同时在商业化平台开户投放广告。案例只用于表述模型，不对应实际平台合作关系。文中的“案例认知稿”“案例方案”和图示均指本文整理出的不同设计阶段，不指向某份未公开的外部文档。</p>
 <p>文章讨论两个问题：平台如何识别跨业务经营的同一个客户，资质数据如何脱离入驻流程持续服务经营场景。客户部分涉及三层 ID 体系；资质部分涉及入驻、经营、变更、供给和消费，以及这些材料在四色模型中的位置。</p>
 </div>
 <h2 id="part1">客户平台与资质中心</h2>
@@ -115,7 +115,7 @@
 
 <h2 id="ch2">二、统一客户平台的三层 ID 体系</h2>
 <h3 id="ch2-1">2.1 银行业务中的 ID 职责迁移</h3>
-<p>经典文档以银行业务为例。早期模型把余额、用户信息和交易记录都放在 Card Number 下：</p>
+<p>案例先用银行业务说明 ID 职责如何分化。早期模型把余额、用户信息和交易记录都放在 Card Number 下：</p>
 <figure class="article-figure">
   <a href="images/bank-card-number-model.svg" target="_blank"><img src="images/bank-card-number-model.svg" alt="最简单的银行业务模型，Card Number 承载余额、用户信息和交易记录" loading="lazy"></a>
   <figcaption>演进图 1：Card Number 同时承担凭证、客户、账户和交易入口职责。</figcaption>
@@ -161,14 +161,14 @@ uid U01
 <p>更换登录账号时 <code>customer_id=C1001</code> 不变；开通广告业务时也沿用这个客户 ID。账号和业务发生变化，客户标识保持稳定。</p>
 
 <h3 id="ch2-4">2.4 客户 ID 与业务身份</h3>
-<p>把银行模型映射到平台，主体资质用于识别物理世界中的客户。身份资质与客户通常是 1:1，业务资质可以有多份。</p>
+<p>把银行模型映射到平台，主体资质是识别现实经营主体的重要证据，但不是客户本身。一个客户可以关联多种身份识别材料及其历史版本，业务资质也可以有多份；<code>customer_id</code> 标识归一后的现实主体，即使某份资质过期，客户记录仍然存在。</p>
 <figure class="article-figure">
-  <a href="images/customer-qualification-model.svg" target="_blank"><img src="images/customer-qualification-model.svg" alt="经典客户 ID 文档中的客户和资质模型" loading="lazy"></a>
+  <a href="images/customer-qualification-model.svg?v=2" target="_blank"><img src="images/customer-qualification-model.svg?v=2" alt="案例中的客户和资质识别模型" loading="lazy"></a>
   <figcaption>识别与经营分工：身份资质确认客户是谁，业务资质说明客户能够经营什么。</figcaption>
 </figure>
-<p>经典客户 ID 认知稿继续把 ShopID、AuthorID、广告账户 ID、合同和账号都放到客户 ID 周围，形成阶段性的完整模型：</p>
+<p>案例中的阶段性客户 ID 认知稿继续把 ShopID、AuthorID、广告账户 ID、合同和账号放到客户 ID 周围，形成关系全景：</p>
 <figure class="article-figure">
-  <a href="images/customer-centered-final-model.svg?v=2" target="_blank"><img src="images/customer-centered-final-model.svg?v=2" alt="经典以客户 ID 为中心的客户体系模型" loading="lazy"></a>
+  <a href="images/customer-centered-final-model.svg?v=2" target="_blank"><img src="images/customer-centered-final-model.svg?v=2" alt="案例中以客户 ID 为中心的客户体系模型" loading="lazy"></a>
   <figcaption>以 Customer ID 为关系锚点，账号、资质、业务对象与商业关系沿各自生命周期变化。</figcaption>
 </figure>
 <p>图中的登录账号、客户和业务对象各有自己的 ID，客户 ID 位于跨业务关系的中心。统一客户平台又增加了一层业务身份，用来容纳商家、达人、服务商、广告主和代理商之间的差异。</p>
@@ -196,7 +196,7 @@ uid U01
 <h3 id="ch2-5">2.5 三层 ID 的原始定义</h3>
 <table>
 <tr><th>层级</th><th>技术方案中的定义</th><th>业务方感知</th></tr>
-<tr><td>统一客户 ID<br><code>customer_id</code></td><td>与主体资质一一对应，不随业务场景变化</td><td>业务方不强感知，用于跨业务归一客户与共享客户级资产</td></tr>
+<tr><td>统一客户 ID<br><code>customer_id</code></td><td>标识归一后的现实经营主体，可关联多份识别材料，不随单项业务或单份资质变化</td><td>业务方不强感知，用于跨业务归一客户与共享客户级资产</td></tr>
 <tr><td>业务客户 ID<br><code>biz_customer_id</code></td><td>客户在不同业务场景下的身份定义</td><td>业务方需要感知，用于业务身份注册及资产绑定</td></tr>
 <tr><td>业务 ID<br><code>biz_id</code></td><td>业务基于业务客户 ID 衍生的模型 ID</td><td>由各业务域维护，并建立与 <code>biz_customer_id</code> 的映射</td></tr>
 </table>
@@ -215,21 +215,21 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 <h3 id="ch2-7">2.7 统一客户平台总体模型</h3>
 <p>统一客户平台规划把这些关系放进一张总图：统一客户 ID、业务客户 ID 和业务 ID 纵向排列，左侧是统一 B 端账号，右侧是业务身份管理和用户资产。</p>
 <figure class="article-figure">
-  <a href="images/unified-customer-platform-model.svg" target="_blank"><img src="images/unified-customer-platform-model.svg" alt="统一客户平台三层 ID 体系总体架构图" loading="lazy"></a>
+  <a href="images/unified-customer-platform-model.svg?v=2" target="_blank"><img src="images/unified-customer-platform-model.svg?v=2" alt="统一客户平台三层 ID 体系总体架构图" loading="lazy"></a>
   <figcaption>统一客户 ID 体系规划总图：主体资质识别统一客户，业务客户 ID 表达业务身份，各业务 ID 继续由业务域维护。</figcaption>
 </figure>
 <p>图中的三层 ID 各自承载不同信息：UID 与客户分离，业务客户 ID 容纳各业务身份，业务 ID 保留在业务域内；统一 B 端账号负责跨业务登录和管理。</p>
 
 <h2 id="ch3">三、统一客户平台的建设范围</h2>
 <table>
-<tr><th>建设内容</th><th>原方案职责</th><th>边界</th></tr>
+<tr><th>建设内容</th><th>案例方案职责</th><th>边界</th></tr>
 <tr><td>三层 ID 体系</td><td>定义 <code>customer_id</code>、<code>biz_customer_id</code> 以及与业务 ID 的关系</td><td>不替换各业务现有 ID</td></tr>
 <tr><td>业务身份管理</td><td>定义和注册客户在各业务域中的身份</td><td>具体经营规则仍在业务域</td></tr>
 <tr><td>统一 B 端账号</td><td>统一登录、组织管理、管理员和子账号基础能力</td><td>业务内角色与权限由各业务管理</td></tr>
 <tr><td>客户关系平台</td><td>维护 ID 类型、业务场景、绑定关系及正反向寻址</td><td>只保存关系，不承载业务对象数据</td></tr>
 <tr><td>统一资产管理</td><td>主体资质等客户级资产可以跨业务复用</td><td>业务流强相关资产继续留在业务域</td></tr>
 </table>
-<p>经典认知稿把客户 ID 放在跨业务关系的中心；统一客户平台规划在其上下增加业务客户 ID、统一 B 端账号和关系平台。两份文档处于不同设计阶段，登录账号、客户、业务身份和业务对象的职责划分保持一致。</p>
+<p>案例认知稿把客户 ID 放在跨业务关系的中心；后续平台化规划在其上下增加业务客户 ID、统一 B 端账号和关系平台。两版模型处于不同设计阶段，登录账号、客户、业务身份和业务对象的职责划分保持一致。</p>
 
 <h2 id="part2">下篇：资质业务与四色视角</h2>
 
@@ -295,7 +295,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 <p>资质中心通过 <code>related_entity_type + related_entity_id</code> 引用主体，不维护客户和业务客户的主体表。资产挂在哪一层，决定它可以在哪些场景中复用。</p>
 
 <h3 id="ch4-5">4.5 生效数据与待审数据并存</h3>
-<p>“某个主体拥有什么类型的资质”对应一条<strong>资质实例</strong>。营业执照地址变更后，实例的读取和修改发生在同一时间：</p>
+<p><strong>资质实例</strong>表示某个主体持有的一份具体资质。同一主体可以拥有多份同类型资质，例如多个商标注册证或不同品牌范围的授权；因此主体类型、主体 ID 和资质类型只确定业务归属，还需要实例 ID 或证照号、品牌、适用范围等业务键区分具体实例。营业执照地址变更后，同一实例的读取和修改会同时发生：</p>
 <div class="diagram"><pre>
 当前营业执照已生效
        │
@@ -305,7 +305,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 </pre></div>
 <p>模型需要同时保存两类事实：当前生效数据继续服务，本次修改内容处于审批中。对应的数据结构也分成两套：</p>
 <table>
-<tr><th>模型</th><th>原方案状态</th><th>职责</th></tr>
+<tr><th>模型</th><th>案例状态</th><th>职责</th></tr>
 <tr><td>资质实例</td><td>初始化、已生效、已失效</td><td>保存当前对外服务的数据及有效期</td></tr>
 <tr><td>资质快照</td><td>已保存、审批中、审批通过、审批拒绝</td><td>保存草稿、本次修改和历史镜像</td></tr>
 <tr><td>申请单 / 审核单</td><td>由申请单域和审核中心管理</td><td>记录送审过程并承接审核交互</td></tr>
@@ -314,7 +314,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 
 <h3 id="ch4-6">4.6 页面、接口和离线数据</h3>
 <p>资质数据的来源继续扩展：商家在页面填写，外部系统实时调用接口，历史数据通过离线任务迁移。如果按业务身份分别开发，商家、达人、服务商、商业化都要重复建设接入链路。</p>
-<p>原方案将来源收敛成三种<strong>资质供给方式</strong>：</p>
+<p>案例方案将来源收敛成三种<strong>资质供给方式</strong>：</p>
 <ul>
 <li>JSON Schema 可视化收集：资质中心托管表单和完整生命周期；</li>
 <li>开放接入：外部系统通过 RPC 实时写入；</li>
@@ -329,7 +329,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 <li>某个业务场景需要哪些资质类型；</li>
 <li>当前资质主体是否拥有满足条件的有效实例。</li>
 </ol>
-<p>原方案据此引入：</p>
+<p>案例方案据此引入：</p>
 <ul>
 <li><strong>业务实体</strong>：规则作用的外部对象，例如商品类目；</li>
 <li><strong>资质关联规则</strong>：业务实体需要哪些资质类型及其约束；</li>
@@ -365,11 +365,11 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 <tr><td style="background:#d1fae5">绿</td><td>Party-Place-Thing</td><td>资质主体、资质实例、资质快照、资质审核单、证照文件和业务实体</td></tr>
 <tr><td style="background:#dbeafe">蓝</td><td>Description</td><td>资质主体类型、资质定义、资质分类、资质供给方式、业务定义、规则定义及 Schema 配置</td></tr>
 </table>
-<p>原技术方案中的资质实例、资质快照和资质审核单都有独立标识，可以保存和关联，属于绿色 PPT。保存、提审、审核、生效和失效则是发生在这些对象上的红色 MI。</p>
+<p>案例技术方案中的资质实例、资质快照和资质审核单都有独立标识，可以保存和关联，属于绿色 PPT。保存、提审、审核、生效和失效则是发生在这些对象上的红色 MI。</p>
 
 <h3 id="ch5-2">5.2 绿色 PPT：资质业务中的对象</h3>
 <table>
-<tr><th>绿色对象</th><th>原文含义</th><th>主要关系</th></tr>
+<tr><th>绿色对象</th><th>案例含义</th><th>主要关系</th></tr>
 <tr><td>资质主体</td><td>资质归属的具体对象，例如 <code>customer_id=C1001</code> 或某个 <code>biz_customer_id</code></td><td>一个主体可以拥有多条资质实例</td></tr>
 <tr><td>资质实例</td><td>某个资质主体针对某个资质类型的一条具体资质</td><td>引用主体与资质定义，并拥有多个快照</td></tr>
 <tr><td>资质快照</td><td>资质实例的草稿、本次修改内容或历史镜像</td><td>归属于资质实例，并参与送审</td></tr>
@@ -389,7 +389,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 
 业务实体 ── 资质关联规则 ──▶ 资质定义
 </pre></div>
-<p>原文在不同位置使用“申请单”和“资质审核单”：申请单由外部申请单域提供，记录一次业务申请；领域模型图中的资质审核单关联本次送审的一份或多份资质快照；审核操作由审核中心执行。三者共同组成审批链路。</p>
+<p>案例材料区分“申请单”和“资质审核单”：申请单由外部申请单域提供，记录一次业务申请；领域模型图中的资质审核单关联本次送审的一份或多份资质快照；审核操作由审核中心执行。三者共同组成审批链路。</p>
 <p>资质快照不是一次“审核通过”事件，它保存草稿、待审内容和历史镜像；资质审核单也不是“审核”动作本身，而是审核流程留下的业务记录。对象和过程分开后，实例状态与快照审批状态也各有归属。</p>
 
 <h3 id="ch5-3">5.3 红色 MI：对象经历的过程</h3>
@@ -414,7 +414,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
                     │
                     └── effective_start_time / effective_end_time
 </pre></div>
-<p>原文分别定义了实例状态和快照状态。实例表达当前资质是否对外有效，快照表达一份提交内容处于什么审批阶段。审核单保存过程记录，审核中心执行审核操作。</p>
+<p>案例分别定义了实例状态和快照状态。实例表达当前资质是否对外有效，快照表达一份提交内容处于什么审批阶段。审核单保存过程记录，审核中心执行审核操作。</p>
 
 <h3 id="ch5-4">5.4 黄色 Role：同一对象在过程中的身份</h3>
 <table>
@@ -429,7 +429,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 
 <h3 id="ch5-5">5.5 蓝色 Description：定义、分类与规则</h3>
 <table>
-<tr><th>蓝色描述</th><th>原文含义</th><th>描述的绿色对象或红色过程</th></tr>
+<tr><th>蓝色描述</th><th>案例含义</th><th>描述的绿色对象或红色过程</th></tr>
 <tr><td>资质主体类型</td><td>统一客户 ID、业务客户 ID、店铺等可承载资质的主体类别</td><td>约束资质主体及实例归属</td></tr>
 <tr><td>资质定义 / 资质类型</td><td>资质名称、业务含义、字段、所属主体类型和支持的校验</td><td>描述资质实例</td></tr>
 <tr><td>资质分类</td><td>主体资质、品牌资质等多个资质类型的业务聚合</td><td>组织资质定义</td></tr>
@@ -454,7 +454,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 <h3 id="ch6-1">6.1 资质中心领域模型</h3>
 <p>把这些概念放进同一张领域模型图，可以看到一条清晰主线：先定义资质，再形成实例与快照，最后通过审核决定哪一版数据生效。图中沿用“资质定义、资质类别”的表述，正文对应使用“资质类型、资质分类”。</p>
 <figure class="article-figure">
-  <a href="images/qualification-domain-model.svg" target="_blank"><img src="images/qualification-domain-model.svg" alt="资质中心原始领域模型架构图" loading="lazy"></a>
+  <a href="images/qualification-domain-model.svg" target="_blank"><img src="images/qualification-domain-model.svg" alt="资质中心案例领域模型架构图" loading="lazy"></a>
   <figcaption>资质中心领域模型：定义约束实例，快照承载变更，审核决定哪一版数据生效。</figcaption>
 </figure>
 <p>资质主体类型连接资质定义，资质定义关联供给方式和分类，具体数据落在资质实例中。实例拥有多份资质快照，快照保存草稿、待审内容和历史镜像；资质审核单记录一次送审上下文，并与相关快照关联。</p>
@@ -467,7 +467,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 <tr><td>资质消费</td><td>业务实体、资质关联规则</td><td>数据用于何处，怎样完成查询和规则校验</td></tr>
 </table>
 <figure class="article-figure">
-  <a href="images/qualification-subdomain-architecture.svg" target="_blank"><img src="images/qualification-subdomain-architecture.svg" alt="资质基础、资质供给和资质消费三个子域总体架构图" loading="lazy"></a>
+  <a href="images/qualification-subdomain-architecture.svg?v=2" target="_blank"><img src="images/qualification-subdomain-architecture.svg?v=2" alt="资质基础、资质供给和资质消费三个子域总体架构图" loading="lazy"></a>
   <figcaption>资质中心三个子域总图：资质基础提供定义，资质供给承接全托管/半托管及实时/离线数据，资质消费提供在线与离线查询和规则校验。</figcaption>
 </figure>
 <p>领域模型图列出概念及关系，子域架构图呈现资质基础、供给和消费的运行方式。</p>
@@ -475,7 +475,7 @@ biz_customer_id EC2001 ──映射──▶ seller_id / shop_id
 <h2 id="ch7">七、业务变化在模型中的落点</h2>
 <p>几个常见变化在模型中的影响范围如下：</p>
 <ul>
-<li>资质实例由资质主体类型、资质主体 ID 和资质类型共同确定其业务归属；</li>
+<li>资质主体类型、资质主体 ID 和资质类型共同确定实例的业务归属；实例 ID 或证照号、品牌、适用范围等业务键区分同类型的多份实例；</li>
 <li>资质实例保留当前对外服务的数据，状态为初始化、已生效或已失效；</li>
 <li>每次保存或修改形成资质快照，审批结论绑定快照；</li>
 <li>快照审批通过后更新实例，审批拒绝不覆盖当前生效实例；</li>
@@ -499,7 +499,7 @@ biz_customer_id ───────────┼──────▶ 资质
 业务实体 ──资质关联规则──▶ 资质类型 ──查询──▶ 有效资质实例
 </pre></div>
 <table>
-<tr><th>业务变化</th><th>原方案中受影响的概念</th><th>保持稳定的部分</th></tr>
+<tr><th>业务变化</th><th>案例中受影响的概念</th><th>保持稳定的部分</th></tr>
 <tr><td>新增商业化广告主身份</td><td>业务客户 ID、业务 ID 映射</td><td>统一客户 ID、已有主体资质实例</td></tr>
 <tr><td>营业执照地址变更</td><td>资质快照、申请单</td><td>已生效资质实例在审批期间继续服务</td></tr>
 <tr><td>新增一种品牌证明</td><td>资质类型、资质分类、供给方式配置</td><td>资质实例和快照通用模型</td></tr>
@@ -507,7 +507,7 @@ biz_customer_id ───────────┼──────▶ 资质
 </table>
 
 <h2 id="summary">结语</h2>
-<p>客户体系围绕几个长期存在的问题展开：平台服务的是谁，客户进入了哪些业务，资产归属统一客户 ID、业务客户 ID 还是业务 ID，登录账号与业务账户是什么关系。经典认知稿以客户 ID 为中心组织这些对象；平台化规划补充了业务客户 ID、统一 B 端账号和客户关系平台。</p>
+<p>客户体系围绕几个长期存在的问题展开：平台服务的是谁，客户进入了哪些业务，资产归属统一客户 ID、业务客户 ID 还是业务 ID，登录账号与业务账户是什么关系。案例认知稿以客户 ID 为中心组织这些对象；平台化规划补充了业务客户 ID、统一 B 端账号和客户关系平台。</p>
 <p>资质最初由入驻平台采集，用来证明商家满足合规准入条件。店铺开通后，主体资质进入商家证明公示和资金进件，品牌、行业及类目资质也被经营场景持续使用。它们的更新、续期、过期和失效跨越了入驻申请单的生命周期，长期存续和消费由资质中心承接。</p>
 <p>四色建模把资质材料分成四类：资质主体、资质实例、资质快照、资质审核单和业务实体属于绿色对象；采集、保存、提审、审核、生效和失效属于红色过程；供给方、申请人、持有人、审核方和使用方属于黄色角色；主体类型、资质定义、分类、供给方式、业务定义和规则定义属于蓝色描述。</p>
 

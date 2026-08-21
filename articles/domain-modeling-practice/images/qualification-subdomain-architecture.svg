@@ -30,17 +30,15 @@
   <rect x="870" y="125" width="160" height="26" rx="13" fill="#FFFFFF"/>
   <text x="950.0" y="143" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#666666">&#x5DF2;&#x5931;&#x6548;</text>
   <line x1="220" y1="138" x2="245" y2="138" class="link" marker-end="url(#arr)"/>
-  <rect x="198.5" y="126.0" width="68" height="20" rx="10" fill="#FFFFFF"/>
-  <text x="232.5" y="141.0" text-anchor="middle" class="small">&#x63D0;&#x5BA1;</text>
+  <text x="232.5" y="119" text-anchor="middle" class="small">&#x63D0;&#x5BA1;</text>
   <line x1="405" y1="138" x2="430" y2="138" class="link" marker-end="url(#arr)"/>
-  <rect x="383.5" y="126.0" width="68" height="20" rx="10" fill="#FFFFFF"/>
-  <text x="417.5" y="141.0" text-anchor="middle" class="small">&#x901A;&#x8FC7;</text>
-  <line x1="405" y1="150" x2="650" y2="150" class="link" marker-end="url(#arr)"/>
-  <rect x="493.5" y="138.0" width="68" height="20" rx="10" fill="#FFFFFF"/>
-  <text x="527.5" y="153.0" text-anchor="middle" class="small">&#x62D2;&#x7EDD;</text>
-  <line x1="590" y1="138" x2="870" y2="138" class="link" marker-end="url(#arr)"/>
-  <rect x="696.0" y="126.0" width="68" height="20" rx="10" fill="#FFFFFF"/>
-  <text x="730.0" y="141.0" text-anchor="middle" class="small">&#x8FC7;&#x671F; / &#x6CBB;&#x7406;</text>
+  <text x="417.5" y="119" text-anchor="middle" class="small">&#x901A;&#x8FC7;</text>
+  <polyline points="405,150 405,170 730,170 730,151" class="link" marker-end="url(#arr)"/>
+  <rect x="527" y="158" width="76" height="20" rx="10" fill="#FFFFFF"/>
+  <text x="565" y="173" text-anchor="middle" class="small">&#x62D2;&#x7EDD;</text>
+  <polyline points="590,138 620,138 620,198 950,198 950,151" class="link" marker-end="url(#arr)"/>
+  <rect x="747" y="186" width="86" height="20" rx="10" fill="#FFFFFF"/>
+  <text x="790" y="201" text-anchor="middle" class="small">&#x8FC7;&#x671F; / &#x6CBB;&#x7406;</text>
   <rect x="35" y="835" width="1510" height="125" rx="16" fill="#FFFFFF" stroke="#CCFFFF" stroke-width="1.8"/>
   <rect x="55" y="819" width="130" height="30" rx="15" fill="#6699CC"/>
   <text x="120" y="839" text-anchor="middle" class="white">&#x8D44;&#x8D28;&#x57FA;&#x7840;</text>

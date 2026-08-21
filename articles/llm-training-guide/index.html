@@ -111,7 +111,7 @@
 </pre>
 </div>
 
-<p>一篇几千字的长回答，就是这样<strong>一个词一个词接出来的</strong>。每接一个词，都要把"当前全部内容"重新读一遍、重新打分。这就是大模型生成文本的全部秘密。</p>
+<p>一篇几千字的长回答，就是这样<strong>一个 token 一个 token 接出来的</strong>。每生成一个新 token，模型都要结合此前的上下文重新计算下一步概率；实际推理通常用 KV Cache 复用历史 token 的 Key/Value，避免把整段前文从头重复计算。</p>
 
 <div class="callout callout-note">
 <strong>一个常见误解：</strong> 模型不是"想好了整段话再输出"，而是每一步只决定下一个词。前面接了什么词，会直接影响后面接什么词——所以同一个开头，接出的话每次都可能不一样。
@@ -166,7 +166,7 @@ print(ids)           # [1036, 69507, 540, 1511]  ← 模型真正看到的是这
 │  ┌───────────────────────────────────┐  │
 │  │ 前馈网络 FFN                        │  │
 │  │ 对每个位置独立做非线性加工            │  │
-│  │ —— 大量事实知识存在这里               │  │
+│  │ —— 参与特征变换与知识表征              │  │
 │  └───────────────────────────────────┘  │
 │ （每层都有残差捷径 + 归一化，保证稳定）     │
 └──────────────────┬──────────────────────┘
@@ -182,7 +182,7 @@ print(ids)           # [1036, 69507, 540, 1511]  ← 模型真正看到的是这
 
 <p>看这句话：<code>小猫追着球跑，它玩得很开心</code>。<code>它</code>指的是小猫还是球？人一眼就看出来是<em>小猫</em>（会"玩得开心"的是猫）。要让模型也能判断，<code>它</code>这个词的表示里就必须<strong>混入"小猫"的信息</strong>。</p>
 
-<p>这就是注意力做的事：<strong>读句子时，每个词都去看一遍所有其他词，把相关的信息抄一点过来</strong>。相关度越高，抄得越多。经过几十层的注意力加工，每个词的向量就不再是"这个字本身"，而是"这个字在这句话里的意思"。</p>
+<p>这就是注意力做的事：<strong>每个位置都会从允许访问的位置聚合相关信息</strong>。相关度越高，汇入的信息越多。在 Decoder-only 模型中，因果掩码只允许当前位置关注自己和更早的 token，不能看到未来。经过多层加工后，每个 token 的向量不再只表示它本身，还带有上下文信息。</p>
 
 <h4 id="sec1-3-2">1.3.2 Q/K/V：词与词对暗号</h4>
 
@@ -229,7 +229,7 @@ print(ids)           # [1036, 69507, 540, 1511]  ← 模型真正看到的是这
 <h4 id="sec1-3-5">1.3.5 前馈网络与残差捷径</h4>
 
 <ul>
-<li><strong>FFN（前馈网络）</strong>：注意力负责词与词之间"沟通"，FFN 负责对每个位置独立"深加工"。研究普遍认为，模型记住的<strong>事实知识</strong>（"北京是中国首都"这类）主要存储在 FFN 的权重里。</li>
+<li><strong>FFN（前馈网络）</strong>：注意力负责 token 之间的信息聚合，FFN 负责对每个位置独立做非线性变换。部分研究发现某些事实关联可以在 FFN 中定位或编辑，但知识表征分布在嵌入、注意力和 FFN 等多处，不能简单理解为只存放在 FFN。</li>
 <li><strong>残差连接</strong>：每层的输出 = 输入 + 本层的加工结果。相当于给信息留了一条"抄近道"的捷径，几十层堆叠时信号和梯度都能顺利通过，不至于传着传着就消失了。</li>
 <li><strong>归一化（LayerNorm/RMSNorm）</strong>：把数值范围稳住，防止越算越炸。</li>
 </ul>
@@ -313,7 +313,7 @@ next_token = torch.multinomial(probs, num_samples=1)   # 按概率抽签
 
   <rect x="40" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
   <text x="55" y="420" font-size="12" font-weight="500" fill="#444441">推理 = 参数固定，跑前向传播</text>
-  <text x="55" y="440" font-size="11" font-weight="400" fill="#5F5E5A">每生成一个词都要把全文重新读一遍</text>
+  <text x="55" y="440" font-size="11" font-weight="400" fill="#5F5E5A">逐 token 生成；KV Cache 复用历史注意力状态</text>
 
   <rect x="350" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
   <text x="365" y="420" font-size="12" font-weight="500" fill="#444441">训练 = 反复调那几十亿个旋钮</text>
@@ -332,7 +332,7 @@ next_token = torch.multinomial(probs, num_samples=1)   # 按概率抽签
 
 <h3 id="sec2-1">2.1 训练目标：一个游戏玩几万亿次</h3>
 
-<p>预训练的损失函数说出来简单到不像话——<strong>让模型猜中的下一个 token 的概率尽可能大</strong>。具体做法：把语料每个位置的"下一个词"盖住当标准答案，让模型猜，猜错得越离谱，惩罚（loss）越大。</p>
+<p>预训练的损失函数说出来简单到不像话——<strong>让模型给真实的下一个 token 更高概率</strong>。训练时把同一段序列右移一位作为标签，并用因果掩码阻止当前位置看到未来 token；模型会同时对序列中的各个位置预测下一 token，预测越偏离标签，损失（loss）越大。</p>
 
 <pre><code class="language-python"># 伪代码：预训练的核心只有这几行
 model = Transformer(params=random_init())        # 参数随机初始化
@@ -354,7 +354,7 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
 <p>神奇之处在于：为了把"接龙"这一件事做好，模型<strong>被迫</strong>学会语法（不然接不通顺）、事实（"中国的首都是"后面接什么）、逻辑（推理链条）、代码（GitHub 上接注释和函数体）……所有能力都被压缩进参数里。</p>
 
 <div class="callout callout-note">
-<strong>为什么"猜下一个词"这么有效：</strong> 想把海量的接龙都接对，唯一的办法就是真正"理解"文本里的规律。这个朴素的目标函数，逼出了通用智能的雏形——这是 GPT 系列最反直觉也最深刻的洞察。
+<strong>为什么"猜下一个词"这么有效：</strong> 要在海量语料上持续降低预测误差，模型必须学习语法、语义、事实关联和推理模式。至于这是否等同于人类意义上的"理解"仍有争论；可以确定的是，这个朴素目标能够产生广泛的可迁移能力。
 </div>
 
 <h3 id="sec2-2">2.2 数据：几万亿词从哪来</h3>
@@ -519,7 +519,7 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
 <h2 id="ch3">第三章：后训练——从书呆子到好助手<span class="badge badge-hot">重点</span></h2>
 
 <div class="chapter-intro">
-<p>预训练产出的基座模型没法直接给用户用。<strong>后训练（Post-training）</strong>是在基座之上继续做的"小灶式"训练，把"博览群书的怪才"变成"好用的助手"。本章按主流流水线顺序讲四个环节：SFT → RLHF → DPO → RLVR，最后给出完整流水线和常见误区。</p>
+<p>预训练产出的基座模型通常还需要适配后才能成为好用的助手。<strong>后训练（Post-training）</strong>是在基座之上继续优化行为与能力的过程。本章先讲常见起点 SFT，再分别介绍两类偏好对齐方案——基于奖励模型与 PPO 的 RLHF、直接偏好优化 DPO——以及可按任务需要加入的 RLVR。它们不是必须全部串行执行的四个阶段。</p>
 <p>贯穿本章的比喻：<strong>预训练 = 上学读书；SFT = 岗前培训；RLHF = 实习中被人点评；RLVR = 刷题练出打草稿的习惯。</strong></p>
 </div>
 
@@ -537,11 +537,11 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
 <tr><td>安全边界</td><td>有害请求照接</td><td>合理拒绝</td></tr>
 </table>
 
-<p>后训练要解决的就是这些——<strong>不教新知识，教"怎么表现"</strong>。</p>
+<p>后训练首先要解决这些行为问题——<strong>重点是教模型如何响应、如何取舍</strong>。它也可能注入领域知识或技能，但少量监督样本并不是稳定维护大量、时效性知识的理想方式。</p>
 
 <h3 id="sec3-2">3.2 SFT：照着范例学</h3>
 
-<p><strong>SFT（Supervised Fine-Tuning，监督微调）</strong>是最直接的后训练：人工造几万到几百万条"问题 → 理想回答"的示范数据，用和预训练<strong>一模一样</strong>的"猜下一个词"方法去学。</p>
+<p><strong>SFT（Supervised Fine-Tuning，监督微调）</strong>是最直接的后训练：使用人工编写或模型生成并经筛选的"问题 → 理想回答"示范数据，继续用自回归交叉熵训练。它和预训练共享下一 token 预测形式，但数据分布、对话模板及损失掩码通常不同。</p>
 
 <p>数据长这样（如今很多由强模型生成 + 人工校验）：</p>
 
@@ -575,7 +575,7 @@ prompt = tokenizer.apply_chat_template(messages, tokenize=False)
 </code></pre>
 
 <div class="callout callout-note">
-<strong>SFT 学的是格式和角色，不是知识：</strong> 几万条数据相对几万亿 token 的预训练语料九牛一毛。SFT 教会模型的是：你是助手、先答后展开、用 markdown、不懂要说不懂、有害请求要拒绝。这一步之后，模型已经"像模像样"了。
+<strong>SFT 主要塑造行为，也能影响知识与技能：</strong> 相比预训练语料，SFT 数据规模通常较小，最显著的作用是让模型学习助手角色、回答格式、任务步骤和安全示范。高质量领域数据也能补充能力或知识，但覆盖范围、遗忘和事实更新仍需单独评估。
 </div>
 
 <h3 id="sec3-3">3.3 RLHF：根据反馈学分寸</h3>
@@ -638,7 +638,7 @@ for question in prompt_data:
 
 <h3 id="sec3-4">3.4 DPO：轻量级对齐</h3>
 
-<p>RLHF 效果好但太重：要同时维护策略模型、参考模型、奖励模型、价值模型。<strong>DPO（Direct Preference Optimization，直接偏好优化，2023）</strong>证明了可以直接从偏好数据优化策略，跳过奖励模型和 PPO：</p>
+<p>经典的奖励模型 + PPO 流程工程较重，训练时通常涉及策略模型、参考模型、奖励模型和价值函数。<strong>DPO（Direct Preference Optimization，直接偏好优化，2023）</strong>提供了另一条偏好对齐路线：直接从成对偏好数据优化策略，不显式训练奖励模型，也不运行 PPO。它通常是 PPO 式 RLHF 的替代选择，而不是其后的固定步骤。</p>
 
 <pre><code class="language-json">// DPO 数据：同一个问题的两个回答，人类标注谁更好
 {
@@ -654,13 +654,13 @@ for question in prompt_data:
 <tr><th>维度</th><th>RLHF（PPO）</th><th>DPO</th></tr>
 <tr><td>需要奖励模型</td><td>需要（单独训练）</td><td>不需要</td></tr>
 <tr><td>需要强化学习</td><td>需要（PPO，不稳定）</td><td>不需要（类似监督训练）</td></tr>
-<tr><td>工程门槛</td><td>高</td><td>低，社区事实上的默认选项</td></tr>
-<tr><td>效果上限</td><td>更高（信号更充分）</td><td>略保守，但够用且稳</td></tr>
+<tr><td>工程门槛</td><td>较高，包含在线采样与强化学习稳定性问题</td><td>较低，训练形态接近监督学习</td></tr>
+<tr><td>效果特点</td><td>可利用在线采样持续探索，但更依赖奖励质量与训练稳定性</td><td>实现简单、稳定，效果取决于偏好数据覆盖和超参数</td></tr>
 </table>
 
 <h3 id="sec3-5">3.5 RLVR：学会打草稿<span class="badge badge-new">推理模型</span></h3>
 
-<p>近两年后训练最大的突破：在<strong>答案可以自动判对错</strong>的任务上做强化学习，全称 RL with Verifiable Rewards（可验证奖励的强化学习）。</p>
+<p>近年来后训练的重要方向之一，是在<strong>结果可以自动验证</strong>的任务上做强化学习，全称 RL with Verifiable Rewards（可验证奖励的强化学习）。</p>
 
 <p>关键洞察：数学题可以核对答案、代码题可以跑单元测试——<strong>不需要人类标注"好不好"，对错机器自己知道</strong>。于是可以大规模地"刷题"：模型生成带推理过程的解答，对了给奖励，错了不给，能力就自己长出来了。</p>
 
@@ -683,10 +683,10 @@ for question in prompt_data:
 </pre>
 </div>
 
-<p>DeepSeek 的 R1 论文记录了有趣的现象：纯靠 RLVR（不加 SFT 起步的 R1-Zero 设置），模型<strong>自发涌现</strong>出越来越长的反思式思维链——中途会写出"等等，我刚才那步好像不对，让我重新算"，被称为"aha moment"。这证明推理能力可以在没有人类示范解题过程的情况下被激励出来。</p>
+<p>DeepSeek 的 R1 论文记录了有趣的现象：R1-Zero 不以 SFT 冷启动，主要通过可验证奖励强化学习，训练中出现了更长的反思式推理轨迹，例如中途重新检查答案。这个实验说明，在特定模型、任务和奖励设计下，不提供人工推理过程示范也可能增强某些推理行为；它不能单独证明所有推理能力都会自然涌现。</p>
 
 <div class="callout callout-note">
-<strong>推理模型 vs 普通模型：</strong> 普通模型"凭直觉抢答"，推理模型"先打草稿再交卷"。代价是：更慢（生成几千 token 的思考过程）、更贵（token 数翻几倍）。所以日常闲聊用普通模型，数学/代码/复杂分析用推理模型。
+<strong>推理模型 vs 常规模型：</strong> 推理模型会在回答前投入更多计算或生成更多中间 token，通常在数学、代码和复杂分析上更有优势，代价是延迟与成本增加。简单任务未必从额外推理中获益，应根据质量、时延和成本选择。
 </div>
 
 <h3 id="sec3-6">3.6 完整流水线总览</h3>
@@ -697,12 +697,12 @@ for question in prompt_data:
         ▼ 预训练：几万亿 token 上猜下一个词
         │ （几千卡 × 几个月 × 数千万美元级）
    基座模型 Base
-   （博览群书，但只会续写）
+   （知识丰富，但尚未稳定遵循指令）
         │
         ▼ SFT：几万~百万条「问-答」示范
         │ （学角色、格式、基本安全）
-        ▼ RLHF / DPO：人类偏好数据
-        │ （学分寸：helpful + harmless 的平衡）
+        ▼ 偏好对齐：RLHF（奖励模型 + PPO）或 DPO
+        │ （两条常见替代路线，学习回答偏好与安全边界）
         ▼ （可选）RLVR：数学/代码刷题
         │ （学思维链：先打草稿再交卷）
    Chat / 推理 模型
@@ -713,7 +713,7 @@ for question in prompt_data:
 <h3 id="sec3-7">3.7 常见误区</h3>
 
 <div class="callout callout-danger">
-<strong>误区一："模型的知识是微调教进去的。"</strong> 几万条微调数据教不动几万亿 token 建立的知识体系。想让模型知道新知识，正解是 RAG（外挂检索）或继续预训练（大量领域语料），而不是微调。
+<strong>误区一："更新模型知识，只要做一次小规模微调。"</strong> 微调可以注入知识，但覆盖、可追溯性和更新稳定性往往不足。需要频繁更新或必须引用来源的知识优先用 RAG；需要改变广泛领域能力时，再评估继续预训练或较大规模微调。
 </div>
 
 <div class="callout callout-danger">
@@ -728,7 +728,7 @@ for question in prompt_data:
 <div class="chapter-summary">
 <svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
   <title>后训练总结图</title>
-  <desc>SFT、RLHF、DPO、RLVR 四个环节及完整流水线</desc>
+  <desc>SFT、两类偏好对齐路线与可选 RLVR 的典型组合</desc>
 
   <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">后训练 Post-training</text>
   <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">岗前培训——把书呆子变成好助手</text>
@@ -796,7 +796,7 @@ for question in prompt_data:
 │
 ├── 需要固定的风格 / 领域行为 / 输出格式
 │    └── → 微调（LoRA）
-│         几千~几万条数据，教"怎么干"，不是教"知识"
+│         几千~几万条数据，重点塑造"怎么干"，也可能补充领域能力
 │
 ├── 需要全新领域 / 新语言的基础能力
 │    └── → 继续预训练 CPT
@@ -808,7 +808,7 @@ for question in prompt_data:
 </div>
 
 <div class="callout callout-tip">
-<strong>经验法则：</strong> 80% 的"模型不够好"其实是 Prompt 没写好；剩下的大部分该用 RAG；真正需要微调的，往往是"输出格式/风格必须高度一致"的场景（如特定领域的结构化抽取）。知识类需求优先 RAG，不要指望微调灌知识。
+<strong>经验法则：</strong> 先用评测集定位问题，再按成本从 Prompt、工具调用或 RAG 开始验证。需要稳定改变输出格式、风格或领域行为时再考虑微调；知识类需求如果强调时效与可溯源，通常优先 RAG，但不存在适用于所有项目的固定比例。
 </div>
 
 <h3 id="sec4-2">4.2 LoRA：轻量微调</h3>
@@ -856,13 +856,13 @@ model.print_trainable_parameters()
 <li><strong>logits 蒸馏</strong>（更学术）：小模型直接拟合强模型的输出概率分布</li>
 </ul>
 
-<p>价值：推理成本降一个数量级。大模型当"老师"离线生成，小模型当"学生"在线服务。</p>
+<p>价值：在合适任务上显著降低推理成本。大模型当"老师"离线生成，小模型当"学生"在线服务；实际降幅取决于模型尺寸、硬件、吞吐和质量要求，不能保证固定为一个数量级。</p>
 
 <h3 id="sec4-4">4.4 术语小词典</h3>
 
 <table>
 <tr><th>术语</th><th>一句话解释</th></tr>
-<tr><td><strong>Base / Chat / Instruct</strong></td><td>同一模型的两个版本：Base 是预训练产物（只会续写）；Chat/Instruct 是后训练产物（能对话）。日常永远选后者</td></tr>
+<tr><td><strong>Base / Chat / Instruct</strong></td><td>Base 主要按续写目标训练；Chat/Instruct 经过指令或对话后训练。面向终端对话通常选后者，研究、补充训练或特定续写任务可能选 Base</td></tr>
 <tr><td><strong>Checkpoint</strong></td><td>训练过程中存下的参数快照，"存档"</td></tr>
 <tr><td><strong>Loss</strong></td><td>模型"错得有多离谱"的数字，训练就是把它压下去</td></tr>
 <tr><td><strong>Epoch / Step</strong></td><td>数据完整过一遍 / 每处理一个批次更新一次参数</td></tr>
@@ -871,7 +871,7 @@ model.print_trainable_parameters()
 <tr><td><strong>幻觉</strong></td><td>一本正经地编造——因为训练目标是"接得像"而非"接得对"</td></tr>
 <tr><td><strong>对齐</strong></td><td>让模型行为符合人类意图和价值观（RLHF/DPO 做的事）</td></tr>
 <tr><td><strong>思维链 CoT</strong></td><td>让模型"一步步想"的输出/提示方式，推理模型将其内化</td></tr>
-<tr><td><strong>推理模型</strong></td><td>后训练阶段经 RLVR 强化、会先打长草稿再作答的模型（o1、R1）</td></tr>
+<tr><td><strong>推理模型</strong></td><td>在回答时投入额外推理计算的模型；RLVR 是常见训练手段之一，但不是唯一实现路径</td></tr>
 <tr><td><strong>MoE</strong></td><td>混合专家：每次只激活部分参数，大容量低推理成本</td></tr>
 <tr><td><strong>量化</strong></td><td>把参数从 16bit 压到 4/8bit，模型变小变快，精度略降</td></tr>
 </table>
@@ -934,7 +934,7 @@ model.print_trainable_parameters()
   <text x="365" y="303" font-size="11" font-weight="400" fill="#5F5E5A">强模型当老师离线生成数据</text>
   <text x="365" y="320" font-size="11" font-weight="400" fill="#5F5E5A">小模型学生在线服务，便宜一个量级</text>
 
-  <text x="340" y="375" text-anchor="middle" font-size="12" font-weight="400" fill="#888780">80% 的"模型不够好"其实是 Prompt 没写好</text>
+  <text x="340" y="375" text-anchor="middle" font-size="12" font-weight="400" fill="#888780">先评测定位问题，再选择 Prompt、RAG 或微调</text>
 </svg>
 </div>
 
@@ -951,7 +951,7 @@ model.print_trainable_parameters()
 <tr><td>RLVR</td><td>可验证任务上刷题</td><td>打草稿再交卷</td><td>推理模型</td></tr>
 </table>
 
-<p>这些阶段不是"后者取代前者"，而是<strong>层层叠加</strong>：</p>
+<p>这些训练方法共享同一基座，但具体配方会按目标选择和组合：</p>
 
 <ul>
 <li>推理模型再能打草稿，底层依然是那个只会"猜下一个词"的接龙机器</li>

@@ -16,17 +16,17 @@
   </defs>
   <rect width="1580" height="980" fill="#FFFFFF"/>
   <text x="36" y="42" class="title">&#x7EDF;&#x4E00;&#x5BA2;&#x6237;&#x5E73;&#x53F0;&#x603B;&#x4F53;&#x6A21;&#x578B;</text>
-  <text x="36" y="66" class="sub">&#x4E3B;&#x4F53;&#x8D44;&#x8D28;&#x8BC6;&#x522B;&#x7EDF;&#x4E00;&#x5BA2;&#x6237;&#xFF0C;&#x4E1A;&#x52A1;&#x5BA2;&#x6237; ID &#x8868;&#x8FBE;&#x4E1A;&#x52A1;&#x8EAB;&#x4EFD;&#xFF0C;&#x5404;&#x4E1A;&#x52A1; ID &#x7EE7;&#x7EED;&#x7531;&#x4E1A;&#x52A1;&#x57DF;&#x7EF4;&#x62A4;</text>
+  <text x="36" y="66" class="sub">主体识别材料用于归一现实客户，业务客户 ID 表达业务身份，各业务 ID 继续由业务域维护</text>
   <text x="36" y="102" class="layer">&#x5BA2;&#x6237;&#x8BC6;&#x522B;&#x4E3B;&#x8F74;</text>
   <line x1="160" y1="98" x2="1544" y2="98" stroke="#CCCCCC"/>
   <g filter="url(#shadow)">
     <rect x="650" y="112" width="280" height="64" rx="12" fill="#FFFFFF" stroke="#9999CC" stroke-width="1.8"/>
-    <text x="790.0" y="141" text-anchor="middle" class="head">&#x4E3B;&#x4F53;&#x8D44;&#x8D28;</text>
-    <text x="790.0" y="163" text-anchor="middle" class="small">&#x8BC6;&#x522B;&#x73B0;&#x5B9E;&#x7ECF;&#x8425;&#x4E3B;&#x4F53;</text>
+    <text x="790.0" y="141" text-anchor="middle" class="head">主体识别材料</text>
+    <text x="790.0" y="163" text-anchor="middle" class="small">一份或多份证据识别现实经营主体</text>
   </g>
   <line x1="790" y1="176" x2="790" y2="215" class="link" marker-end="url(#arr)"/>
   <rect x="756.0" y="183.5" width="68" height="20" rx="10" fill="#FFFFFF"/>
-  <text x="790.0" y="198.5" text-anchor="middle" class="small">1 : 1</text>
+  <text x="790.0" y="198.5" text-anchor="middle" class="small">N : 1</text>
   <g filter="url(#shadow)">
     <rect x="365" y="215" width="850" height="70" rx="2" fill="#6699CC" stroke="#336699" stroke-width="1.4"/>
     <text x="790.0" y="244" text-anchor="middle" class="head" style="fill:#333333">&#x7EDF;&#x4E00;&#x5BA2;&#x6237; ID  customer_id</text>

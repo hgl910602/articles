@@ -33,7 +33,7 @@
       <li><a href="#ch2">第二章：架构方法论基础</a>
         <ul>
           <li><a href="#sec2-1">2.1 CRUD：最朴素的实践</a></li>
-          <li><a href="#sec2-2">2.2 MVC 分层架构</a></li>
+          <li><a href="#sec2-2">2.2 MVC 与后端分层</a></li>
           <li><a href="#sec2-3">2.3 经典三层架构</a></li>
           <li><a href="#sec2-4">2.4 贫血 vs 充血模型</a></li>
           <li><a href="#sec2-5">2.5 更广阔的方法论版图</a>
@@ -106,7 +106,7 @@
 <!-- ====================== 第一章 ====================== -->
 <h2 id="ch1">第一章：架构演进史</h2>
 
-<p>回顾历史是理解今天架构的最佳途径。每一种架构风格都为了解决前一种架构留下的问题而产生。本章沿着时间线走一遍。</p>
+<p>回顾历史有助于理解今天的架构选择。架构风格并不是简单地一代替代一代，而是在不同业务目标、质量属性、组织结构和技术条件下形成并长期共存。本章沿着一条简化的时间线介绍几个代表性阶段。</p>
 
 <h3 id="sec1-1">1.1 软件架构的本质</h3>
 
@@ -118,11 +118,11 @@
 
 <p>简单来说：<strong>架构是把系统拆成几块、每块干什么、块和块之间怎么打交道，以及为什么要这么拆。</strong></p>
 
-<p>比"拆成几块"更重要的是——<strong>为什么要拆？</strong> 答案只有一个词：</p>
+<p>比"拆成几块"更重要的是——<strong>为什么要拆？</strong> 一个核心目标是：</p>
 
 <h4>控制复杂性</h4>
 
-<p>所有软件架构演进的动力，都来自于同一个源头：<strong>业务复杂度的增长</strong>。</p>
+<p>业务复杂度增长是重要动力，但不是唯一来源；性能、可靠性、安全、合规、成本和团队协作等质量属性，也会推动架构调整。</p>
 
 <ul>
 <li>代码从 100 行涨到 10000 行 → 需要分层</li>
@@ -198,7 +198,7 @@ public class OrderSystem {
 <p>这就是"大泥球"（Big Ball of Mud）反模式。其核心问题是：<strong>没有分离关注点</strong>。</p>
 
 <div class="callout callout-tip">
-<strong>阈值效应：</strong> 当代码量超过一定规模（通常是一个文件 500 行左右），就需要引入结构。这个"结构"，就是架构。
+<strong>没有通用行数阈值：</strong> 是否需要拆分，应看职责是否混杂、变化是否相互影响、测试与协作是否困难，而不是用“单文件 500 行”作为架构分界线。几十行代码也可能设计混乱，几百行的内聚模块也可能合理。
 </div>
 
 <hr>
@@ -207,7 +207,7 @@ public class OrderSystem {
 
 <p>大泥球的问题催生了一个朴素的想法：<strong>把不同关注点的代码放到不同的层里</strong>。这就是分层架构。</p>
 
-<p>1979 年，Trygve Reenskaug 在 Smalltalk 项目中提出了 <strong>MVC（Model-View-Controller）</strong>模式，这是分层思想的最早实践之一。后来演化为更通用的<strong>三层架构</strong>（Three-Tier Architecture）。</p>
+<p>1979 年，Trygve Reenskaug 在 Smalltalk 项目中提出了 <strong>MVC（Model-View-Controller）</strong>，用于分离交互界面中的模型、视图和控制逻辑。三层架构则从表现、业务和数据访问等职责组织系统；二者都体现关注点分离，但三层架构并不是由 MVC 直接演化而来，也不能视为同一种模式。</p>
 
 <div class="diagram">
 <pre>┌─────────────────────────────────────────┐
@@ -227,12 +227,12 @@ public class OrderSystem {
 </pre>
 </div>
 
-<p>分层架构的核心原则是<strong>单向依赖</strong>：上层可以调用下层，但下层不能反向调用上层。这样一来，修改数据库从 MySQL 换成 PostgreSQL，只需要改 DAO 层，上面的业务逻辑完全不用动。</p>
+<p>传统分层常采用<strong>单向依赖</strong>：上层调用下层，下层不反向依赖上层。边界设计良好时，更换数据库可以把大部分改动限制在数据访问层；如果业务代码依赖特定 SQL、事务语义或数据库能力，上层仍可能需要调整。</p>
 
 <p>第二章会详细讲 CRUD 和 MVC 的具体写法，这里先了解它的历史定位。</p>
 
 <div class="callout callout-note">
-<strong>分层的价值：</strong> 分层的核心价值是<strong>隔离变化</strong>。每一层的变化频率不同（UI 变化最快，数据库变化最慢），分层让快变的东西不影响慢变的东西。
+<strong>分层的价值：</strong> 分层的核心价值是<strong>隔离关注点与变化</strong>。不同系统中各层的变化频率并不固定；关键是让一种变化尽量少穿透无关边界。
 </div>
 
 <hr>
@@ -241,11 +241,11 @@ public class OrderSystem {
 
 <p>随着系统继续增长，单个应用即使分了层，也变得越来越大。于是人们想到了另一个办法：<strong>把大应用拆成多个服务</strong>。</p>
 
-<p>这就是 <strong>SOA（Service-Oriented Architecture，面向服务架构）</strong>。它的核心思想是：把系统拆成若干个独立的服务，服务之间通过标准协议通信。</p>
+<p>这就是 <strong>SOA（Service-Oriented Architecture，面向服务架构）</strong>。它用具有明确契约的服务暴露业务能力，让不同系统和所有权边界下的能力能够组合与复用。SOA 是技术无关的架构范式；SOAP、WSDL 和 ESB 只是企业实践中曾经常见的一组实现选择。</p>
 
 <div class="diagram">
 <pre>                    ┌──────────┐
-                    │   ESB    │  ← 企业服务总线（笨重！）
+                    │   ESB    │  ← 一种常见集成实现，并非 SOA 必需
                     │  总线     │
             ┌───────┴────┬─────┴───────┐
             │            │              │
@@ -253,37 +253,37 @@ public class OrderSystem {
      │ 订单服务  │  │ 用户服务 │  │ 商品服务  │
      └─────────┘  └─────────┘  └──────────┘
 
-  通信方式：SOAP / XML / WSDL（非常重！）
+  常见历史实现：SOAP / XML / WSDL；也可以采用其他协议与集成方式
 </pre>
 </div>
 
-<p>SOA 的问题是<strong>太重了</strong>：</p>
+<p>一些企业级 SOA 落地方案暴露出较高的治理和平台复杂度：</p>
 
 <ul>
-<li>通信协议用 <strong>SOAP/XML</strong>，报文冗长、解析慢</li>
-<li>强依赖 <strong>ESB（企业服务总线）</strong>，所有服务通信都要经过它，ESB 成了性能瓶颈和单点故障</li>
-<li><strong>WSDL</strong> 接口定义复杂，改一个接口要走一套繁琐的流程</li>
-<li>服务粒度通常较大，一个"服务"内部可能还是一个巨型单体</li>
+<li>采用 SOAP/XML 时，契约和消息处理成本可能高于轻量协议</li>
+<li>把编排、转换和治理过度集中到 ESB 时，容易形成瓶颈与团队依赖</li>
+<li>集中治理流程过重时，接口演进速度会下降</li>
+<li>服务边界如果只按技术系统切分，内部仍可能形成巨型单体</li>
 </ul>
 
-<p>结果就是：SOA 在企业级领域（如银行、电信）有一些应用，但在互联网公司中很少成功落地。<strong>它想解决的问题是正确的，但给出的方案太重了。</strong></p>
+<p>这些问题针对的是特定 SOA 实现，而不是 SOA 定义本身。SOA 在银行、电信和大型企业集成中长期使用；互联网系统后来更偏好独立部署、自动化交付和去中心化治理的微服务实践。</p>
 
 <hr>
 
 <h3 id="sec1-5">1.5 微服务架构</h3>
 
-<p>2014 年左右，Martin Fowler 和 James Lewis 发表了《Microservices》一文，正式定义了<strong>微服务架构</strong>。</p>
+<p>2014 年，James Lewis 和 Martin Fowler 的《Microservices》系统总结了当时逐渐成形的<strong>微服务架构</strong>特征；该风格没有唯一、精确的定义。</p>
 
-<p>微服务继承了 SOA"拆分服务"的思路，但完全抛弃了 SOA 的笨重基础设施：</p>
+<p>微服务延续了面向服务的思想，更强调独立部署、围绕业务能力组织、基础设施自动化和去中心化治理。下面比较的是常见实践倾向，不是两种架构的硬性定义：</p>
 
 <table>
 <tr><th>维度</th><th>SOA</th><th>微服务</th></tr>
-<tr><td>通信协议</td><td>SOAP / XML（重）</td><td>REST / gRPC / JSON（轻）</td></tr>
-<tr><td>服务总线</td><td>强依赖 ESB</td><td>无 ESB，去中心化</td></tr>
-<tr><td>服务粒度</td><td>较大，按业务域粗分</td><td>小而专注，围绕单一能力</td></tr>
-<tr><td>数据存储</td><td>共享数据库</td><td>每个服务独享数据库</td></tr>
-<tr><td>部署方式</td><td>集中式部署</td><td>独立部署、独立演进</td></tr>
-<tr><td>技术栈</td><td>统一技术栈</td><td>技术异构（允许不同语言）</td></tr>
+<tr><td>服务契约</td><td>常强调企业级标准与跨组织集成</td><td>常采用轻量 API 或消息契约</td></tr>
+<tr><td>集成治理</td><td>可能集中在 ESB 或统一治理平台</td><td>倾向智能端点、简单通道和团队自治</td></tr>
+<tr><td>服务边界</td><td>粒度可大可小，强调能力复用</td><td>通常围绕业务能力与独立演进划分</td></tr>
+<tr><td>数据管理</td><td>可共享或独立，取决于具体架构</td><td>倾向服务拥有数据，避免跨服务直接读表</td></tr>
+<tr><td>部署方式</td><td>不作统一规定，历史项目常集中发布</td><td>强调服务可独立部署</td></tr>
+<tr><td>技术栈</td><td>历史上常统一选型</td><td>允许异构，但也要控制运维成本</td></tr>
 </table>
 
 <div class="diagram">
@@ -305,7 +305,7 @@ public class OrderSystem {
 
 <ul>
 <li><strong>独立部署</strong>：改了支付服务，只发布支付服务，不影响商品服务</li>
-<li><strong>故障隔离</strong>：商品服务挂了，用户还能下单（只是看不到商品图）</li>
+<li><strong>故障隔离</strong>：合理设计降级与缓存后，局部故障不必让所有功能同时失效</li>
 <li><strong>团队自治</strong>：不同团队负责不同服务，减少协作摩擦</li>
 <li><strong>弹性伸缩</strong>：大促时只扩容订单服务和支付服务</li>
 </ul>
@@ -337,7 +337,7 @@ public class OrderSystem {
 
 <p>微服务解决了业务拆分的问题，但把基础设施的复杂性甩给了开发者。每个团队都要自己处理服务发现、熔断、限流、追踪……</p>
 
-<p>于是<strong>云原生（Cloud Native）</strong>应运而生，核心思想是：<strong>把这些基础设施能力从业务代码中剥离出来，交给平台层</strong>。</p>
+<p><strong>云原生（Cloud Native）</strong>进一步强调在动态环境中构建松耦合、可观测、可管理且有韧性的系统，并通过自动化实现频繁、可预测的变更。容器、编排、服务网格、不可变基础设施和声明式 API 都是常见手段，但不是必须同时采用的固定套餐。</p>
 
 <table>
 <tr><th>能力</th><th>微服务时代（开发者自行处理）</th><th>云原生时代（平台层处理）</th></tr>
@@ -349,7 +349,7 @@ public class OrderSystem {
 </table>
 
 <div class="diagram">
-<pre>  云原生架构 = 容器 + 微服务 + DevOps + 持续交付
+<pre>  云原生目标：松耦合 + 韧性 + 可观测 + 自动化交付
 
   ┌─────────────────────────────────────────────┐
   │            应用层（业务代码）                   │
@@ -383,7 +383,7 @@ public class OrderSystem {
 <tr><th>架构</th><th>解决了什么</th><th>引入了什么新问题</th></tr>
 <tr><td>单体</td><td>—</td><td>代码膨胀、协作困难</td></tr>
 <tr><td>分层</td><td>关注点分离</td><td>层次多了跳转复杂</td></tr>
-<tr><td>SOA</td><td>服务复用</td><td>ESB 笨重、协议复杂</td></tr>
+<tr><td>SOA</td><td>跨系统能力复用与组合</td><td>集中治理或特定实现可能过重</td></tr>
 <tr><td>微服务</td><td>独立部署、团队自治</td><td>分布式事务、运维复杂</td></tr>
 <tr><td>云原生</td><td>基础设施下沉</td><td>学习曲线陡峭、平台依赖</td></tr>
 </table>
@@ -442,7 +442,7 @@ public class OrderSystem {
   <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
   <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
   <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">面向服务架构 SOA</text>
-  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">服务复用 — 但 ESB 笨重、SOAP/XML 协议复杂</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">能力复用与组合 — 特定集中式实现可能过重</text>
 
   <circle cx="70" cy="305" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
   <text x="70" y="305" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
@@ -560,23 +560,23 @@ public class OrderService {
 
 <hr>
 
-<h3 id="sec2-2">2.2 MVC 分层架构</h3>
+<h3 id="sec2-2">2.2 MVC 与后端分层</h3>
 
-<p>事务脚本的下一个进化方向就是<strong>分层</strong>。MVC 是最经典的分层模式。</p>
+<p>事务脚本可以放进分层结构中，以隔离输入输出、业务逻辑和持久化。MVC 是界面交互中经典的关注点分离模式，后端三层架构则按表现、业务和数据访问职责组织代码；两者经常组合出现，但不是同一个概念。</p>
 
 <h4>MVC 的三个角色</h4>
 
 <table>
 <tr><th>角色</th><th>职责</th><th>对应后端</th></tr>
-<tr><td><strong>Model</strong>（模型）</td><td>数据 + 业务逻辑</td><td>Service + Entity/DO</td></tr>
-<tr><td><strong>View</strong>（视图）</td><td>展示数据</td><td>前端页面 / JSON 响应</td></tr>
-<tr><td><strong>Controller</strong>（控制器）</td><td>接收请求、调度、返回响应</td><td>Controller</td></tr>
+<tr><td><strong>Model</strong>（模型）</td><td>表示应用状态与行为</td><td>可能由领域对象、应用服务和数据访问共同支撑</td></tr>
+<tr><td><strong>View</strong>（视图）</td><td>呈现模型</td><td>服务端页面；在 API 场景可对应响应表示</td></tr>
+<tr><td><strong>Controller</strong>（控制器）</td><td>接收输入并协调模型与视图</td><td>HTTP Controller</td></tr>
 </table>
 
-<p>在后端开发中，MVC 通常演化为<strong>三层架构</strong>：Controller → Service → DAO。这是 Java Web 开发的"标准姿势"。</p>
+<p>在 Java Web 项目中，经常同时看到 MVC 风格的入口与 <strong>Controller → Service → DAO</strong> 三层代码结构。这是常见组合，不代表 MVC 必然演化成三层架构。</p>
 
 <div class="callout callout-note">
-<strong>MVC 的本质：</strong> <strong>关注点分离</strong>。Controller 不应该包含业务逻辑，Service 不应该包含 SQL，DAO 不应该包含业务规则。每层只做自己的事。
+<strong>共同目标：</strong> <strong>关注点分离</strong>。Controller 不应承载核心业务规则，Service 不应散落具体 SQL，DAO 不应决定业务合法性。边界应围绕职责，而不是只把代码放进不同文件夹。
 </div>
 
 <hr>
@@ -897,7 +897,7 @@ public class OrderService {
 │                                                                    │
 │  问题维度            代表模式                                      │
 │  ──────────         ──────────────────────────                      │
-│  数据怎么访问       CRUD / Active Record / Table Module / Repository │
+│  数据怎么访问       CRUD / Active Record / Data Mapper / Repository  │
 │  代码怎么分层       MVC 三层 / 六边形 / 整洁架构 / 洋葱架构           │
 │  读写怎么分离       CQRS / Event Sourcing                           │
 │  组件怎么通信       事件驱动 / 响应式                                 │
@@ -914,15 +914,15 @@ public class OrderService {
 
 <hr>
 
-<h4 id="sec2-5-1">2.5.1 数据访问模式：Active Record vs Table Module vs Repository</h4>
+<h4 id="sec2-5-1">2.5.1 数据访问模式：Active Record、Data Mapper 与 Repository</h4>
 
 <p>CRUD 事务脚本的核心问题是：对象和数据表之间是什么关系？业界有三种主流答案。</p>
 
 <table>
 <tr><th>模式</th><th>核心思想</th><th>代表框架</th><th>特点</th></tr>
 <tr><td><strong>Active Record</strong>（活动记录）</td><td>对象即表行，自带持久化方法</td><td>Rails, Laravel, Django ORM</td><td>简单高效，但对象承担了业务+持久化双重职责</td></tr>
-<tr><td><strong>Table Module</strong>（表模块）</td><td>一个类对应一张表，封装表级操作</td><td>.NET DataSet, MyBatis Mapper</td><td>面向表而非面向对象，适合报表类场景</td></tr>
-<tr><td><strong>Repository</strong>（仓储）</td><td>面向聚合根，以领域对象为单位</td><td>Spring Data JPA, DDD 实践</td><td>业务与持久化解耦，但抽象成本高</td></tr>
+<tr><td><strong>Data Mapper</strong>（数据映射器）</td><td>用独立映射器在对象与数据库之间搬运数据</td><td>MyBatis Mapper、手写 DAO</td><td>对象不负责持久化，适合显式控制 SQL</td></tr>
+<tr><td><strong>Repository</strong>（仓储）</td><td>面向领域集合或聚合根，隐藏持久化细节</td><td>DDD 实践、定制仓储接口</td><td>业务与持久化解耦，但不能仅靠框架接口自动获得领域语义</td></tr>
 </table>
 
 <pre><code class="language-java">// ── Active Record 风格 ──
@@ -931,8 +931,8 @@ Order order = Order.find(123);       // 静态方法查
 order.setStatus("PAID");
 order.save();                        // 自带持久化
 
-// ── Table Module 风格 ──
-// Mapper 封装表级操作，返回的是数据结构而非领域对象
+// ── Data Mapper 风格 ──
+// Mapper 在数据结构与数据库记录之间做映射
 OrderDO orderDO = orderMapper.selectById(123);
 orderDO.setStatus("PAID");
 orderMapper.update(orderDO);
@@ -945,7 +945,7 @@ orderRepository.save(order);                  // 保存整个聚合</code>
 </pre>
 
 <div class="callout callout-tip">
-<strong>选择建议：</strong> Active Record 适合快速开发中小型项目（Rails/Django 生态繁荣就是因为这个）。Repository 适合复杂业务——它让领域层完全不依赖持久化技术，但这层抽象有成本。Table Module 是 MyBatis 等框架的默认模式，务实但缺少领域内聚。
+<strong>选择建议：</strong> Active Record 适合快速开发中小型项目。Data Mapper 适合需要显式 SQL 控制、又不希望对象自带持久化行为的场景。Repository 面向领域集合或聚合提供接口，适合复杂业务，但是否真正隔离持久化取决于接口与模型设计，而不只取决于使用哪个框架。
 </div>
 
 <hr>
@@ -1078,14 +1078,14 @@ public class MySQLOrderRepositoryAdapter implements OrderRepositoryPort {
 </table>
 
 <div class="callout callout-note">
-<strong>三者关系：</strong> 六边形、整洁、洋葱架构本质上是<strong>同一个思想的三个表达</strong>——依赖倒置、核心不依赖外围。区别仅在表达方式和分层粒度。实际项目中选一个理解即可，不需要纠结"用哪个"。
+<strong>三者关系：</strong> 六边形、整洁和洋葱架构都强调依赖倒置与业务核心不依赖外围，但组织视角并不完全相同：六边形突出端口与适配器，洋葱突出围绕领域模型的依赖层次，整洁架构还明确了用例与接口适配层。可以共享原则，但落地时仍要根据边界和团队语言选择表达。
 </div>
 
 <hr>
 
-<h4 id="sec2-5-3">2.5.3 读写分离模式：CQRS + Event Sourcing</h4>
+<h4 id="sec2-5-3">2.5.3 读写模型与事件存储：CQRS、Event Sourcing</h4>
 
-<p>前面所有模式都假设读写共用一套模型。但在很多高流量系统中，读和写的需求差异巨大：</p>
+<p>前面的示例大多让读写共用一套模型。在业务规则复杂、查询形态差异明显或读写需要独立扩展时，可以考虑分离：</p>
 
 <ul>
 <li>写：需要保证业务一致性，用 DDD 聚合、事务控制</li>
@@ -1150,7 +1150,7 @@ public class OrderQueryService {
 
 <h4>Event Sourcing（事件溯源）</h4>
 
-<p>Event Sourcing 与 CQRS 天然搭配：<strong>不存储当前状态，存储所有变更事件</strong>。当前状态通过重放事件得到。</p>
+<p>Event Sourcing 可以与 CQRS 组合，但二者彼此独立：CQRS 不要求事件溯源，事件溯源也不要求读写使用不同模型。事件溯源把领域事件作为事实来源，当前状态通过重放事件得到；为提升读取与恢复速度，也常保存投影和快照。</p>
 
 <div class="diagram">
 <pre>
@@ -1178,7 +1178,7 @@ public class OrderQueryService {
 </div>
 
 <div class="callout callout-warning">
-<strong>使用门槛：</strong> CQRS 和 Event Sourcing 都引入了显著的架构复杂度。Greg Young 自己都说："只在你的系统真的有严重的读写不平衡时才上 CQRS。"对于普通的增删改查系统，这是杀鸡用牛刀。
+<strong>使用门槛：</strong> CQRS 和 Event Sourcing 都会引入模型同步、最终一致、事件演进和运维等复杂度。采用 CQRS 的理由不只包括读写流量不平衡，也可能是读写模型的业务语义差异；对于简单 CRUD，通常没有必要引入。
 </div>
 
 <hr>
@@ -1274,13 +1274,13 @@ public class OrderQueryService {
 
 <table>
 <tr><th>模式</th><th>解决的问题</th><th>类比</th><th>与 DDD 关系</th></tr>
-<tr><td>CRUD 事务脚本</td><td>最简单的数据操作</td><td>把所有代码写在一个函数里</td><td>DDD 的反面参照</td></tr>
-<tr><td>Active Record</td><td>对象自带持久化</td><td>对象既是数据又是 DAO</td><td>与 DDD Repository 互斥</td></tr>
-<tr><td>MVC 三层</td><td>关注点分离</td><td>把代码分文件夹</td><td>DDD 的分层基础</td></tr>
-<tr><td>六边形/整洁/洋葱</td><td>依赖倒置、核心不依赖外围</td><td>MVC 三层的进化版</td><td>DDD 落地的推荐架构</td></tr>
+<tr><td>CRUD 事务脚本</td><td>以流程组织简单业务操作</td><td>一个方法完成一个用例</td><td>可用于简单子域，也可与 DDD 战略设计共存</td></tr>
+<tr><td>Active Record</td><td>对象自带持久化</td><td>对象既是数据又是持久化入口</td><td>与富领域模型存在张力，但并非概念上绝对互斥</td></tr>
+<tr><td>MVC / 三层</td><td>分离交互或应用职责</td><td>按职责组织模块</td><td>可与 DDD 组合，但不是 DDD 的前提</td></tr>
+<tr><td>六边形/整洁/洋葱</td><td>依赖倒置、核心不依赖外围</td><td>围绕核心设置边界</td><td>常用于承载 DDD 模型，也可独立使用</td></tr>
 <tr><td>CQRS</td><td>读写模型分离</td><td>读用只读副本、写用主库</td><td>可叠加在 DDD 之上</td></tr>
-<tr><td>Event Sourcing</td><td>不存状态，存事件</td><td>Git 的提交历史</td><td>领域事件的极致形式</td></tr>
-<tr><td>事件驱动</td><td>异步解耦</td><td>发邮件通知 vs 当面说</td><td>领域事件的传输方式</td></tr>
+<tr><td>Event Sourcing</td><td>以事件日志作为事实来源</td><td>Git 的提交历史</td><td>可保存领域事件，也可与 CQRS 组合</td></tr>
+<tr><td>事件驱动</td><td>组件通过事件协作</td><td>发布消息而非直接指定调用方</td><td>可传递领域事件，既可同步也可异步</td></tr>
 <tr><td>微内核</td><td>核心+插件</td><td>VS Code</td><td>与 DDD 正交</td></tr>
 <tr><td>管道-过滤器</td><td>数据流水线</td><td>Unix 管道</td><td>与 DDD 正交</td></tr>
 </table>
@@ -1306,7 +1306,7 @@ public class OrderQueryService {
   <rect x="195" y="100" width="145" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
   <text x="267" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Active Record</text>
   <rect x="350" y="100" width="145" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
-  <text x="422" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Table Module</text>
+  <text x="422" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Data Mapper</text>
   <rect x="505" y="100" width="135" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
   <text x="572" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Repository</text>
 
@@ -1438,7 +1438,7 @@ public class OrderQueryService {
 <tr><td>关注层面</td><td>宏观——系统的整体结构</td><td>微观——代码层面的建模</td></tr>
 <tr><td>核心概念</td><td>领域、子域、限界上下文、上下文映射</td><td>实体、值对象、聚合、领域服务、领域事件、仓储、工厂</td></tr>
 <tr><td>解决的问题</td><td>系统怎么拆？边界在哪？</td><td>代码怎么写？模型怎么建？</td></tr>
-<tr><td>与微服务关系</td><td>限界上下文 ≈ 微服务边界</td><td>聚合 ≈ 微服务内的代码组织单元</td></tr>
+<tr><td>与部署关系</td><td>可以为服务边界提供语义依据，但不等同于微服务</td><td>是模型一致性边界，不等同于部署单元</td></tr>
 </table>
 
 <p>战略设计告诉你<strong>在哪切</strong>，战术设计告诉你<strong>切完之后怎么写</strong>。两者缺一不可。</p>
@@ -1521,17 +1521,17 @@ public class OrderQueryService {
 </pre>
 </div>
 
-<p><strong>限界上下文的判断标准：</strong></p>
+<p><strong>识别限界上下文时可以观察：</strong></p>
 
 <ol>
 <li>这个范围内有一套<strong>统一的领域语言</strong>（Ubiquitous Language）</li>
 <li>它与外部有相对<strong>清晰的边界</strong></li>
-<li>它可以<strong>独立部署</strong>（通常对应一个微服务）</li>
-<li>它有<strong>独立的数据库</strong>（数据不共享）</li>
+<li>同一个术语、规则和模型在边界内具有一致含义</li>
+<li>跨边界交互能够通过明确的上下文映射和契约说明</li>
 </ol>
 
 <div class="callout callout-note">
-<strong>限界上下文 ≈ 微服务边界。</strong> 这就是 DDD 对微服务的指导意义：拆分依据是<strong>业务语义边界</strong>。
+<strong>限界上下文不等于微服务。</strong> 它首先是语言和模型的语义边界，可以和其他上下文部署在同一个单体中，也可以在需要独立演进时成为一个或多个服务。DDD 的价值是先明确业务语义边界，再决定部署与数据边界。
 </div>
 
 <h4 id="sec3-3-3">3.3.3 上下文映射（Context Mapping）</h4>
@@ -2000,7 +2000,7 @@ public enum OrderStatus {
 <ol>
 <li><strong>通过聚合根访问内部</strong>：外部不能直接引用 OrderItem，必须通过 Order</li>
 <li><strong>聚合内强一致</strong>：聚合内的操作要么全部成功，要么全部失败</li>
-<li><strong>聚合间弱一致</strong>：不同聚合之间通过领域事件最终一致</li>
+<li><strong>聚合间按业务要求协作</strong>：优先通过 ID 引用和领域事件保持边界；是否最终一致取决于业务不变量，不能机械套用</li>
 <li><strong>聚合要小</strong>：只包含必须一起修改的对象</li>
 </ol>
 
@@ -2133,18 +2133,18 @@ public class OrderItem {
 </code></pre>
 
 <div class="callout callout-warning">
-<strong>聚合大小的判断标准：</strong> 如果删除 Order 时，OrderItem 也应该一起删除 → 放同一个聚合。如果删除 Order 时，Product 不受影响 → Product 是独立聚合。聚合越小越好，只包含<strong>必须一起修改和删除</strong>的对象。
+<strong>聚合大小的判断标准：</strong> 重点不是级联删除，而是哪些业务不变量必须在一次事务中维护。Order 与 OrderItem 通常需要共同保证金额、数量等规则，因此可以位于同一聚合；Product 有独立生命周期，通常只通过 ID 引用。聚合应尽量小，但不能小到破坏必须同步成立的不变量。
 </div>
 
 <h4 id="sec3-4-4">3.4.4 领域服务（Domain Service）</h4>
 
-<p>有些业务逻辑<strong>不属于任何一个实体或值对象</strong>，而是涉及多个对象的协作。这种逻辑放在<strong>领域服务</strong>中。</p>
+<p>有些<strong>领域规则</strong>不自然属于某个实体或值对象，可以放在<strong>领域服务</strong>中。领域服务仍表达领域概念；跨聚合加载、保存、调用外部系统和事务编排通常由应用服务负责。</p>
 
 <p>典型场景：</p>
 <ul>
-<li>跨聚合的业务操作（如：下单时需要同时操作订单聚合和库存聚合）</li>
-<li>无状态的计算逻辑</li>
-<li>涉及外部资源的领域判断</li>
+<li>涉及多个领域对象、但不归属于其中任何一个对象的业务规则</li>
+<li>具有明确领域含义的无状态计算，例如跨多个定价策略计算价格</li>
+<li>通过领域端口获取必要信息后完成的领域判断；外部调用本身由应用层或适配器承担</li>
 </ul>
 
 <div class="callout callout-danger">
@@ -2368,9 +2368,9 @@ public class LogisticsEventListener implements RocketMQListener&lt;OrderPaidEven
 <div class="callout callout-tip">
 <strong>同步 vs 异步的选择：</strong>
 <ul style="margin-bottom:0">
-<li><strong>同事务强一致</strong>：如果扣库存必须和下单在同一事务中，用同步</li>
-<li><strong>跨服务最终一致</strong>：如果发积分可以晚几秒，用异步消息队列</li>
-<li><strong>原则</strong>：能异步就异步，减少事务范围，提高系统吞吐</li>
+<li><strong>同步不等于同事务</strong>：进程内同步处理可以共享本地事务，跨服务同步调用通常不能自动获得同一数据库事务</li>
+<li><strong>异步与最终一致</strong>：库存、积分等跨边界更新可以使用消息和补偿，但必须设计幂等、重试、顺序与失败恢复</li>
+<li><strong>原则</strong>：先根据业务一致性、时延和失败语义选同步或异步，再评估吞吐；不能简单套用“能异步就异步”</li>
 </ul>
 </div>
 
@@ -2536,7 +2536,7 @@ public class OrderFactory {
 <p><strong>四色建模法</strong>（Four-Color Modeling / Color Modeling in Domain Models）由 Peter Coad 提出，是一种<strong>领域分析技术</strong>。它通过将领域对象分为四种"原型"（Archetype），在需求分析阶段快速识别和分类领域概念，为后续的战术设计建模打下基础。</p>
 
 <div class="callout callout-note">
-<strong>四色建模法与 DDD 的关系：</strong> 四色建模法是 DDD 战术设计的"前置分析工具"。它用颜色标记法在写代码之前把领域对象分类——哪些是实体、哪些是值对象、哪些是事件、哪些是描述。比直接面对一堆业务名词要清晰得多。
+<strong>四色建模法与 DDD 的关系：</strong> 四色建模法可以作为领域分析工具，帮助区分人、地点、物、角色、描述以及发生在时间轴上的业务事实。四色原型与 DDD 的实体、值对象、聚合和领域事件处在不同分类维度，不能直接一一转换；完成业务分析后，还要根据标识、生命周期和一致性边界做战术设计。
 </div>
 
 <p>四种原型及对应颜色：</p>
@@ -2548,19 +2548,19 @@ public class OrderFactory {
   │                                                           │
   │   🟢 PPT (Party-Place-Thing)     事物/实体               │
   │      有唯一标识，有生命周期                                 │
-  │      → 对应 DDD 的 Entity                                  │
+  │      → 实现时常有身份，可能建模为 Entity                    │
   │                                                           │
   │   🔵 Description                  描述                    │
   │      分类/类型信息，被多个实体共享                           │
-  │      → 对应 DDD 的 Value Object                            │
+  │      → 可能是 Entity，也可能是 Value Object                 │
   │                                                           │
   │   🟡 Role                         角色                    │
   │      实体在特定上下文中扮演的角色                             │
-  │      → 对应 DDD 的 Entity（带角色语义）                      │
+  │      → 可能是实体、值对象或一段关联关系                      │
   │                                                           │
   │   🔴 MI (Moment-Interval)         时刻-时段/事件           │
   │      在特定时刻或时段发生的业务活动                           │
-  │      → 对应 DDD 的 Domain Event / 聚合根                    │
+  │      → 可能是交易实体、聚合或描述其发生的 Domain Event       │
   │                                                           │
   └──────────────────────────────────────────────────────────┘
 </pre>
@@ -2569,11 +2569,11 @@ public class OrderFactory {
 <h4>四种原型详解</h4>
 
 <table>
-<tr><th>原型</th><th>颜色</th><th>含义</th><th>特征</th><th>电商示例</th><th>DDD 映射</th></tr>
-<tr><td><strong>PPT</strong><br>事物/实体</td><td style="background:#d1fae5">🟢 绿</td><td>业务中核心的"谁"和"什么"</td><td>有唯一标识、有生命周期、属性可变</td><td>用户、商品、店铺、订单</td><td>Entity / Aggregate Root</td></tr>
-<tr><td><strong>Description</strong><br>描述</td><td style="background:#dbeafe">🔵 蓝</td><td>对事物的分类和描述</td><td>不可变、可共享、多个实体引用同一个</td><td>商品类目、品牌、会员等级定义</td><td>Value Object</td></tr>
-<tr><td><strong>Role</strong><br>角色</td><td style="background:#fef3c7">🟡 黄</td><td>实体在特定业务场景中的角色</td><td>依附于实体、随上下文变化</td><td>买家、卖家、收货人、发货员</td><td>Entity（带角色属性）</td></tr>
-<tr><td><strong>MI</strong><br>时刻-时段</td><td style="background:#fee2e2">🔴 红</td><td>在特定时间发生的业务活动</td><td>有时间戳、记录业务事实</td><td>下单、支付、发货、退款</td><td>Domain Event / Aggregate</td></tr>
+<tr><th>原型</th><th>颜色</th><th>含义</th><th>常见特征</th><th>电商示例</th><th>可能的 DDD 实现</th></tr>
+<tr><td><strong>PPT</strong><br>人-地点-物</td><td style="background:#d1fae5">🟢 绿</td><td>业务中参与活动的"谁"和"什么"</td><td>常有稳定身份与生命周期</td><td>用户、商品、店铺、仓库</td><td>常建模为 Entity；是否为聚合根另行判断</td></tr>
+<tr><td><strong>Description</strong><br>描述</td><td style="background:#dbeafe">🔵 蓝</td><td>对事物、角色或活动的分类与规则描述</td><td>可被多个对象引用，也可能独立版本化</td><td>商品类目、品牌定义、会员等级定义</td><td>可建模为 Entity 或 Value Object</td></tr>
+<tr><td><strong>Role</strong><br>角色</td><td style="background:#fef3c7">🟡 黄</td><td>对象在特定关系或场景中的身份</td><td>依赖上下文，可能带有角色专属属性</td><td>买家、卖家、收货人、发货员</td><td>可建模为实体、值对象、关联或聚合内状态</td></tr>
+<tr><td><strong>MI</strong><br>时刻-时段</td><td style="background:#fee2e2">🔴 红</td><td>在某一时刻或时段发生的业务活动与交易</td><td>具有时间、参与者和结果</td><td>订单、支付、发货、退款</td><td>可建模为交易实体/聚合；其发生事实可发布为 Domain Event</td></tr>
 </table>
 
 <h4>用四色建模法分析电商交易场景</h4>
@@ -2587,7 +2587,7 @@ public class OrderFactory {
   四色分析结果：
 
   🟢 PPT (实体)：
-     User(张三)、User(李四)、Shop(店铺)、Product(商品)、Order(订单)、Coupon(优惠券)
+     User(张三)、User(李四)、Shop(店铺)、Product(商品)、Coupon(优惠券)
 
   🔵 Description (描述)：
      Category(手机类目)、Brand(品牌)、MemberLevel(会员等级定义)、CouponRule(满减规则)
@@ -2605,7 +2605,7 @@ public class OrderFactory {
 
 <h4>从四色到代码</h4>
 
-<p>四色建模法的价值在于：分析完之后，几乎可以直接映射到 DDD 的代码结构。一个 Role 原型的代码示例：</p>
+<p>四色建模先帮助梳理业务语义，再由 DDD 战术设计决定代码结构。下面展示几种可能的实现，但这些代码不是由颜色自动推导出来的：</p>
 
 <pre><code class="language-java">// 🟡 Role 原型：买家角色
 // 一个用户在"购物"这个上下文中扮演的角色
@@ -2621,8 +2621,8 @@ public class Buyer {
     }
 }
 
-// 🔴 MI 原型：下单事件（时刻-时段）
-// 记录"谁在什么时间下了什么单"这个业务事实
+// 🔴 MI 发生后发布的领域事件
+// 记录"谁在什么时间下了什么单"这个已经发生的业务事实
 public class PlaceOrderEvent implements DomainEvent {
     private final String orderId;
     private final String buyerId;       // 🟡 买家角色
@@ -2643,8 +2643,8 @@ public class PlaceOrderEvent implements DomainEvent {
     // ... getter
 }
 
-// 🔵 Description 原型：商品类目
-// 被多个商品共享的描述信息
+// 🔵 Description 的一种实现：不可变商品类目值对象
+// 如果类目需要独立标识、版本和生命周期，也可以建模为实体
 public final class Category implements ValueObject {
     private final String code;        // "PHONE"
     private final String name;        // "手机通讯"
@@ -2667,7 +2667,7 @@ public final class Category implements ValueObject {
 <li><strong>标 Description</strong>：找出分类/描述信息 → 蓝色</li>
 <li><strong>标 Role</strong>：找出实体在不同场景中的角色 → 黄色</li>
 <li><strong>标 MI</strong>：找出业务事件/交易记录 → 红色</li>
-<li><strong>映射 DDD</strong>：PPT→Entity、Description→VO、Role→Entity（带角色）、MI→DomainEvent</li>
+<li><strong>映射 DDD</strong>：再判断标识、生命周期、不变量与一致性边界，决定 Entity、Value Object、Aggregate、Domain Service 或 Domain Event</li>
 </ol>
 </div>
 
@@ -2822,7 +2822,7 @@ public class OrderApplicationService {
 </code></pre>
 
 <div class="callout callout-tip">
-<strong>判断应用层是否写对了的标准：</strong> 看应用层方法里有没有 <code>if</code> 判断业务条件。如果有（比如 <code>if (order.getStatus() == PAID)</code>），说明业务规则泄漏到了应用层，应该下沉到领域层。
+<strong>判断应用层是否写对了的标准：</strong> 关注业务不变量由谁负责，而不是机械检查有没有 <code>if</code>。应用层可以为权限、幂等、错误处理和流程分支使用条件判断；像 <code>if (order.getStatus() == PAID)</code> 这类决定领域行为是否合法的规则，通常应由聚合或领域服务封装。
 </div>
 
 <hr>
@@ -2978,14 +2978,14 @@ public class Order {
     private String id;
 }
 
-// ✅ 领域层应该是纯 POJO
+// ✅ 一种低耦合做法：领域对象保持为纯 POJO
 public class Order {
     private String id;
     // 没有任何框架注解
 }
 </code></pre>
 
-<p>领域层应该<strong>零框架依赖</strong>。JPA 注解、Spring 注解都应该放在基础设施层的 DO 对象上，而不是领域实体上。</p>
+<p>领域层应尽量保持对框架和基础设施的低耦合，以便独立测试和演化。把 JPA/Spring 注解放在独立的数据对象上是一种做法；如果团队接受少量持久化注解并能保持业务模型清晰，也不必为了“绝对零依赖”复制整套对象。关键是领域规则不能依赖数据库会话、网络客户端等运行时细节。</p>
 
 <h4>最佳实践清单</h4>
 
@@ -2994,9 +2994,9 @@ public class Order {
 <tr><td>统一语言</td><td>代码中的命名和业务术语一致，如产品说"优惠券"代码就叫 <code>Coupon</code> 而非 <code>DiscountRecord</code></td></tr>
 <tr><td>聚合要小</td><td>一个聚合只包含必须一起修改的对象，宁多勿大</td></tr>
 <tr><td>充血模型</td><td>业务逻辑内聚在实体/值对象中，Service 只做编排</td></tr>
-<tr><td>领域层纯净</td><td>不依赖框架、不依赖数据库、可独立单元测试</td></tr>
+<tr><td>领域层低耦合</td><td>不依赖数据库和外部服务运行时细节，可独立单元测试；框架注解按项目权衡</td></tr>
 <tr><td>事件驱动</td><td>跨聚合/跨上下文用领域事件解耦</td></tr>
-<tr><td>防腐层</td><td>对接外部系统一律加防腐层翻译</td></tr>
+<tr><td>防腐层</td><td>外部模型与本域语言差异明显、且存在污染风险时增加翻译层</td></tr>
 <tr><td>持续重构</td><td>领域模型不是一次设计完，随着业务理解持续调整</td></tr>
 </table>
 
@@ -3024,7 +3024,7 @@ public class Order {
   <text x="90" y="180" font-size="13" font-weight="500" fill="#3C3489">上下文映射（8 种模式）</text>
   <text x="90" y="196" font-size="12" font-weight="400" fill="#5F5E5A">ACL 防腐层 ★ · OHS 开放主机 · 客户-供应商 · 共享内核 …</text>
 
-  <text x="90" y="214" font-size="12" font-weight="400" fill="#888780">→ 限界上下文 ≈ 微服务边界</text>
+  <text x="90" y="214" font-size="12" font-weight="400" fill="#888780">→ 限界上下文为服务拆分提供语义依据，但不等同于微服务</text>
 
   <line x1="40" y1="235" x2="640" y2="235" stroke="#D3D1C7" stroke-width="0.5"/>
 
@@ -3270,8 +3270,8 @@ onMessage(OrderTimeoutMessage msg) {
 <p>这个认知升级路径呈现<strong>层层叠加</strong>的特征：</p>
 <ul>
 <li>再复杂的 DDD 系统，底层也有 CRUD</li>
-<li>再好的领域模型，也需要 MVC 分层来组织代码</li>
-<li>再清晰的限界上下文，也需要充血模型来落地</li>
+<li>领域模型需要清晰的模块与依赖边界，但不要求一定采用 MVC</li>
+<li>限界上下文可以用充血模型、函数式模型等不同方式实现，关键是保持统一语言与业务规则边界</li>
 <li>再好的分层，也可以叠加六边形架构、CQRS、事件驱动——它们是正交的</li>
 </ul>
 
