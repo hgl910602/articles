@@ -33,9 +33,11 @@ updateActiveLink();
 // Smooth scroll for TOC links
 document.querySelectorAll('#sidebar nav a').forEach(link => {
   link.addEventListener('click', function(e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
+    const href = this.getAttribute('href');
+    const target = document.querySelector(href);
     if (target) {
+      e.preventDefault();
+      history.pushState(null, '', href);
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       // Close sidebar on mobile
       document.getElementById('sidebar').classList.remove('open');

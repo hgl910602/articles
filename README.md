@@ -66,6 +66,17 @@ git add . && git commit -m "新增文章：xxx" && git push   # push 后 Pages �
    - Build output directory: **/**（仓库根目录）
 4. Save and Deploy，之后每次 push 到 main 自动上线
 
+## 写作规范（所有文章适用，不限技术文章）
+
+- 正文写作或改写完成后，必须过一遍"去 AI 腔"：skill 位于 `~/.zcode/skills/de-ai-tone`，配套自检脚本：
+
+  ```bash
+  python3 ~/.zcode/skills/de-ai-tone/scripts/tone_scan.py articles/<slug>/index.html
+  ```
+
+- 常见症状与改法见 skill 内清单（破折号过密、"不是 X 而是 Y"对仗、总结腔、段段加粗金句等）。核心原则：**只动语气，不动事实、数据、引用与排版体系**。
+- 详见 [AGENTS.md](AGENTS.md)，AI 助手在本仓库工作时会自动读到。
+
 ## 风格统一机制
 
 - 所有颜色、字体、间距等设计变量在 `assets/css/theme.css` 的 `:root` 中，首页与文章页共用
