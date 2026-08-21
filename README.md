@@ -14,6 +14,7 @@
 │   ├── css/article.css          # 文章页样式（侧边栏目录、排版、提示框等）
 │   ├── css/site.css             # 首页样式
 │   ├── js/article.js            # 文章页脚本（目录高亮跟随、平滑滚动、移动端目录）
+│   ├── img/                     # favicon 三件套 + og-image 分享卡片图
 │   └── vendor/prism/            # 代码高亮（本地化，不依赖外网 CDN）
 └── scripts/
     ├── build-index.mjs          # 读 articles.json → 生成首页
@@ -82,3 +83,4 @@ git add . && git commit -m "新增文章：xxx" && git push   # push 后 Pages �
 - 所有颜色、字体、间距等设计变量在 `assets/css/theme.css` 的 `:root` 中，首页与文章页共用
 - 文章页全部样式在 `assets/css/article.css`，改这一个文件即可全站生效
 - 文章内图片等资源放在 `articles/<slug>/` 目录内，用相对路径引用（如 `<img src="fig1.png">`）
+- favicon 与 Open Graph 由模板/脚本自动带上：首页的标签筛选与阅读时长由 `build-index.mjs` 生成（chips 只展示 ≥2 篇的热门标签）；分享卡片图要生效，需在 `articles.json` 的 `site.url` 填上线上域名（如 `https://xxx.pages.dev`）后重跑构建脚本

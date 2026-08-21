@@ -60,6 +60,14 @@ if (!html.includes('/assets/css/article.css?v=5')) {
   }
 }
 
+// 4.1) favicon（已有则跳过）
+if (!html.includes('rel="icon"')) {
+  const favicons = '<link rel="icon" href="/assets/img/favicon.ico" sizes="32x32">\n' +
+    '<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">\n' +
+    '<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">';
+  html = html.replace('</head>', `${favicons}\n</head>`);
+}
+
 // 5) 底部加载公共文章脚本
 if (!html.includes('/assets/js/article.js?v=2')) {
   html = html.replace('</body>', '<script src="/assets/js/article.js?v=2"></script>\n\n</body>');

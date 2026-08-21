@@ -2,7 +2,8 @@
   "site": {
     "name": "技术知识库",
     "description": "个人技术文章与知识分享：架构设计、后端开发与方法论沉淀。",
-    "footer": "© 2026 技术知识库 · Powered by Cloudflare Pages"
+    "footer": "© 2026 技术知识库 · Powered by Cloudflare Pages",
+    "url": ""
   },
   "articles": [
     {
@@ -11,7 +12,12 @@
       "description": "围绕跨业务客户识别和资质经营场景，讨论统一客户平台三层 ID、资质类型与主体、实例与快照、供给与消费，并以四色视角整理相关业务材料。",
       "date": "2026-08-18",
       "category": "架构设计",
-      "tags": ["DDD", "领域建模", "四色建模", "平台化"]
+      "tags": [
+        "DDD",
+        "领域建模",
+        "四色建模",
+        "平台化"
+      ]
     },
     {
       "slug": "tech-design-guide",
@@ -19,7 +25,12 @@
       "description": "从架构演进史讲起，经过 CRUD、MVC、三层架构等方法论，深入 DDD 战略与战术设计，最后落到如何写好一份技术方案。电商交易场景 + Java 代码示例。",
       "date": "2026-08-12",
       "category": "架构设计",
-      "tags": ["架构", "DDD", "技术方案", "Java"]
+      "tags": [
+        "架构",
+        "DDD",
+        "技术方案",
+        "Java"
+      ]
     },
     {
       "slug": "llm-training-guide",
@@ -27,7 +38,13 @@
       "description": "把大模型当作文字接龙机器讲起：Token、注意力、参数与采样；再看预训练如何把图书馆读进参数，SFT、RLHF、DPO、RLVR 等后训练如何把基座变成好助手；最后落到 LoRA、蒸馏与实践决策树。",
       "date": "2026-08-18",
       "category": "大模型",
-      "tags": ["大模型", "Transformer", "预训练", "后训练", "Python"]
+      "tags": [
+        "大模型",
+        "Transformer",
+        "预训练",
+        "后训练",
+        "Python"
+      ]
     },
     {
       "slug": "llm-engineering-guide",
@@ -35,7 +52,14 @@
       "description": "以企业知识助手为贯穿项目，从单次调用基线开始，给出 RAG 数据契约、检索与重排参数、Agent 执行预算和安全边界，再用离线门禁、影子流量、灰度、回滚线及两周计划把系统推向生产；同时补齐推理、Prompt、上下文与可观测性原理。",
       "date": "2026-08-18",
       "category": "大模型",
-      "tags": ["大模型", "推理优化", "RAG", "Agent", "LLM应用", "Python"]
+      "tags": [
+        "大模型",
+        "推理优化",
+        "RAG",
+        "Agent",
+        "LLM应用",
+        "Python"
+      ]
     },
     {
       "slug": "ecommerce-biz-guide",
@@ -43,7 +67,13 @@
       "description": "从贸易本质讲起，拆解电商生态里的核心角色：商家、品牌、厂家、平台之间的关系；聊商品价格的构成与平台货币化率；再到营销、直播电商与电商生态服务。既有宏观格局，也有微观数据。",
       "date": "2026-08-18",
       "category": "电商",
-      "tags": ["电商", "零售", "供应链", "营销", "直播电商"]
+      "tags": [
+        "电商",
+        "零售",
+        "供应链",
+        "营销",
+        "直播电商"
+      ]
     }
   ]
 }
