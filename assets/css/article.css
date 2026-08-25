@@ -263,6 +263,27 @@ blockquote {
   margin: 24px 0 4px 0;
 }
 
+/* Detail-page zone comparison table (taobao vs pinduoduo) */
+.detail-compare-table .page-shot {
+  vertical-align: top;
+  min-width: 150px;
+  max-width: 190px;
+}
+.detail-compare-table .page-shot .table-figure {
+  margin: 0 0 12px 0;
+}
+.detail-compare-table .page-shot img {
+  max-width: 170px;
+  max-height: 560px;
+}
+.detail-compare-table .zone-shot {
+  min-width: 260px;
+}
+.detail-compare-table .zone-shot img {
+  max-width: 300px;
+  max-height: 420px;
+}
+
 /* Footer */
 .footer {
   margin-top: 80px;
