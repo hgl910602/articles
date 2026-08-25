@@ -284,6 +284,24 @@ blockquote {
   max-height: 420px;
 }
 
+/* Tool screenshots embedded per row (lightboxes to full size on click) */
+.tool-shot-table .shot {
+  min-width: 280px;
+}
+.tool-shot-table .shot img {
+  max-width: 300px;
+  max-height: 420px;
+}
+
+/* Org-structure charts embedded per row */
+.org-table .shot {
+  min-width: 240px;
+}
+.org-table .shot img {
+  max-width: 280px;
+  max-height: 400px;
+}
+
 /* Footer */
 .footer {
   margin-top: 80px;
