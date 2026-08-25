@@ -75,7 +75,7 @@ git add . && git commit -m "新增文章：xxx" && git push   # push 后 Pages �
   python3 ~/.zcode/skills/de-ai-tone/scripts/tone_scan.py articles/<slug>/index.html
   ```
 
-- 常见症状与改法见 skill 内清单（破折号过密、"不是 X 而是 Y"对仗、总结腔、段段加粗金句等）。核心原则：**只动语气，不动事实、数据、引用与排版体系**。
+- 常见症状与改法见 skill 内清单（破折号过密、"不是 X 而是 Y"对仗、总结腔、段末金句落点、绝对化用词等）。核心原则：**只动语气，不动事实、数据、引用与排版体系**；扫描 0 标记不等于过关，仍需人工做落点自检。
 - 详见 [AGENTS.md](AGENTS.md)，AI 助手在本仓库工作时会自动读到。
 
 ## 风格统一机制
