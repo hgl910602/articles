@@ -8,11 +8,11 @@
 
 **适用范围是全部文章，不限技术文章**——业务分析、领域建模、随笔感想，凡新写、扩写、改写的正文都算。
 
-- 加载并遵循 `~/.zcode/skills/de-ai-tone/SKILL.md`（ZCode 环境会自动发现该 skill；其他环境直接读这个文件照做）。
+- 加载并遵循仓库内 `skills/de-ai-tone/SKILL.md`（skill 已版本化在本仓库；ZCode 环境通过 `~/.zcode/skills/de-ai-tone` 软链自动发现，其他环境直接读仓库内文件照做）。
 - 交付前自检：
 
   ```bash
-  python3 ~/.zcode/skills/de-ai-tone/scripts/tone_scan.py articles/<slug>/index.html
+  python3 skills/de-ai-tone/scripts/tone_scan.py articles/<slug>/index.html
   ```
 
   改写后 AI 腔标记密度应明显下降（重点看破折号"——"密度和"一段 ≥2 个——"的段落数），读起来不顺眼的热点句子清零。**扫描 0 标记不等于过关**：段末金句落点、对偶句密度、姊妹篇共用结尾模板这些"读感"问题脚本抓不到，交付前把每章最后一句连起来读一遍做落点自检，并和站内旧文比对收尾句式（详见 skill 工作流程）。
