@@ -2,7 +2,7 @@
   "site": {
     "name": "思享集",
     "headline": "业余思考 · 沉淀",
-    "description": "写点文章，分享给需要的人。",
+    "description": "想明白的事，写下来分享：架构设计、业务分析与工程方法论。",
     "url": "https://www.articleshare.cn",
     "footer": "© 2026 思享集 · Powered by Cloudflare Pages"
   },
@@ -74,6 +74,19 @@
         "供应链",
         "营销",
         "直播电商"
+      ]
+    },
+    {
+      "slug": "workplace-communication",
+      "title": "工作中沟通的要点",
+      "description": "按沟通对象拆解职场沟通：对上给结论给选项，对业务方给确定性，对技术方守边界留痕，平级求同存异，向下讲清为什么；核心方法是换位思考，从“我以为”切换到“他以为”。",
+      "date": "2026-08-25",
+      "category": "职场",
+      "tags": [
+        "沟通",
+        "职场",
+        "向上管理",
+        "换位思考"
       ]
     }
   ]
