@@ -54,13 +54,12 @@ const readingMinutes = (slug) => {
   }
 };
 
-// 标签汇总（按出现次数排序）；chips 只展示 ≥2 篇的热门标签，长尾标签仍可搜索、仍在卡片上
+// 标签汇总（按出现次数排序，热门在前）
 const tagCounts = new Map();
 for (const a of articles) {
   for (const t of a.tags ?? []) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
 }
 const tags = [...tagCounts.entries()]
-  .filter(([, n]) => n >= 2)
   .sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0], 'zh-Hans-CN'));
 
 const chips = [
