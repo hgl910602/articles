@@ -1,6 +1,6 @@
-# 技术知识库
+# 思享集
 
-对外分享的纯静态知识库站点：所有文章都是 HTML，共享同一套样式，部署在 Cloudflare Pages，push 到 main 自动上线。
+对外分享的纯静态文章站（域名 [articleshare.cn](https://www.articleshare.cn/)）：所有文章都是 HTML，共享同一套样式，部署在 Cloudflare Pages，push 到 main 自动上线。
 
 ## 目录结构
 
