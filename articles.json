@@ -1,9 +1,10 @@
 {
   "site": {
     "name": "思享集",
+    "headline": "业余思考 · 沉淀",
     "description": "写点文章，分享给需要的人。",
-    "footer": "© 2026 思享集 · Powered by Cloudflare Pages",
-    "url": "https://www.articleshare.cn"
+    "url": "https://www.articleshare.cn",
+    "footer": "© 2026 思享集 · Powered by Cloudflare Pages"
   },
   "articles": [
     {

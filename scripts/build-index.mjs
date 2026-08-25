@@ -115,7 +115,7 @@ ${og.join('\n')}
 <body>
 
 <header class="site-header">
-  <h1>${esc(site.name)}</h1>
+  <h1>${esc(site.headline ?? site.name)}</h1>
   <p class="site-desc">${esc(site.description ?? '')}</p>
 </header>
 
