@@ -89,7 +89,7 @@
 <p style="font-size:14px;color:var(--text-muted);text-indent:0">LLM 训练全景 &nbsp;|&nbsp; Python 代码示例</p>
 
 <div class="chapter-intro">
-<p><strong>本文的定位</strong>：很多人天天和 ChatGPT 聊天，却说不清"预训练""后训练""微调""对齐"这些词到底指什么、发生在模型生产的哪个环节。本文的目标是把<strong>一个模型从随机参数到能聊天的全过程</strong>讲透——它是什么、怎么养成、以及实践里该怎么选。</p>
+<p><strong>本文的定位</strong>：很多人天天和 ChatGPT 聊天，却说不清"预训练""后训练""微调""对齐"这些词到底指什么、发生在模型生产的哪个环节。本文的目标是把<strong>一个模型从随机参数到能聊天的全过程</strong>讲透：它是什么、怎么养成、以及实践里该怎么选。</p>
 <p><strong>本文的叙事方式</strong>：先讲"模型是什么"（一台文字接龙机器），再讲"怎么养成"（预训练 = 读万卷书，后训练 = 岗前培训），最后讲"实践怎么选"（Prompt / RAG / 微调 / 继续预训练）。Transformer 架构部分参考了知乎《Transformer 架构原理通俗解释》的讲法。</p>
 </div>
 
@@ -104,7 +104,7 @@
 
 <h3 id="sec1-1">1.1 从文字接龙说起</h3>
 
-<p>给模型一段开头：<code>Today is a</code>。它做的事情是——把这三个词读一遍，然后对词表里<strong>每一个</strong>词打一个分，输出一个概率分布：</p>
+<p>给模型一段开头：<code>Today is a</code>。它做的事情是：把这三个词读一遍，然后对词表里<strong>每一个</strong>词打一个分，输出一个概率分布：</p>
 
 <div class="diagram">
 <pre>输入: Today is a
@@ -124,12 +124,12 @@
 <p>一篇几千字的长回答，就是这样<strong>一个 token 一个 token 接出来的</strong>。每生成一个新 token，模型都要结合此前的上下文重新计算下一步概率；实际推理通常用 KV Cache 复用历史 token 的 Key/Value，避免把整段前文从头重复计算。</p>
 
 <div class="callout callout-note">
-<strong>一个常见误解：</strong> 模型不是"想好了整段话再输出"，而是每一步只决定下一个词。前面接了什么词，会直接影响后面接什么词——所以同一个开头，接出的话每次都可能不一样。
+<strong>一个常见误解：</strong> 模型不是"想好了整段话再输出"，而是每一步只决定下一个词。前面接了什么词，会直接影响后面接什么词，所以同一个开头，接出的话每次都可能不一样。
 </div>
 
 <h3 id="sec1-2">1.2 Token：模型眼中的文字</h3>
 
-<p>模型不直接处理字符，而是处理 <strong>token（词元）</strong>——把文字切成的最小单元。切分由<strong>分词器（Tokenizer）</strong>完成，常用算法是 BPE（字节对编码）。</p>
+<p>模型不直接处理字符，而是处理 <strong>token（词元）</strong>，即把文字切成的最小单元。切分由<strong>分词器（Tokenizer）</strong>完成，常用算法是 BPE（字节对编码）。</p>
 
 <pre><code class="language-python">from transformers import AutoTokenizer
 
@@ -223,7 +223,7 @@ print(ids)           # [1036, 69507, 540, 1511]  ← 模型真正看到的是这
 </div>
 
 <div class="callout callout-note">
-<strong>Q/K/V 怎么来的：</strong> 每个词的向量分别乘上三个可学习的矩阵 W_Q、W_K、W_V 得到。这三个矩阵就是模型要学的参数的一部分——"怎么提问、怎么标索引、怎么存内容"本身是被训练出来的。
+<strong>Q/K/V 怎么来的：</strong> 每个词的向量分别乘上三个可学习的矩阵 W_Q、W_K、W_V 得到。这三个矩阵就是模型要学的参数的一部分："怎么提问、怎么标索引、怎么存内容"本身是被训练出来的。
 </div>
 
 <h4 id="sec1-3-3">1.3.3 多头注意力</h4>
@@ -234,7 +234,7 @@ print(ids)           # [1036, 69507, 540, 1511]  ← 模型真正看到的是这
 
 <h4 id="sec1-3-4">1.3.4 位置编码</h4>
 
-<p>注意力有个先天缺陷：它只算"谁和谁相关"，<strong>天然不知道词的先后顺序</strong>——把"猫追狗"和"狗追猫"的词打乱输入，纯注意力会当成同一回事。所以在进模型前，要给每个 token 加一个<strong>座位号</strong>（位置编码），把"我是第几个词"的信息混进向量里。现代模型多用 RoPE（旋转位置编码）等方案。</p>
+<p>注意力有个先天缺陷：它只算"谁和谁相关"，<strong>天然不知道词的先后顺序</strong>。把"猫追狗"和"狗追猫"的词打乱输入，纯注意力会当成同一回事。所以在进模型前，要给每个 token 加一个<strong>座位号</strong>（位置编码），把"我是第几个词"的信息混进向量里。现代模型多用 RoPE（旋转位置编码）等方案。</p>
 
 <h4 id="sec1-3-5">1.3.5 前馈网络与残差捷径</h4>
 
@@ -248,11 +248,11 @@ print(ids)           # [1036, 69507, 540, 1511]  ← 模型真正看到的是这
 
 <p>原始 Transformer 分编码器和解码器两部分；翻译模型是"编码器读原文 + 解码器写译文"。而 GPT 这类生成模型只用了解码器，叫 <strong>Decoder-only</strong> 结构，并且加了<strong>因果掩码</strong>：预测第 n 个词时只许看前 n-1 个词，不许偷看后面。</p>
 
-<p>为什么？因为训练目标就是"猜下一个词"——如果能看到下一个词，就等于抄答案，什么都学不到。这个"只许看左边"的约束，恰好和接龙任务的形态完全一致，这也是 Decoder-only 成为主流的原因。</p>
+<p>为什么？因为训练目标就是"猜下一个词"，如果能看到下一个词，就等于抄答案，什么都学不到。这个"只许看左边"的约束，恰好和接龙任务的形态完全一致，这也是 Decoder-only 成为主流的原因。</p>
 
 <h3 id="sec1-4">1.4 参数：模型的脑回路</h3>
 
-<p>所谓"7B 模型"，指它有 <strong>70 亿个参数</strong>——70 亿个可调节的浮点数（W_Q、W_K、W_V、FFN 权重等加起来）。</p>
+<p>所谓"7B 模型"，指它有 <strong>70 亿个参数</strong>，也就是 70 亿个可调节的浮点数（W_Q、W_K、W_V、FFN 权重等加起来）。</p>
 
 <ul>
 <li><strong>推理</strong>：参数固定不动，输入一句话跑一遍前向传播，得到下一个词的分数。一次接龙只需毫秒级。</li>
@@ -284,7 +284,7 @@ next_token = torch.multinomial(probs, num_samples=1)   # 按概率抽签
 <tr><td>&gt; 1.2</td><td>过于发散，容易跑偏</td><td>头脑风暴（慎用）</td></tr>
 </table>
 
-<p>这就是"同样的问题每次回答不一样"的原因——<strong>模型本身每次的打分几乎一样，差别只在最后抽签那一下</strong>。</p>
+<p>这就是"同样的问题每次回答不一样"的原因：<strong>模型本身每次的打分几乎一样，差别只在最后抽签那一下</strong>。</p>
 
 <!-- 第一章总结图 -->
 <div class="chapter-summary">
@@ -342,7 +342,7 @@ next_token = torch.multinomial(probs, num_samples=1)   # 按概率抽签
 
 <h3 id="sec2-1">2.1 训练目标：一个游戏玩几万亿次</h3>
 
-<p>预训练的损失函数说出来简单到不像话——<strong>让模型给真实的下一个 token 更高概率</strong>。训练时把同一段序列右移一位作为标签，并用因果掩码阻止当前位置看到未来 token；模型会同时对序列中的各个位置预测下一 token，预测越偏离标签，损失（loss）越大。</p>
+<p>预训练的损失函数说出来简单到不像话：<strong>让模型给真实的下一个 token 更高概率</strong>。训练时把同一段序列右移一位作为标签，并用因果掩码阻止当前位置看到未来 token；模型会同时对序列中的各个位置预测下一 token，预测越偏离标签，损失（loss）越大。</p>
 
 <pre><code class="language-python"># 伪代码：预训练的核心只有这几行
 model = Transformer(params=random_init())        # 参数随机初始化
@@ -390,7 +390,7 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
 </table>
 
 <div class="callout callout-warning">
-<strong>数据质量 &gt; 数据数量：</strong> "Garbage In, Garbage Out"。预训练语料的清洗和配比是各家最核心的机密之一——同样的架构和算力，数据配比不同，最终能力可以差一大截。高质量数据的获取，已经成了预训练的主要瓶颈。
+<strong>数据质量 &gt; 数据数量：</strong> "Garbage In, Garbage Out"。预训练语料的清洗和配比是各家最核心的机密之一：同样的架构和算力，数据配比不同，最终能力可以差一大截。高质量数据的获取，已经成了预训练的主要瓶颈。
 </div>
 
 <h3 id="sec2-3">2.3 训练过程：猜、对答案、拧旋钮</h3>
@@ -423,7 +423,7 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
 <p>2020 年 OpenAI 发表 Scaling Laws（Kaplan 等），2022 年 DeepMind 的 Chinchilla 论文修正了结论。核心经验规律：</p>
 
 <blockquote>
-<p><strong>在相当大的范围内，参数越多、数据越多、算力越多，loss 就越低，模型就越聪明——且可以提前预测。</strong></p>
+<p><strong>在相当大的范围内，参数越多、数据越多、算力越多，loss 就越低，模型就越聪明，且可以提前预测。</strong></p>
 </blockquote>
 
 <table>
@@ -433,11 +433,11 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
 <tr><td>算力</td><td>总 FLOPs（GPU 数 × 时间）</td><td>上多少年学</td></tr>
 </table>
 
-<p>Chinchilla 给出的经验结论：算力预算固定时，参数量和数据量应<strong>同比例增长</strong>（大约每个参数配 20 个 token）。这条规律直接决定了"砸多少钱 → 得到多聪明的模型"的投入产出预估，也是各家军备竞赛的理论依据。不过实践中（Llama 3 等）普遍会在同参数量下喂<strong>远超</strong> Chinchilla 最优值的数据——多读书总是更好，只是边际收益递减。</p>
+<p>Chinchilla 给出的经验结论：算力预算固定时，参数量和数据量应<strong>同比例增长</strong>（大约每个参数配 20 个 token）。这条规律直接决定了"砸多少钱 → 得到多聪明的模型"的投入产出预估，也是各家军备竞赛的理论依据。不过实践中（Llama 3 等）普遍会在同参数量下喂<strong>远超</strong> Chinchilla 最优值的数据：多读书总是更好，只是边际收益递减。</p>
 
 <h3 id="sec2-5">2.5 基座模型：博览群书的"怪才"</h3>
 
-<p>预训练的产物叫<strong>基座模型（Base Model）</strong>。它知识渊博，但有个尴尬的问题——<strong>它只学过"接龙"，没学过"当助手"</strong>。</p>
+<p>预训练的产物叫<strong>基座模型（Base Model）</strong>。它知识渊博，但有个尴尬的问题：<strong>它只学过"接龙"，没学过"当助手"</strong>。</p>
 
 <pre><code class="language-text">问基座模型: 中国的首都是哪里？
 
@@ -482,7 +482,7 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
   <desc>预训练的目标、数据、过程、规律、产物与门槛</desc>
 
   <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">预训练 Pre-training</text>
-  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">读万卷书——把整个互联网量级的知识压进参数</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">读万卷书，把整个互联网量级的知识压进参数</text>
 
   <line x1="70" y1="78" x2="70" y2="408" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
 
@@ -529,7 +529,7 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
 <h2 id="ch3">第三章：后训练——从书呆子到好助手<span class="badge badge-hot">重点</span></h2>
 
 <div class="chapter-intro">
-<p>预训练产出的基座模型通常还需要适配后才能成为好用的助手。<strong>后训练（Post-training）</strong>是在基座之上继续优化行为与能力的过程。本章先讲常见起点 SFT，再分别介绍两类偏好对齐方案——基于奖励模型与 PPO 的 RLHF、直接偏好优化 DPO——以及可按任务需要加入的 RLVR。它们不是必须全部串行执行的四个阶段。</p>
+<p>预训练产出的基座模型通常还需要适配后才能成为好用的助手。<strong>后训练（Post-training）</strong>是在基座之上继续优化行为与能力的过程。本章先讲常见起点 SFT，再分别介绍两类偏好对齐方案（基于奖励模型与 PPO 的 RLHF、直接偏好优化 DPO），以及可按任务需要加入的 RLVR。它们不是必须全部串行执行的四个阶段。</p>
 <p>贯穿本章的比喻：<strong>预训练 = 上学读书；SFT = 岗前培训；RLHF = 实习中被人点评；RLVR = 刷题练出打草稿的习惯。</strong></p>
 </div>
 
@@ -547,7 +547,7 @@ for batch in dataloader:          # 数据：几万亿 token，切成批次
 <tr><td>安全边界</td><td>有害请求照接</td><td>合理拒绝</td></tr>
 </table>
 
-<p>后训练首先要解决这些行为问题——<strong>重点是教模型如何响应、如何取舍</strong>。它也可能注入领域知识或技能，但少量监督样本并不是稳定维护大量、时效性知识的理想方式。</p>
+<p>后训练首先要解决这些行为问题：<strong>重点是教模型如何响应、如何取舍</strong>。它也可能注入领域知识或技能，但少量监督样本并不是稳定维护大量、时效性知识的理想方式。</p>
 
 <h3 id="sec3-2">3.2 SFT：照着范例学</h3>
 
@@ -590,7 +590,7 @@ prompt = tokenizer.apply_chat_template(messages, tokenize=False)
 
 <h3 id="sec3-3">3.3 RLHF：根据反馈学分寸</h3>
 
-<p>SFT 有个天花板：示范数据只能教"什么是好的"，但<strong>好到什么程度、哪种更好，说不清楚</strong>。就像看教学视频学礼仪能学会基本动作，但分寸感要在实习中被点评才能磨出来——这就是 <strong>RLHF（Reinforcement Learning from Human Feedback，人类反馈强化学习）</strong>，也是 ChatGPT 走红的技术核心（InstructGPT 论文，2022）。</p>
+<p>SFT 有个天花板：示范数据只能教"什么是好的"，但<strong>好到什么程度、哪种更好，说不清楚</strong>。就像看教学视频学礼仪能学会基本动作，但分寸感要在实习中被点评才能磨出来，这就是 <strong>RLHF（Reinforcement Learning from Human Feedback，人类反馈强化学习）</strong>，也是 ChatGPT 走红的技术核心（InstructGPT 论文，2022）。</p>
 
 <div class="diagram">
 <pre>          ┌────────────┐
@@ -643,7 +643,7 @@ for question in prompt_data:
 </table>
 
 <div class="callout callout-warning">
-<strong>Reward Hacking（奖励投机）：</strong> 奖励模型只是人类偏好的近似。策略模型可能找到"让 RM 打高分但人觉得离谱"的输出——比如堆砌套话、过度冗长。KL 惩罚就是为压制这种漂移设计的，但无法根除。
+<strong>Reward Hacking（奖励投机）：</strong> 奖励模型只是人类偏好的近似。策略模型可能找到"让 RM 打高分但人觉得离谱"的输出，比如堆砌套话、过度冗长。KL 惩罚就是为压制这种漂移设计的，但无法根除。
 </div>
 
 <h3 id="sec3-4">3.4 DPO：轻量级对齐</h3>
@@ -672,7 +672,7 @@ for question in prompt_data:
 
 <p>近年来后训练的重要方向之一，是在<strong>结果可以自动验证</strong>的任务上做强化学习，全称 RL with Verifiable Rewards（可验证奖励的强化学习）。</p>
 
-<p>关键洞察：数学题可以核对答案、代码题可以跑单元测试——<strong>不需要人类标注"好不好"，对错机器自己知道</strong>。于是可以大规模地"刷题"：模型生成带推理过程的解答，对了给奖励，错了不给，能力就自己长出来了。</p>
+<p>关键洞察：数学题可以核对答案、代码题可以跑单元测试，<strong>不需要人类标注"好不好"，对错机器自己知道</strong>。于是可以大规模地"刷题"：模型生成带推理过程的解答，对了给奖励，错了不给，能力就自己长出来了。</p>
 
 <div class="diagram">
 <pre>┌────────────── RLVR 训练循环 ──────────────┐
@@ -731,7 +731,7 @@ for question in prompt_data:
 </div>
 
 <div class="callout callout-danger">
-<strong>误区三："RLHF 之后模型就不幻觉了。"</strong> 幻觉源于预训练目标本身——学的是"接得像"而不是"接得对"。后训练能压制（让模型更倾向说"我不确定"），不能根除。
+<strong>误区三："RLHF 之后模型就不幻觉了。"</strong> 幻觉源于预训练目标本身：学的是"接得像"而不是"接得对"。后训练能压制（让模型更倾向说"我不确定"），不能根除。
 </div>
 
 <!-- 第三章总结图 -->
@@ -741,7 +741,7 @@ for question in prompt_data:
   <desc>SFT、两类偏好对齐路线与可选 RLVR 的典型组合</desc>
 
   <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">后训练 Post-training</text>
-  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">岗前培训——把书呆子变成好助手</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">岗前培训，把书呆子变成好助手</text>
 
   <line x1="70" y1="78" x2="70" y2="428" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
 
@@ -859,7 +859,7 @@ model.print_trainable_parameters()
 
 <h3 id="sec4-3">4.3 蒸馏：大老师教小学生</h3>
 
-<p><strong>知识蒸馏（Distillation）</strong>：用强模型的输出当训练数据，去教小模型。R1 论文的做法就是典型——用 R1 生成 80 万条高质量推理数据，SFT 教给小模型，让 7B 的小杯也学会打草稿。</p>
+<p><strong>知识蒸馏（Distillation）</strong>：用强模型的输出当训练数据，去教小模型。R1 论文的做法就是典型：用 R1 生成 80 万条高质量推理数据，SFT 教给小模型，让 7B 的小杯也学会打草稿。</p>
 
 <ul>
 <li><strong>数据蒸馏</strong>（主流）：强模型生成"问题-答案"数据 → SFT 小模型</li>
@@ -878,7 +878,7 @@ model.print_trainable_parameters()
 <tr><td><strong>Epoch / Step</strong></td><td>数据完整过一遍 / 每处理一个批次更新一次参数</td></tr>
 <tr><td><strong>学习率 LR</strong></td><td>每次拧旋钮的幅度：太大震荡不收敛，太慢训不动</td></tr>
 <tr><td><strong>上下文窗口</strong></td><td>模型一次能"看进去"的最大 token 数（4K~1M+）</td></tr>
-<tr><td><strong>幻觉</strong></td><td>一本正经地编造——因为训练目标是"接得像"而非"接得对"</td></tr>
+<tr><td><strong>幻觉</strong></td><td>一本正经地编造，因为训练目标是"接得像"而非"接得对"</td></tr>
 <tr><td><strong>对齐</strong></td><td>让模型行为符合人类意图和价值观（RLHF/DPO 做的事）</td></tr>
 <tr><td><strong>思维链 CoT</strong></td><td>让模型"一步步想"的输出/提示方式，推理模型将其内化</td></tr>
 <tr><td><strong>推理模型</strong></td><td>在回答时投入额外推理计算的模型；RLVR 是常见训练手段之一，但不是唯一实现路径</td></tr>
@@ -897,7 +897,7 @@ model.print_trainable_parameters()
 <tr><td>LoRA 微调</td><td>数百~数万条</td><td>单卡</td><td>数小时~数天</td><td>个人</td></tr>
 </table>
 
-<p>可以看到一条清晰的规律：<strong>越靠近预训练，越是"巨头的游戏"；越靠近应用，门槛越低</strong>。这也是开源基座的价值所在——把最贵的一步替你做完了。</p>
+<p>可以看到一条清晰的规律：<strong>越靠近预训练，越是"巨头的游戏"；越靠近应用，门槛越低</strong>。这也是开源基座的价值所在：把最贵的一步替你做完了。</p>
 
 <!-- 第四章总结图 -->
 <div class="chapter-summary">
@@ -966,7 +966,7 @@ model.print_trainable_parameters()
 <ul>
 <li>推理模型再能打草稿，底层依然是那个只会"猜下一个词"的接龙机器</li>
 <li>对话能力再自然，也建立在预训练灌进去的万亿 token 之上</li>
-<li>再强的对齐，也压不住接龙目标的先天属性——幻觉只能管理，不能消灭</li>
+<li>再强的对齐，也压不住接龙目标的先天属性：幻觉只能管理，不能消灭</li>
 </ul>
 
 <p><strong>记住一句话就够了：架构是"大脑怎么连"，预训练是"读书养成知识"，后训练是"学着好好说话做事"。</strong>三者合起来，才是你面前这个能聊天的 AI。</p>
