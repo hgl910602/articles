@@ -622,7 +622,7 @@ vllm serve Qwen/Qwen2.5-7B-Instruct-AWQ \
 
 <h4 id="sec2-2-1">2.2.1 缓存里存的是什么：逐 token 的笔记，而非 prompt 原文</h4>
 
-<p>一个常见误会：以为缓存是"按 prompt 存"的某种整体映射。实际不是：KV Cache 按 <strong>token × 层</strong>存条目，存的是把每个 token 过一遍网络后、在每一层算出的 K 和 V 向量。以"退"这个字（Qwen2.5-7B，第 37 个 token）为例：</p>
+<p>容易把缓存误会成"按 prompt 存"的某种整体映射。实际不是：KV Cache 按 <strong>token × 层</strong>存条目，存的是把每个 token 过一遍网络后、在每一层算出的 K 和 V 向量。以"退"这个字（Qwen2.5-7B，第 37 个 token）为例：</p>
 
 <div class="diagram">
 <pre>token "退" 进入缓存后，存的是它在每一层算出的 K/V：
@@ -1584,7 +1584,7 @@ Layer 3: 外部世界（整个互联网）
 <tr><td><strong>重置状态</strong></td><td>清空上下文，从头来过</td><td>丢失所有进展，成本翻倍</td></tr>
 </table>
 
-<p>Manus 把<strong>错误恢复能力</strong>视为真正 Agent 行为的最明确指标之一。大多数学术评测关注理想条件下的任务成功率，但生产环境的真实挑战恰恰是出错后能不能恢复。</p>
+<p>Manus 把<strong>错误恢复能力</strong>视为真正 Agent 行为的最明确指标之一。学术评测大多关注理想条件下的任务成功率，生产环境的真实考验则是出错后能不能恢复。</p>
 
 <h4 id="sec4-5-6">4.5.6 打破 Few-shot 模式固化</h4>
 
@@ -2434,7 +2434,7 @@ while not done:
 
 <h3 id="sec6-9">6.9 Agent 工程全景：一张地图收束全文</h3>
 
-<p>到这里可以摊开整张地图了。前面几章看起来各讲各的，其实是同一门学问的几个侧面——<strong>Agent 工程研究"如何构建让模型在环境里自主完成任务的系统"</strong>，其余领域都是它的子域：</p>
+<p>到这里可以把各章串起来了。前面几章看起来各讲各的，其实是同一门学问的几个侧面——<strong>Agent 工程研究"如何构建让模型在环境里自主完成任务的系统"</strong>，其余领域都是它的子域：</p>
 
 <table>
 <tr><th>子域</th><th>解决什么问题</th><th>对应章节</th></tr>
@@ -3163,7 +3163,7 @@ rollback_to: qa-assistant-2026-08-18.3
 
 <h3 id="sec9-1">9.1 常见 LLM 应用架构速览</h3>
 
-<p>先给一张总地图：绝大多数 LLM 应用都落在下面五种模式之一（复杂度从左到右递增），选型的第一问永远是"<strong>我需要哪一档</strong>"：</p>
+<p>LLM 应用的形态看着五花八门，落到架构上基本就是下面五种模式之一（复杂度从左到右递增），选型的第一问是"<strong>我需要哪一档</strong>"：</p>
 
 <table>
 <tr><th>模式</th><th>组成</th><th>适用</th><th>典型成本</th></tr>
