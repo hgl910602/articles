@@ -1,29 +1,17 @@
-/* 自适应宽度：屏幕越宽正文越宽，上限 1100px；窄屏回落 VitePress 默认 */
+/* 内容宽度连续自适应：正文列宽跟随视口线性伸缩，窄屏回落默认 */
 :root {
-  --vp-layout-max-width: 1800px;
+  --vp-layout-max-width: 2200px;
 }
 
 .VPPage .aside {
   display: none;
 }
 
-/* 窄屏/移动端保持默认排版，不加边距修正 */
 @media (min-width: 960px) {
   .VPPage .container .content-container {
-    max-width: 800px !important;
-  }
-}
-
-@media (min-width: 1280px) {
-  .VPPage .container .content-container {
-    max-width: 900px !important;
-    margin-left: calc((100% - 900px) / 2) !important;
-  }
-}
-
-@media (min-width: 1680px) {
-  .VPPage .container .content-container {
-    max-width: 1050px !important;
-    margin-left: calc((100% - 1050px) / 2) !important;
+    /* 下限 720px 保可读，上限 1250px 防行过长，中间按视口 62% 连续缩放 */
+    max-width: none !important;
+    width: clamp(720px, 62vw, 1250px);
+    margin-inline: auto !important;
   }
 }
