@@ -1,3 +1,21 @@
+/* 侧栏更精致：字号小一档，条目带颜色过渡 */
+.Layout .VPSidebar {
+  font-size: 13px;
+}
+.Layout .VPSidebar a {
+  transition: color 0.25s ease;
+}
+
+/* 滚动跟随高亮：当前读到的小节着墨蓝色并加深 */
+:root {
+  --toc-active: #34618e;
+}
+.Layout .VPSidebar a.spy-current,
+.Layout .VPSidebar a.spy-current p {
+  color: var(--toc-active) !important;
+  font-weight: 600;
+}
+
 /*
  * 标题排版精修：中文衬线字体（宋体系）+ 字距细节。
  * 只动标题与副标题行，正文保持无衬线保证长文易读。
