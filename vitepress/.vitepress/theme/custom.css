@@ -1,17 +1,29 @@
-/* 页面加宽：默认内容区约 688px，放宽到 ~900px */
+/* 自适应宽度：屏幕越宽正文越宽，上限 1100px；窄屏回落 VitePress 默认 */
 :root {
-  --vp-layout-max-width: 1600px;
+  --vp-layout-max-width: 1800px;
 }
 
-.VPPage .container .content-container {
-  max-width: 900px !important;
+.VPPage .aside {
+  display: none;
+}
+
+/* 窄屏/移动端保持默认排版，不加边距修正 */
+@media (min-width: 960px) {
+  .VPPage .container .content-container {
+    max-width: 800px !important;
+  }
 }
 
 @media (min-width: 1280px) {
-  .VPPage .aside {
-    display: none;
-  }
-  .VPPage .content-container {
+  .VPPage .container .content-container {
+    max-width: 900px !important;
     margin-left: calc((100% - 900px) / 2) !important;
+  }
+}
+
+@media (min-width: 1680px) {
+  .VPPage .container .content-container {
+    max-width: 1050px !important;
+    margin-left: calc((100% - 1050px) / 2) !important;
   }
 }
