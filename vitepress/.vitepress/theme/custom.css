@@ -1,17 +1,17 @@
-/* 内容宽度连续自适应：正文列宽跟随视口线性伸缩，窄屏回落默认 */
-:root {
-  --vp-layout-max-width: 2200px;
-}
-
+/* 右栏大纲移除（本页目录已在左栏） */
 .VPPage .aside {
   display: none;
 }
 
+/*
+ * 正文列宽随窗口连续伸缩。
+ * 不动 --vp-layout-max-width：主题在 >=1440 视口用 (100vw - 该值)/2 算边距，
+ * 调大它会在中等窗口算出负边距把内容顶进侧栏底下。
+ * 这里让内容列填充自身可用空间、封顶 1250px，min() 保证永不溢出。
+ */
 @media (min-width: 960px) {
-  .VPPage .container .content-container {
-    /* 下限 720px 保可读，上限 1250px 防行过长，中间按视口 62% 连续缩放 */
-    max-width: none !important;
-    width: clamp(720px, 62vw, 1250px);
+  .VPPage .content-container {
+    max-width: min(1250px, 100%);
     margin-inline: auto !important;
   }
 }
