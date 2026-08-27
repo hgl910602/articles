@@ -21,9 +21,17 @@
 }
 
 /* 宽屏时内容区左右外边距改为小定值，正文即可一直延伸到窗口右侧 */
+/* 宽屏时侧栏钉死为窄栏、内容区贴着它一直延伸到窗口右侧。
+ * 注意：主题默认给侧栏加了随视口变宽的居中偏移（宽度会超过 272px），
+ * 只改内容边距不动侧栏的话，正文就会钻到侧栏底下被盖住。 */
 @media (min-width: 1440px) {
-  .Layout #VPContent.VPContent.has-sidebar {
+  .Layout .VPSidebar {
+    width: var(--vp-sidebar-width);
+    padding-left: 24px;
+    box-sizing: border-box;
+  }
+  #VPContent.VPContent.has-sidebar {
     padding-right: 48px;
-    padding-left: var(--vp-sidebar-width);
+    padding-left: calc(var(--vp-sidebar-width) + 40px);
   }
 }

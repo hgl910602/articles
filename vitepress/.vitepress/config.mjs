@@ -20,7 +20,8 @@ const slugify = (str) =>
     .replace(/^(\d)/, '_$1')
     .toLowerCase();
 
-// 扫描每篇 md 的 ##/### 标题，生成"文章标题 + 本页目录"式侧边栏
+// 扫描每篇 md 的 ##/###/#### 标题，生成"文章标题 + 本页目录"式侧边栏，
+// 全部默认展开不折叠（目录长不是问题）
 function buildSidebar() {
   return readdirSync(srcDir)
     .filter((f) => f.endsWith('.md') && f !== 'index.md')
@@ -30,14 +31,19 @@ function buildSidebar() {
         text.match(/^# (.+)$/m)?.[1] ?? file.replace('.md', '');
       const items = [];
       for (const line of text.split('\n')) {
-        const m = line.match(/^(##|###) (.+)$/);
-        if (m) {
-          const link = `#${slugify(m[2].trim())}`;
-          if (m[1] === '##') {
-            items.push({ text: m[2].trim(), link, collapsed: true, items: [] });
-          } else if (items.length) {
-            items[items.length - 1].items.push({ text: m[2].trim(), link });
-          }
+        const m = line.match(/^(#{2,4}) (.+)$/);
+        if (!m) continue;
+        const link = `#${slugify(m[2].trim())}`;
+        if (m[1] === '##') {
+          items.push({ text: m[2].trim(), link, collapsed: false, items: [] });
+        } else if (m[1] === '###' && items.length) {
+          const parent = items[items.length - 1];
+          parent.items.push({ text: m[2].trim(), link, collapsed: false, items: [] });
+        } else if (items.length) {
+          // #### 挂到最近的 ###，没有 ### 就挂到 ##
+          const chapter = items[items.length - 1];
+          const section = chapter.items[chapter.items.length - 1];
+          (section?.items ?? chapter.items).push({ text: m[2].trim(), link });
         }
       }
       return {
