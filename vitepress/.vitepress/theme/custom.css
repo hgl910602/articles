@@ -1,4 +1,29 @@
 /*
+ * 标题排版精修：中文衬线字体（宋体系）+ 字距细节。
+ * 只动标题与副标题行，正文保持无衬线保证长文易读。
+ */
+.Layout .vp-doc h1 {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.Layout .vp-doc h2 {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* 紧跟标题的首行当作副标题样式：弱化、收紧与主标题的距离 */
+.Layout .vp-doc h1 + p {
+  color: var(--vp-c-text-3);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  margin-top: -4px;
+}
+
+/*
  * 正文区域占满左侧栏右边全部可用空间：窗口多宽正文就多宽。
  * 真实 DOM 链：#app > .Layout > #VPContent.VPContent.has-sidebar
  *            > .VPDoc.has-sidebar.has-aside > .container > .content > .content-container
