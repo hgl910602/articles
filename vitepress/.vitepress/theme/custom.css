@@ -1,0 +1,17 @@
+/* 页面加宽：默认内容区约 688px，放宽到 ~900px */
+:root {
+  --vp-layout-max-width: 1600px;
+}
+
+.VPPage .container .content-container {
+  max-width: 900px !important;
+}
+
+@media (min-width: 1280px) {
+  .VPPage .aside {
+    display: none;
+  }
+  .VPPage .content-container {
+    margin-left: calc((100% - 900px) / 2) !important;
+  }
+}

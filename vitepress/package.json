@@ -13,6 +13,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "github-slugger": "^2.0.0",
     "vitepress": "^1.6.4"
   },
   "private": true
