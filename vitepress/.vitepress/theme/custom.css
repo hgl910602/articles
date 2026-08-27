@@ -1,17 +1,29 @@
-/* 右栏大纲移除（本页目录已在左栏） */
-.VPPage .aside {
+/*
+ * 正文区域占满左侧栏右边全部可用空间：窗口多宽正文就多宽。
+ * 真实 DOM 链：#app > .Layout > #VPContent.VPContent.has-sidebar
+ *            > .VPDoc.has-sidebar.has-aside > .container > .content > .content-container
+ * 主题自身的限宽规则带 data-v 作用域属性、优先级更高，
+ * 故这里挂靠 .Layout 提升优先级并对关键属性加 !important。
+ * 另注：不要动 --vp-layout-max-width，主题在宽视口用它算边距，调大会出负数。
+ */
+
+/* 右侧大纲栏移除：目录已由左栏承担；不然 outline 关掉后会留一条空栏 */
+.Layout .VPDoc .aside {
   display: none;
 }
 
-/*
- * 正文列宽随窗口连续伸缩。
- * 不动 --vp-layout-max-width：主题在 >=1440 视口用 (100vw - 该值)/2 算边距，
- * 调大它会在中等窗口算出负边距把内容顶进侧栏底下。
- * 这里让内容列填充自身可用空间、封顶 1250px，min() 保证永不溢出。
- */
 @media (min-width: 960px) {
-  .VPPage .content-container {
-    max-width: min(1250px, 100%);
-    margin-inline: auto !important;
+  .Layout .VPDoc.has-aside .content-container {
+    max-width: none !important;
+    margin-inline: auto;
+    padding-inline: 40px;
+  }
+}
+
+/* 宽屏时内容区左右外边距改为小定值，正文即可一直延伸到窗口右侧 */
+@media (min-width: 1440px) {
+  .Layout #VPContent.VPContent.has-sidebar {
+    padding-right: 48px;
+    padding-left: var(--vp-sidebar-width);
   }
 }
