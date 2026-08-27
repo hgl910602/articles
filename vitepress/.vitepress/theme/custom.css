@@ -1,19 +1,29 @@
-/* 侧栏更精致：字号小一档，条目带颜色过渡 */
+/* 侧栏：整体窄字号精致化；宽度加大容纳长标题 */
+.Layout {
+  --vp-sidebar-width: 360px;
+  --toc-active: #0a6cf5;
+}
 .Layout .VPSidebar {
-  font-size: 13px;
+  font-size: 12.5px;
 }
 .Layout .VPSidebar a {
   transition: color 0.25s ease;
 }
 
-/* 滚动跟随高亮：当前读到的小节着墨蓝色并加深 */
-:root {
-  --toc-active: #34618e;
+/* 宽屏时目录块在侧栏带内水平居中：短标题居中、长标题自动吃满宽度 */
+@media (min-width: 960px) {
+  .Layout .VPSidebar .nav {
+    max-width: max-content;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
 }
+
+/* 滚动跟随高亮：亮蓝色明显标记当前小节 */
 .Layout .VPSidebar a.spy-current,
 .Layout .VPSidebar a.spy-current p {
   color: var(--toc-active) !important;
-  font-weight: 600;
+  font-weight: 600 !important;
 }
 
 /*
