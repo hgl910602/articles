@@ -4,7 +4,12 @@
   --toc-active: #0a6cf5;
 }
 .Layout .VPSidebar {
-  font-size: 12.5px;
+  font-size: 12px;
+}
+/* 子元素若自带字号声明会被这里统一压平 */
+.Layout .VPSidebar .nav,
+.Layout .VPSidebar .nav * {
+  font-size: 12px;
 }
 .Layout .VPSidebar a {
   transition: color 0.25s ease;
