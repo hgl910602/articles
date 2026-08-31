@@ -1,0 +1,75 @@
+<svg viewBox="0 0 680 620" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>架构方法论全景总结图</title>
+  <desc>从 CRUD 到 DDD 以及更广阔的方法论版图，按问题维度分类展示各架构模式</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">架构方法论全景</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">不止 CRUD/MVC/DDD — 按问题维度梳理业界主流模式</text>
+
+  <!-- Dimension 1: Data Access -->
+  <text x="40" y="85" font-size="14" font-weight="500" fill="#712B13">数据访问</text>
+  <line x1="40" y1="93" x2="640" y2="93" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="100" width="145" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="112" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">CRUD 事务脚本</text>
+  <rect x="195" y="100" width="145" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="267" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Active Record</text>
+  <rect x="350" y="100" width="145" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="422" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Data Mapper</text>
+  <rect x="505" y="100" width="135" height="28" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="572" y="118" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Repository</text>
+
+  <!-- Dimension 2: Layering -->
+  <text x="40" y="155" font-size="14" font-weight="500" fill="#633806">代码分层</text>
+  <line x1="40" y1="163" x2="640" y2="163" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="170" width="145" height="28" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="112" y="188" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">MVC 三层</text>
+  <rect x="195" y="170" width="145" height="28" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="267" y="188" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">六边形架构</text>
+  <rect x="350" y="170" width="145" height="28" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="422" y="188" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">整洁架构</text>
+  <rect x="505" y="170" width="135" height="28" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="572" y="188" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">洋葱架构</text>
+
+  <!-- Dimension 3: Read/Write -->
+  <text x="40" y="225" font-size="14" font-weight="500" fill="#3C3489">读写分离</text>
+  <line x1="40" y1="233" x2="640" y2="233" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="240" width="280" height="28" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="180" y="258" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">CQRS（命令查询职责分离）</text>
+  <rect x="330" y="240" width="310" height="28" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="485" y="258" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">Event Sourcing（事件溯源）</text>
+
+  <!-- Dimension 4: Communication -->
+  <text x="40" y="295" font-size="14" font-weight="500" fill="#0C447C">通信范式</text>
+  <line x1="40" y1="303" x2="640" y2="303" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="310" width="290" height="28" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="185" y="328" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C">事件驱动架构 (EDA)</text>
+  <rect x="340" y="310" width="300" height="28" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="490" y="328" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C">响应式架构 (Reactive)</text>
+
+  <!-- Dimension 5: Extensibility -->
+  <text x="40" y="365" font-size="14" font-weight="500" fill="#085041">系统扩展</text>
+  <line x1="40" y1="373" x2="640" y2="373" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="380" width="290" height="28" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="185" y="398" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">微内核 / 插件架构</text>
+  <rect x="340" y="380" width="300" height="28" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="490" y="398" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">管道 - 过滤器</text>
+
+  <!-- Dimension 6: Business Modeling -->
+  <text x="40" y="435" font-size="14" font-weight="500" fill="#444441">业务建模</text>
+  <line x1="40" y1="443" x2="640" y2="443" stroke="#E8E6DD" stroke-width="0.5"/>
+  <rect x="40" y="450" width="600" height="28" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="340" y="468" text-anchor="middle" font-size="12" font-weight="500" fill="#444441">DDD（战略设计 + 战术设计）← 本文重点</text>
+
+  <!-- Key insight -->
+  <line x1="40" y1="500" x2="640" y2="500" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="340" y="520" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">核心认知</text>
+
+  <rect x="40" y="535" width="280" height="64" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="555" font-size="12" font-weight="500" fill="#444441">这些模式是正交的</text>
+  <text x="55" y="573" font-size="11" font-weight="400" fill="#5F5E5A">解决不同维度的问题</text>
+  <text x="55" y="589" font-size="11" font-weight="400" fill="#5F5E5A">按需组合使用，正交叠加</text>
+
+  <rect x="340" y="535" width="300" height="64" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="355" y="555" font-size="12" font-weight="500" fill="#444441">CRUD → MVC → DDD 是主线</text>
+  <text x="355" y="573" font-size="11" font-weight="400" fill="#5F5E5A">其余模式按需叠加</text>
+  <text x="355" y="589" font-size="11" font-weight="400" fill="#5F5E5A">没有银弹，适合的才是好的</text>
+</svg>

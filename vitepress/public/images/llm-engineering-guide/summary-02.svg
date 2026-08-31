@@ -1,0 +1,41 @@
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>推理优化总结图</title>
+  <desc>量化、KV Cache 瘦身、投机解码、长上下文与部署决策</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">推理优化</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">更快更省的三板斧 + 一个部署决策</text>
+
+  <line x1="70" y1="78" x2="70" y2="413" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">量化</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">FP16 → INT8 → INT4，权重减半再减半 · 上线前必跑质量回归</text>
+
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">KV Cache 瘦身</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">GQA 分组共享 · MLA 压缩存储 · 前缀命中省重算</text>
+
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">投机解码</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">小模型猜一排、大模型一次批改，无损加速 · 输出越规整收益越大</text>
+
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">长上下文 ≠ 记忆力</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">又贵又"中段走神" · 工作台放本次材料，资料库交给 RAG</text>
+
+  <line x1="40" y1="365" x2="640" y2="365" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="385" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">部署决策</text>
+
+  <rect x="40" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="420" font-size="12" font-weight="500" fill="#444441">默认：云端 API 起步</text>
+  <text x="55" y="440" font-size="11" font-weight="400" fill="#5F5E5A">按 token 付费 · 最快验证产品 · 评估集同步攒</text>
+
+  <rect x="350" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="420" font-size="12" font-weight="500" fill="#444441">自部署的两个触发条件</text>
+  <text x="365" y="440" font-size="11" font-weight="400" fill="#5F5E5A">数据不能出去 · API 账单贵过 GPU 租金</text>
+</svg>

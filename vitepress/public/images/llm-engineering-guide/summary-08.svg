@@ -1,0 +1,41 @@
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>上线之路总结图</title>
+  <desc>评估、观测、安全、成本四要素与上线清单</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">上线之路</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">从"偶尔惊艳"到"每次靠谱"</text>
+
+  <line x1="70" y1="78" x2="70" y2="413" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">评估：黄金集 + 裁判</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">自建业务评估集投入产出比最高 · LLM-as-judge 注意偏差</text>
+
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">观测：全链路 trace</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">改写/检索/重排/生成逐环节留痕 · 盯 P95 而不是平均值</text>
+
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">安全：多层护栏</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">警惕直接/间接 Prompt 注入 · 权限最小化 · 高危动作人审</text>
+
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">成本：token 就是钱</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">砍输出 → 缓存与分级路由 → 蒸馏自部署（收益递减）</text>
+
+  <line x1="40" y1="365" x2="640" y2="365" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="385" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">两句话</text>
+
+  <rect x="40" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="420" font-size="12" font-weight="500" fill="#444441">没有评估集，一切优化都是盲调</text>
+  <text x="55" y="440" font-size="11" font-weight="400" fill="#5F5E5A">上线前攒的第一个资产，别推迟到第 N 个迭代</text>
+
+  <rect x="350" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="420" font-size="12" font-weight="500" fill="#444441">模型是实习生，不是管理员</text>
+  <text x="365" y="440" font-size="11" font-weight="400" fill="#5F5E5A">校验、白名单、人审——执行权和责任都在你的代码里</text>
+</svg>

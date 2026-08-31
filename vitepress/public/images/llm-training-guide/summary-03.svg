@@ -1,0 +1,46 @@
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>后训练总结图</title>
+  <desc>SFT、两类偏好对齐路线与可选 RLVR 的典型组合</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">后训练 Post-training</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">岗前培训，把书呆子变成好助手</text>
+
+  <line x1="70" y1="78" x2="70" y2="428" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="105" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="105" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="100" font-size="14" font-weight="500" fill="#712B13">SFT 监督微调</text>
+  <text x="100" y="118" font-size="13" font-weight="400" fill="#5F5E5A">「问-答」示范，loss 只算回答部分 — 学角色、格式、基本安全</text>
+
+  <circle cx="70" cy="175" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="175" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="170" font-size="14" font-weight="500" fill="#633806">奖励模型 RM</text>
+  <text x="100" y="188" font-size="13" font-weight="400" fill="#5F5E5A">人类排序 → 学会给回答打分 — 人类偏好的"代理评委"</text>
+
+  <circle cx="70" cy="245" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="245" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="240" font-size="14" font-weight="500" fill="#3C3489">RLHF / DPO</text>
+  <text x="100" y="258" font-size="13" font-weight="400" fill="#5F5E5A">朝高分方向调整 + KL 约束 — DPO 跳过 RM 和 PPO，轻量稳定</text>
+
+  <circle cx="70" cy="315" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="315" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="310" font-size="14" font-weight="500" fill="#0C447C">RLVR 推理强化</text>
+  <text x="100" y="328" font-size="13" font-weight="400" fill="#5F5E5A">数学/代码自动判分刷题 — o1/R1 学会"先打草稿再交卷"</text>
+
+  <circle cx="70" cy="385" r="13" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="70" y="385" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">5</text>
+  <text x="100" y="380" font-size="14" font-weight="500" fill="#085041">蒸馏（可选）</text>
+  <text x="100" y="398" font-size="13" font-weight="400" fill="#5F5E5A">用强模型生成的数据教小模型 — R1 的能力就这样传给小杯</text>
+
+  <line x1="40" y1="445" x2="640" y2="445" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="465" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">一句话记住</text>
+
+  <rect x="40" y="480" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="500" font-size="12" font-weight="500" fill="#444441">后训练教行为，不教知识</text>
+  <text x="55" y="520" font-size="11" font-weight="400" fill="#5F5E5A">格式、分寸、安全、思维链</text>
+
+  <rect x="350" y="480" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="500" font-size="12" font-weight="500" fill="#444441">基座 → Chat 的关键一跃</text>
+  <text x="365" y="520" font-size="11" font-weight="400" fill="#5F5E5A">SFT 起步，RLHF/DPO 定分寸，RLVR 练推理</text>
+</svg>

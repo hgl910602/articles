@@ -1,0 +1,41 @@
+<svg viewBox="0 0 680 480" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>大模型是什么总结图</title>
+  <desc>文字接龙、Token、Transformer 注意力加工厂、参数与采样四要素</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">大模型是什么</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">一台被训练得特别会"文字接龙"的机器</text>
+
+  <line x1="70" y1="78" x2="70" y2="348" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">文字接龙</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">读入全部上文 → 词表上每个词打分 → 选一个接上 → 循环</text>
+
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">Token 化</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">文字切成最小单元 → 编号 → 向量；长度和计费都按 token 算</text>
+
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">Transformer 加工厂</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">自注意力让词互相抄信息（Q 找 K 匹配抄 V）· FFN 存知识 · ×N 层</text>
+
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">参数与采样</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">7B = 70 亿个可调旋钮；温度控制抽签的随机程度</text>
+
+  <line x1="40" y1="365" x2="640" y2="365" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="385" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">核心结论</text>
+
+  <rect x="40" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="420" font-size="12" font-weight="500" fill="#444441">推理 = 参数固定，跑前向传播</text>
+  <text x="55" y="440" font-size="11" font-weight="400" fill="#5F5E5A">逐 token 生成；KV Cache 复用历史注意力状态</text>
+
+  <rect x="350" y="400" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="420" font-size="12" font-weight="500" fill="#444441">训练 = 反复调那几十亿个旋钮</text>
+  <text x="365" y="440" font-size="11" font-weight="400" fill="#5F5E5A">接下来两章的主角</text>
+</svg>

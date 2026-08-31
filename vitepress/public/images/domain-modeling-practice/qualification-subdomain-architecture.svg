@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1580" height="990" viewBox="0 0 1580 990" role="img" aria-labelledby="title desc">
+  <title id="title">&#x8D44;&#x8D28;&#x4E2D;&#x5FC3;&#x4E09;&#x4E2A;&#x5B50;&#x57DF;&#x67B6;&#x6784;</title>
+  <desc id="desc">&#x8D44;&#x8D28;&#x57FA;&#x7840;&#x63D0;&#x4F9B;&#x5B9A;&#x4E49;&#xFF0C;&#x8D44;&#x8D28;&#x4F9B;&#x7ED9;&#x627F;&#x63A5;&#x751F;&#x547D;&#x5468;&#x671F;&#xFF0C;&#x8D44;&#x8D28;&#x6D88;&#x8D39;&#x63D0;&#x4F9B;&#x67E5;&#x8BE2;&#x4E0E;&#x89C4;&#x5219;&#x6821;&#x9A8C;</desc>
+  <defs>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#333333" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arr" orient="auto" markerWidth="10" markerHeight="8" refX="9" refY="4" viewBox="0 0 10 8">
+      <path d="M0 0L10 4L0 8Z" fill="#666666"/>
+    </marker>
+    <marker id="arr2" orient="auto" markerWidth="10" markerHeight="8" refX="9" refY="4" viewBox="0 0 10 8">
+      <path d="M0 0L10 4L0 8Z" fill="#999999"/>
+    </marker>
+    <style>text{font-family:PingFang SC,Microsoft YaHei,sans-serif}.title{font-size:25px;font-weight:700;fill:#333333}.sub{font-size:14px;fill:#666666}.layer{font-size:12px;font-weight:700;fill:#666666;letter-spacing:2px}.head{font-size:16px;font-weight:700;fill:#333333}.body{font-size:13px;fill:#666666}.small{font-size:11px;fill:#666666}.white{fill:#333333;font-weight:700;font-size:15px}.box{fill:#fff;stroke:#CCCCCC;stroke-width:1.25}.dash{fill:#fff;stroke:#CCCCCC;stroke-width:1.15;stroke-dasharray:7 5}.link{fill:none;stroke:#666666;stroke-width:1.35}.muted{fill:none;stroke:#999999;stroke-width:1.15}</style>
+  </defs>
+  <rect width="1580" height="990" fill="#FFFFFF"/>
+  <text x="36" y="42" class="title">&#x8D44;&#x8D28;&#x4E2D;&#x5FC3;&#x4E09;&#x4E2A;&#x5B50;&#x57DF;&#x67B6;&#x6784;</text>
+  <text x="36" y="66" class="sub">&#x8D44;&#x8D28;&#x57FA;&#x7840;&#x63D0;&#x4F9B;&#x5B9A;&#x4E49;&#xFF0C;&#x8D44;&#x8D28;&#x4F9B;&#x7ED9;&#x627F;&#x63A5;&#x751F;&#x547D;&#x5468;&#x671F;&#xFF0C;&#x8D44;&#x8D28;&#x6D88;&#x8D39;&#x63D0;&#x4F9B;&#x67E5;&#x8BE2;&#x4E0E;&#x89C4;&#x5219;&#x6821;&#x9A8C;</text>
+  <text x="36" y="104" class="layer">&#x8D44;&#x8D28;&#x751F;&#x547D;&#x5468;&#x671F;</text>
+  <line x1="170" y1="100" x2="1544" y2="100" stroke="#CCCCCC"/>
+  <rect x="60" y="125" width="160" height="26" rx="13" fill="#FFFFFF"/>
+  <text x="140.0" y="143" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#666666">&#x521D;&#x59CB;&#x5316;</text>
+  <rect x="245" y="125" width="160" height="26" rx="13" fill="#FFFFFF"/>
+  <text x="325.0" y="143" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#666666">&#x5BA1;&#x6279;&#x4E2D;</text>
+  <rect x="430" y="125" width="160" height="26" rx="13" fill="#CCFFFF"/>
+  <text x="510.0" y="143" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#336666">&#x5BA1;&#x6279;&#x901A;&#x8FC7; / &#x751F;&#x6548;</text>
+  <rect x="650" y="125" width="160" height="26" rx="13" fill="#FFFFFF"/>
+  <text x="730.0" y="143" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#666666">&#x5BA1;&#x6279;&#x62D2;&#x7EDD;</text>
+  <rect x="870" y="125" width="160" height="26" rx="13" fill="#FFFFFF"/>
+  <text x="950.0" y="143" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#666666">&#x5DF2;&#x5931;&#x6548;</text>
+  <line x1="220" y1="138" x2="245" y2="138" class="link" marker-end="url(#arr)"/>
+  <text x="232.5" y="119" text-anchor="middle" class="small">&#x63D0;&#x5BA1;</text>
+  <line x1="405" y1="138" x2="430" y2="138" class="link" marker-end="url(#arr)"/>
+  <text x="417.5" y="119" text-anchor="middle" class="small">&#x901A;&#x8FC7;</text>
+  <polyline points="405,150 405,170 730,170 730,151" class="link" marker-end="url(#arr)"/>
+  <rect x="527" y="158" width="76" height="20" rx="10" fill="#FFFFFF"/>
+  <text x="565" y="173" text-anchor="middle" class="small">&#x62D2;&#x7EDD;</text>
+  <polyline points="590,138 620,138 620,198 950,198 950,151" class="link" marker-end="url(#arr)"/>
+  <rect x="747" y="186" width="86" height="20" rx="10" fill="#FFFFFF"/>
+  <text x="790" y="201" text-anchor="middle" class="small">&#x8FC7;&#x671F; / &#x6CBB;&#x7406;</text>
+  <rect x="35" y="835" width="1510" height="125" rx="16" fill="#FFFFFF" stroke="#CCFFFF" stroke-width="1.8"/>
+  <rect x="55" y="819" width="130" height="30" rx="15" fill="#6699CC"/>
+  <text x="120" y="839" text-anchor="middle" class="white">&#x8D44;&#x8D28;&#x57FA;&#x7840;</text>
+  <rect x="220" y="860" width="250" height="26" rx="13" fill="#fff"/>
+  <text x="345.0" y="878" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#6699CC">&#x8D44;&#x8D28;&#x4E3B;&#x4F53;&#x5B9A;&#x4E49;</text>
+  <rect x="520" y="860" width="250" height="26" rx="13" fill="#fff"/>
+  <text x="645.0" y="878" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#6699CC">&#x8D44;&#x8D28;&#x4E1A;&#x52A1;&#x5B9A;&#x4E49;</text>
+  <rect x="820" y="860" width="250" height="26" rx="13" fill="#fff"/>
+  <text x="945.0" y="878" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#6699CC">&#x8D44;&#x8D28;&#x89C4;&#x5219;&#x5B9A;&#x4E49;</text>
+  <rect x="1120" y="860" width="250" height="26" rx="13" fill="#fff"/>
+  <text x="1245.0" y="878" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#6699CC">&#x8D44;&#x8D28;&#x5B9A;&#x4E49;</text>
+  <rect x="220" y="902" width="250" height="26" rx="13" fill="#fff"/>
+  <text x="345.0" y="920" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#6699CC">&#x5143;&#x6570;&#x636E;&#x52A8;&#x6001;&#x5316;&#x63CF;&#x8FF0;</text>
+  <rect x="520" y="902" width="250" height="26" rx="13" fill="#fff"/>
+  <text x="645.0" y="920" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:11px;font-weight:700;fill:#6699CC">&#x4E1A;&#x52A1;&#x81EA;&#x52A9;&#x5F00;&#x653E;&#x63A5;&#x5165;</text>
+  <rect x="35" y="230" width="620" height="535" rx="18" class="dash"/>
+  <rect x="58" y="214" width="130" height="30" rx="15" fill="#6699CC"/>
+  <text x="123" y="234" text-anchor="middle" class="white">&#x8D44;&#x8D28;&#x4F9B;&#x7ED9;</text>
+  <g filter="url(#shadow)">
+    <rect x="75" y="270" width="240" height="72" rx="12" fill="#fff" stroke="#CCCCFF" stroke-width="1.8"/>
+    <text x="195.0" y="299" text-anchor="middle" class="head">&#x4F9B;&#x7ED9;&#x6A21;&#x5F0F;</text>
+    <text x="195.0" y="321" text-anchor="middle" class="small">&#x5B9E;&#x65F6; &#xB7; &#x5468;&#x671F;&#x79BB;&#x7EBF; &#xB7; &#x56DE;&#x5237;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="375" y="270" width="240" height="72" rx="12" fill="#fff" stroke="#CCCCFF" stroke-width="1.8"/>
+    <text x="495.0" y="299" text-anchor="middle" class="head">&#x4E1A;&#x52A1;&#x652F;&#x6491;&#x6A21;&#x5F0F;</text>
+    <text x="495.0" y="321" text-anchor="middle" class="small">&#x5168;&#x6258;&#x7BA1; &#xB7; &#x534A;&#x6258;&#x7BA1;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="75" y="400" width="240" height="72" rx="12" fill="#fff" stroke="#CCCCCC" stroke-width="1.8"/>
+    <text x="195.0" y="429" text-anchor="middle" class="head">&#x6570;&#x636E;&#x5B58;&#x50A8;&#x80FD;&#x529B;</text>
+    <text x="195.0" y="451" text-anchor="middle" class="small">&#x6807;&#x51C6;&#x5316;&#x843D;&#x5E93;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="375" y="400" width="240" height="72" rx="12" fill="#fff" stroke="#CCCCCC" stroke-width="1.8"/>
+    <text x="495.0" y="429" text-anchor="middle" class="head">&#x751F;&#x547D;&#x5468;&#x671F;&#x7BA1;&#x7406;</text>
+    <text x="495.0" y="451" text-anchor="middle" class="small">&#x4FDD;&#x5B58; &#xB7; &#x63D0;&#x5BA1; &#xB7; &#x5BA1;&#x6838; &#xB7; &#x5931;&#x6548;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="225" y="560" width="240" height="76" rx="12" fill="#CCCCFF" stroke="#CCCCFF" stroke-width="1.8"/>
+    <text x="345.0" y="589" text-anchor="middle" class="head">&#x8D44;&#x8D28;&#x5B9E;&#x4F8B;&#x4E0E;&#x5FEB;&#x7167;</text>
+    <text x="345.0" y="611" text-anchor="middle" class="small">&#x7EDF;&#x4E00;&#x4F9B;&#x7ED9;&#x6A21;&#x578B;</text>
+  </g>
+  <line x1="195" y1="342" x2="195" y2="400" class="link" marker-end="url(#arr)"/>
+  <line x1="495" y1="342" x2="495" y2="400" class="link" marker-end="url(#arr)"/>
+  <polyline points="195,472 195,520 345,520" class="link"/>
+  <polyline points="495,472 495,520 345,520" class="link"/>
+  <line x1="345" y1="520" x2="345" y2="560" class="link" marker-end="url(#arr)"/>
+  <circle cx="790" cy="500" r="112" fill="#6699CC" filter="url(#shadow)"/>
+  <text x="790" y="486" text-anchor="middle" class="white">&#x8D44;&#x8D28;&#x4E2D;&#x5FC3;&#x5B58;&#x50A8;</text>
+  <text x="790" y="514" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:13px;fill:#CCCCCC">&#x5B9E;&#x4F8B; &#xB7; &#x5FEB;&#x7167; &#xB7; &#x72B6;&#x6001;</text>
+  <text x="790" y="540" text-anchor="middle" style="font-family:PingFang SC, Microsoft YaHei, sans-serif;font-size:12px;fill:#CCFFFF">&#x7EDF;&#x4E00;&#x6A21;&#x578B;&#x4E0E;&#x9886;&#x57DF;&#x6D88;&#x606F;</text>
+  <line x1="655" y1="500" x2="678" y2="500" class="link" marker-end="url(#arr)"/>
+  <rect x="632.5" y="488.0" width="68" height="20" rx="10" fill="#FFFFFF"/>
+  <text x="666.5" y="503.0" text-anchor="middle" class="small">&#x4F9B;&#x7ED9;</text>
+  <rect x="925" y="230" width="620" height="535" rx="18" class="dash"/>
+  <rect x="948" y="214" width="130" height="30" rx="15" fill="#99CCCC"/>
+  <text x="1013" y="234" text-anchor="middle" class="white">&#x8D44;&#x8D28;&#x6D88;&#x8D39;</text>
+  <g filter="url(#shadow)">
+    <rect x="965" y="270" width="240" height="72" rx="12" fill="#fff" stroke="#CCFFFF" stroke-width="1.8"/>
+    <text x="1085.0" y="299" text-anchor="middle" class="head">&#x6D88;&#x8D39;&#x6A21;&#x5F0F;</text>
+    <text x="1085.0" y="321" text-anchor="middle" class="small">&#x5728;&#x7EBF;&#x6D88;&#x8D39; &#xB7; &#x79BB;&#x7EBF;&#x6D88;&#x8D39;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="1265" y="270" width="240" height="72" rx="12" fill="#fff" stroke="#CCFFFF" stroke-width="1.8"/>
+    <text x="1385.0" y="299" text-anchor="middle" class="head">&#x4E1A;&#x52A1;&#x652F;&#x6491;&#x6A21;&#x5F0F;</text>
+    <text x="1385.0" y="321" text-anchor="middle" class="small">&#x5F00;&#x7BB1;&#x67E5;&#x8BE2; &#xB7; &#x8D44;&#x683C;&#x5224;&#x65AD;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="965" y="400" width="240" height="72" rx="12" fill="#fff" stroke="#CCCCCC" stroke-width="1.8"/>
+    <text x="1085.0" y="429" text-anchor="middle" class="head">&#x8D44;&#x8D28;&#x67E5;&#x8BE2;&#x80FD;&#x529B;</text>
+    <text x="1085.0" y="451" text-anchor="middle" class="small">&#x6309;&#x4E3B;&#x4F53;&#x4E0E;&#x7C7B;&#x578B;&#x67E5;&#x8BE2;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="1265" y="400" width="240" height="72" rx="12" fill="#fff" stroke="#CCCCCC" stroke-width="1.8"/>
+    <text x="1385.0" y="429" text-anchor="middle" class="head">&#x89C4;&#x5219;&#x6821;&#x9A8C;&#x80FD;&#x529B;</text>
+    <text x="1385.0" y="451" text-anchor="middle" class="small">&#x4E1A;&#x52A1;&#x5B9E;&#x4F53;&#x8D44;&#x683C;&#x6821;&#x9A8C;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="965" y="560" width="240" height="72" rx="12" fill="#fff" stroke="#CCCCCC" stroke-width="1.8"/>
+    <text x="1085.0" y="589" text-anchor="middle" class="head">&#x5BCC;&#x5BA2;&#x6237;&#x7AEF; / ES</text>
+    <text x="1085.0" y="611" text-anchor="middle" class="small">&#x5728;&#x7EBF;&#x67E5;&#x8BE2;</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="1265" y="560" width="240" height="72" rx="12" fill="#fff" stroke="#CCCCCC" stroke-width="1.8"/>
+    <text x="1385.0" y="589" text-anchor="middle" class="head">&#x4E1A;&#x52A1;&#x5B9A;&#x5236;&#x5206;&#x6D41;&#x7B56;&#x7565;</text>
+    <text x="1385.0" y="611" text-anchor="middle" class="small">&#x79BB;&#x7EBF;&#x5206;&#x53D1;</text>
+  </g>
+  <line x1="902" y1="500" x2="925" y2="500" class="link" marker-end="url(#arr)"/>
+  <rect x="879.5" y="488.0" width="68" height="20" rx="10" fill="#FFFFFF"/>
+  <text x="913.5" y="503.0" text-anchor="middle" class="small">&#x6D88;&#x8D39;</text>
+  <line x1="1085" y1="342" x2="1085" y2="400" class="link" marker-end="url(#arr)"/>
+  <line x1="1385" y1="342" x2="1385" y2="400" class="link" marker-end="url(#arr)"/>
+  <line x1="1085" y1="472" x2="1085" y2="560" class="link" marker-end="url(#arr)"/>
+  <line x1="1385" y1="472" x2="1385" y2="560" class="link" marker-end="url(#arr)"/>
+  <rect x="700" y="680" width="180" height="72" rx="14" fill="#fff" stroke="#9999CC" stroke-dasharray="7 5"/>
+  <text x="790" y="708" text-anchor="middle" class="head">&#x4E1A;&#x52A1;&#x5B58;&#x50A8;</text>
+  <text x="790" y="732" text-anchor="middle" class="small">&#x5B9E;&#x65F6;&#x589E;&#x91CF; + &#x5468;&#x671F;&#x5168;&#x91CF;</text>
+  <line x1="790" y1="612" x2="790" y2="680" class="muted" marker-end="url(#arr2)"/>
+  <rect x="756.0" y="634.0" width="68" height="20" rx="10" fill="#FFFFFF"/>
+  <text x="790.0" y="649.0" text-anchor="middle" class="small">&#x5F00;&#x653E;&#x63A5;&#x5165;</text>
+</svg>

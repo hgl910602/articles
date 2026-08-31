@@ -1,0 +1,45 @@
+<svg viewBox="0 0 680 440" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>实践篇总结图</title>
+  <desc>从 Prompt 到继续预训练的选型递进，LoRA 与蒸馏的定位</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">实践篇：选型递进</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">从最简单的开始，按需升级</text>
+
+  <text x="340" y="85" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">需求强度递增 →</text>
+
+  <rect x="40" y="105" width="120" height="72" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="100" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Prompt</text>
+  <text x="100" y="150" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">输出更好</text>
+  <text x="100" y="166" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">零成本</text>
+
+  <rect x="185" y="105" width="120" height="72" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="245" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">RAG</text>
+  <text x="245" y="150" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">私有知识</text>
+  <text x="245" y="166" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">实时数据</text>
+
+  <rect x="330" y="105" width="120" height="72" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="390" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">微调 LoRA</text>
+  <text x="390" y="150" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">风格/格式</text>
+  <text x="390" y="166" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">单卡可训</text>
+
+  <rect x="475" y="105" width="165" height="72" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="557" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">继续预训练 CPT</text>
+  <text x="557" y="150" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">全新领域基础能力</text>
+  <text x="557" y="166" text-anchor="middle" font-size="11" font-weight="400" fill="#5F5E5A">团队级投入</text>
+
+  <line x1="40" y1="215" x2="640" y2="215" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="240" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">两条经验</text>
+
+  <rect x="40" y="260" width="290" height="72" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="283" font-size="12" font-weight="500" fill="#444441">知识类需求 → RAG</text>
+  <text x="55" y="303" font-size="11" font-weight="400" fill="#5F5E5A">微调教"怎么干"，不教"知道什么"</text>
+  <text x="55" y="320" font-size="11" font-weight="400" fill="#5F5E5A">文档更新立即生效，可溯源</text>
+
+  <rect x="350" y="260" width="290" height="72" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="283" font-size="12" font-weight="500" fill="#444441">成本类需求 → 蒸馏</text>
+  <text x="365" y="303" font-size="11" font-weight="400" fill="#5F5E5A">强模型当老师离线生成数据</text>
+  <text x="365" y="320" font-size="11" font-weight="400" fill="#5F5E5A">小模型学生在线服务，便宜一个量级</text>
+
+  <text x="340" y="375" text-anchor="middle" font-size="12" font-weight="400" fill="#888780">先评测定位问题，再选择 Prompt、RAG 或微调</text>
+</svg>

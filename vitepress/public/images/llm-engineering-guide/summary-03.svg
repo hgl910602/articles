@@ -1,0 +1,28 @@
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>Prompt 工程总结图</title>
+  <desc>Prompt 结构设计、推理技巧、Few-shot、模板管理、注入防御</desc>
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">Prompt 工程</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">把 Prompt 当 API 来设计</text>
+  <line x1="70" y1="78" x2="70" y2="413" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">结构化设计</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">角色·任务·约束·示例·输入 · XML 标签隔离指令与数据</text>
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">推理技巧</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">CoT · 自一致性 · ToT · 推理模型内置 CoT</text>
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">Few-shot 工程</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">示例选择 · 排序 · 动态检索 · 负面示例</text>
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">模板与注入防御</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">版本化 · 参数化 · 链式调用 · 结构隔离防注入</text>
+  <line x1="40" y1="365" x2="640" y2="365" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="340" y="385" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">一句话原则</text>
+  <rect x="40" y="400" width="600" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="340" y="422" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">Prompt 是给模型的 API 调用——有结构、有契约、有版本、有测试</text>
+  <text x="340" y="442" text-anchor="middle" font-size="12" fill="#5F5E5A">"帮我写个好点的"没有约束，等于许愿</text>
+</svg>

@@ -1,0 +1,28 @@
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>RAG 与知识工程总结图</title>
+  <desc>离线建索引、在线检索生成、失败排查、评估指标</desc>
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">RAG 与知识工程</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">知识流水线：离线索引 + 在线检索 + 评估</text>
+  <line x1="70" y1="78" x2="70" y2="413" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">离线知识构建</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">解析→清洗→切分→语义增强→结构化抽取→多路入库</text>
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">在线检索生成</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">查询改写 → 混合检索 → 重排 → 生成（附引用）</text>
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">失败排查</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">80% 的锅在检索不在生成 · 按环节逐个排查</text>
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">RAG 评估</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">精确率 · 召回率 · 忠实度 · 答案相关性（RAGAS）</text>
+  <line x1="40" y1="365" x2="640" y2="365" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="340" y="385" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">一句话原则</text>
+  <rect x="40" y="400" width="600" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="340" y="422" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">知识问题用 RAG，行为问题才微调</text>
+  <text x="340" y="442" text-anchor="middle" font-size="12" fill="#5F5E5A">RAG 可溯源、更新即生效，是知识接入的首选方案</text>
+</svg>

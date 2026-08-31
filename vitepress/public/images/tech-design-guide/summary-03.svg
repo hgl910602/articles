@@ -1,0 +1,67 @@
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>领域驱动设计总结图</title>
+  <desc>DDD 战略设计与战术设计全景，含四色建模法与四层架构</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">领域驱动设计（DDD）</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">战略设计划边界，战术设计建模型，四色建模法做分析</text>
+
+  <!-- Strategic Design -->
+  <text x="60" y="80" font-size="14" font-weight="500" fill="#3C3489">战略设计（宏观 · 划边界）</text>
+
+  <circle cx="70" cy="105" r="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="90" y="100" font-size="13" font-weight="500" fill="#3C3489">子域划分</text>
+  <text x="90" y="116" font-size="12" font-weight="400" fill="#5F5E5A">核心域 ★（竞争力） · 支撑域（辅助） · 通用域（通用能力）</text>
+
+  <circle cx="70" cy="145" r="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="90" y="140" font-size="13" font-weight="500" fill="#3C3489">限界上下文</text>
+  <text x="90" y="156" font-size="12" font-weight="400" fill="#5F5E5A">语义边界 — "商品"在目录/库存/营销团队中含义不同</text>
+
+  <circle cx="70" cy="185" r="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="90" y="180" font-size="13" font-weight="500" fill="#3C3489">上下文映射（8 种模式）</text>
+  <text x="90" y="196" font-size="12" font-weight="400" fill="#5F5E5A">ACL 防腐层 ★ · OHS 开放主机 · 客户-供应商 · 共享内核 …</text>
+
+  <text x="90" y="214" font-size="12" font-weight="400" fill="#888780">→ 限界上下文为服务拆分提供语义依据，但不等同于微服务</text>
+
+  <line x1="40" y1="235" x2="640" y2="235" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- Tactical Design -->
+  <text x="60" y="260" font-size="14" font-weight="500" fill="#0C447C">战术设计（微观 · 建模型）</text>
+
+  <circle cx="70" cy="285" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="280" font-size="13" font-weight="500" fill="#0C447C">聚合 ★ 核心概念</text>
+  <text x="90" y="296" font-size="12" font-weight="400" fill="#5F5E5A">聚合根（Order）→ 实体（OrderItem）+ 值对象（Money/Address）</text>
+  <text x="90" y="314" font-size="12" font-weight="400" fill="#888780">外部只能通过聚合根访问内部</text>
+
+  <circle cx="70" cy="335" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="330" font-size="13" font-weight="500" fill="#0C447C">领域服务</text>
+  <text x="90" y="346" font-size="12" font-weight="400" fill="#5F5E5A">跨聚合的领域逻辑 — PricingService 计算多聚合优惠</text>
+
+  <circle cx="70" cy="375" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="370" font-size="13" font-weight="500" fill="#0C447C">领域事件</text>
+  <text x="90" y="386" font-size="12" font-weight="400" fill="#5F5E5A">解耦利器 — OrderPaidEvent 触发库存扣减/通知</text>
+
+  <circle cx="70" cy="415" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="410" font-size="13" font-weight="500" fill="#0C447C">仓储 · 工厂</text>
+  <text x="90" y="426" font-size="12" font-weight="400" fill="#5F5E5A">Repository 持久化聚合 · Factory 封装复杂创建</text>
+
+  <circle cx="70" cy="455" r="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="90" y="450" font-size="13" font-weight="500" fill="#0C447C">四色建模法</text>
+  <text x="90" y="466" font-size="12" font-weight="400" fill="#5F5E5A">PPT(事物🟢) · Description(描述🔵) · Role(角色🟡) · MI(时刻-时段🔴)</text>
+
+  <line x1="40" y1="485" x2="640" y2="485" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- DDD Four-layer architecture -->
+  <text x="340" y="505" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">DDD 四层架构</text>
+
+  <rect x="40" y="520" width="130" height="30" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="105" y="540" text-anchor="middle" font-size="12" font-weight="500" fill="#5F5E5A">Interface 接口层</text>
+  <text x="180" y="540" font-size="14" fill="#888780">→</text>
+  <rect x="195" y="520" width="130" height="30" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="260" y="540" text-anchor="middle" font-size="12" font-weight="500" fill="#5F5E5A">Application 应用层</text>
+  <text x="335" y="540" font-size="14" fill="#888780">→</text>
+  <rect x="350" y="520" width="130" height="30" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="415" y="540" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">★ Domain 领域层</text>
+  <text x="490" y="540" font-size="14" fill="#888780">→</text>
+  <rect x="505" y="520" width="135" height="30" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="572" y="540" text-anchor="middle" font-size="12" font-weight="500" fill="#5F5E5A">Infrastructure 基础设施</text>
+</svg>

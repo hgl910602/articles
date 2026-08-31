@@ -1,0 +1,47 @@
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>架构与案例总结图</title>
+  <desc>五种架构模式与两个案例的核心设计</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">架构模式与案例</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">复杂度阶梯 · 从最简单的够用方案起步</text>
+
+  <rect x="40" y="70" width="120" height="44" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="100" y="88" text-anchor="middle" font-size="12" font-weight="500" fill="#444441">纯 Prompt</text>
+  <text x="100" y="104" text-anchor="middle" font-size="10" fill="#5F5E5A">分类·改写·抽取</text>
+
+  <rect x="175" y="70" width="120" height="44" rx="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="235" y="88" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C">RAG</text>
+  <text x="235" y="104" text-anchor="middle" font-size="10" fill="#5F5E5A">知识问答·文档助手</text>
+
+  <rect x="310" y="70" width="120" height="44" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="370" y="88" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">RAG + 工具</text>
+  <text x="370" y="104" text-anchor="middle" font-size="10" fill="#5F5E5A">实时数据问答</text>
+
+  <rect x="445" y="70" width="100" height="44" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="495" y="88" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">工作流</text>
+  <text x="495" y="104" text-anchor="middle" font-size="10" fill="#5F5E5A">固定流程业务</text>
+
+  <rect x="560" y="70" width="80" height="44" rx="6" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="600" y="88" text-anchor="middle" font-size="12" font-weight="500" fill="#712B13">Agent</text>
+  <text x="600" y="104" text-anchor="middle" font-size="10" fill="#5F5E5A">开放任务</text>
+
+  <text x="340" y="140" text-anchor="middle" font-size="11" fill="#888780">← 从左往右按需升级 · 成本 3~10 倍递增 · 别跳级</text>
+
+  <line x1="40" y1="160" x2="640" y2="160" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="60" y="188" font-size="14" font-weight="500" fill="#0C447C">案例一：智能客服</text>
+  <text x="80" y="212" font-size="13" fill="#5F5E5A">· 小模型路由 + FAQ 缓存 → 80% 流量不过主力模型</text>
+  <text x="80" y="234" font-size="13" fill="#5F5E5A">· 工具白名单：查询随便调、资金操作必须人审</text>
+  <text x="80" y="256" font-size="13" fill="#5F5E5A">· 转人工率是核心健康指标，兜底比聪明重要</text>
+
+  <text x="60" y="292" font-size="14" font-weight="500" fill="#3C3489">案例二：企业知识问答</text>
+  <text x="80" y="316" font-size="13" fill="#5F5E5A">· 权限过滤做在检索层，不靠模型自觉</text>
+  <text x="80" y="338" font-size="13" fill="#5F5E5A">· 文档变更 → 增量重建索引 → 回答标注版本日期</text>
+  <text x="80" y="360" font-size="13" fill="#5F5E5A">· 点踩自动进评估集：评估集是运营出来的</text>
+
+  <line x1="40" y1="385" x2="640" y2="385" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <rect x="40" y="400" width="600" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="340" y="422" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">所有反模式背后是同一个心智错误：把模型当主角</text>
+  <text x="340" y="442" text-anchor="middle" font-size="12" fill="#5F5E5A">模型只是流水线上几个受保护的工位——进出有检查、产量有计数、工位可替换</text>
+</svg>

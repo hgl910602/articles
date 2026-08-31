@@ -1,0 +1,32 @@
+<svg viewBox="0 0 680 545" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>Harness 工程总结图</title>
+  <desc>编排模式、错误处理、流式缓存、Guardrails、框架选型</desc>
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">Harness 工程</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">Agent 循环的运行时子域</text>
+  <line x1="70" y1="78" x2="70" y2="373" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">编排模式</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">顺序链 · 路由 · 并行 · 循环 · Map-Reduce · 固定编排优先</text>
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">错误处理与降级</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">重试 → 降级模型 → 规则兜底 → 静态话术 · 熔断防雪崩</text>
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">流式与缓存</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">SSE 流式+中断+增量解析 · 前缀/精确/语义三层缓存</text>
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">Guardrails 管道</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">输入：注入+PII+话题+限流 · 输出：格式+内容+引用+审计</text>
+  <circle cx="70" cy="360" r="13" fill="#E8F5E9" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="70" y="360" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#1B5E20">5</text>
+  <text x="100" y="355" font-size="14" font-weight="500" fill="#1B5E20">框架选型（7.7）</text>
+  <text x="100" y="373" font-size="13" font-weight="400" fill="#5F5E5A">裸写 → Agents SDK → LangGraph → CrewAI · 按复杂度升级</text>
+  <line x1="40" y1="430" x2="640" y2="430" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="340" y="450" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">一句话原则</text>
+  <rect x="40" y="465" width="600" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="340" y="487" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">模型是引擎，Harness 是底盘，没有底盘的引擎跑不上路</text>
+  <text x="340" y="507" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">编排、容错、流式、缓存、护栏，这五件事都要做</text>
+</svg>

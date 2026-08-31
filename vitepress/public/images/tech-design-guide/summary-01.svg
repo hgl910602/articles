@@ -1,0 +1,54 @@
+<svg viewBox="0 0 680 514" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>架构演进史总结图</title>
+  <desc>从原始单体到云原生的五阶段架构演进，以及四条核心启示</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">架构演进史</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">从原始单体到云原生，复杂性如何被层层封装</text>
+
+  <line x1="70" y1="78" x2="70" y2="378" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="80" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="80" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="75" font-size="14" font-weight="500" fill="#712B13">原始单体时代</text>
+  <text x="100" y="93" font-size="13" font-weight="400" fill="#5F5E5A">大泥球反模式 — 代码集中、快速开发，但膨胀混乱、难以协作</text>
+
+  <circle cx="70" cy="155" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="155" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="150" font-size="14" font-weight="500" fill="#633806">分层架构诞生</text>
+  <text x="100" y="168" font-size="13" font-weight="400" fill="#5F5E5A">MVC / 三层 — 关注点分离、隔离变化，但单体仍臃肿</text>
+
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">面向服务架构 SOA</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">能力复用与组合 — 特定集中式实现可能过重</text>
+
+  <circle cx="70" cy="305" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="305" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="300" font-size="14" font-weight="500" fill="#0C447C">微服务架构</text>
+  <text x="100" y="318" font-size="13" font-weight="400" fill="#5F5E5A">独立部署、团队自治、技术异构 — 引入分布式复杂性</text>
+
+  <circle cx="70" cy="380" r="13" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="70" y="380" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">5</text>
+  <text x="100" y="375" font-size="14" font-weight="500" fill="#085041">云原生时代</text>
+  <text x="100" y="393" font-size="13" font-weight="400" fill="#5F5E5A">容器化、Service Mesh — 基础设施下沉，开发者只关注业务</text>
+
+  <line x1="40" y1="415" x2="640" y2="415" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="435" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">演进启示</text>
+
+  <rect x="40" y="450" width="141" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="110" y="466" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">没有银弹</text>
+  <text x="110" y="484" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">每种架构都有代价</text>
+
+  <rect x="193" y="450" width="141" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="263" y="466" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">复杂性守恒</text>
+  <text x="263" y="484" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">复杂性只会转移</text>
+
+  <rect x="346" y="450" width="141" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="416" y="466" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">架构是演进的</text>
+  <text x="416" y="484" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">渐进式演化</text>
+
+  <rect x="499" y="450" width="141" height="44" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="569" y="466" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">DDD 是拆分依据</text>
+  <text x="569" y="484" text-anchor="middle" font-size="12" font-weight="400" fill="#5F5E5A">限界上下文≈服务边界</text>
+</svg>

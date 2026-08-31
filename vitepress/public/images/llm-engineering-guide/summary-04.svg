@@ -1,0 +1,32 @@
+<svg viewBox="0 0 680 560" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>上下文工程总结图</title>
+  <desc>上下文窗口限制、组装策略、压缩蒸馏、动态装配、Manus 实践</desc>
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">上下文工程</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">窗口里的信息管理学</text>
+  <line x1="70" y1="78" x2="70" y2="413" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">窗口真相</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">容量有限 · 成本线性涨 · 中段走神 · 上下文 ≠ 记忆</text>
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">组装策略</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">指令在头 · 问题在尾 · 资料夹中间 · 信息密度优先</text>
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">压缩与蒸馏</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">滚动摘要保梗概 · 事实蒸馏提密度 · 60% 时启动压缩</text>
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">动态装配</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">上下文路由 · 渐进加载 · 选择性历史 · token 预算管理</text>
+  <circle cx="70" cy="360" r="13" fill="#E8F5E9" stroke="#2E7D32" stroke-width="0.5"/>
+  <text x="70" y="360" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#1B5E20">5</text>
+  <text x="100" y="355" font-size="14" font-weight="500" fill="#1B5E20">Manus 实践</text>
+  <text x="100" y="373" font-size="13" font-weight="400" fill="#5F5E5A">KV-Cache 优先 · 掩码不移除 · 文件系统即记忆 · todo.md · 保留错误</text>
+  <line x1="40" y1="430" x2="640" y2="430" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="340" y="450" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">一句话原则</text>
+  <rect x="40" y="465" width="600" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="340" y="487" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">上下文不是越大越好，每 token 都要有理由在里面</text>
+  <text x="340" y="507" text-anchor="middle" font-size="12" fill="#5F5E5A">工作台只摊开当前需要的东西，用完清掉</text>
+</svg>

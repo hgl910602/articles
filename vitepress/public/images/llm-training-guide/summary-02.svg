@@ -1,0 +1,46 @@
+<svg viewBox="0 0 680 540" width="100%" role="img" font-family="-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <title>预训练总结图</title>
+  <desc>预训练的目标、数据、过程、规律、产物与门槛</desc>
+
+  <text x="340" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">预训练 Pre-training</text>
+  <text x="340" y="50" text-anchor="middle" font-size="13" font-weight="400" fill="#888780">读万卷书，把整个互联网量级的知识压进参数</text>
+
+  <line x1="70" y1="78" x2="70" y2="408" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <circle cx="70" cy="100" r="13" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+  <text x="70" y="100" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#712B13">1</text>
+  <text x="100" y="95" font-size="14" font-weight="500" fill="#712B13">目标：猜下一个词</text>
+  <text x="100" y="113" font-size="13" font-weight="400" fill="#5F5E5A">交叉熵损失 — 为了接得准，被迫学会语法、事实、逻辑、代码</text>
+
+  <circle cx="70" cy="165" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+  <text x="70" y="165" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#633806">2</text>
+  <text x="100" y="160" font-size="14" font-weight="500" fill="#633806">数据：万亿级 token</text>
+  <text x="100" y="178" font-size="13" font-weight="400" fill="#5F5E5A">网页/书籍/代码/论文 — 去重、质量过滤、配比，质量重于数量</text>
+
+  <circle cx="70" cy="230" r="13" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="70" y="230" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#3C3489">3</text>
+  <text x="100" y="225" font-size="14" font-weight="500" fill="#3C3489">过程：梯度下降</text>
+  <text x="100" y="243" font-size="13" font-weight="400" fill="#5F5E5A">猜 → 对答案 → 反向传播拧参数 → 循环几百万步</text>
+
+  <circle cx="70" cy="295" r="13" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="70" y="295" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#0C447C">4</text>
+  <text x="100" y="290" font-size="14" font-weight="500" fill="#0C447C">规律：Scaling Law</text>
+  <text x="100" y="308" font-size="13" font-weight="400" fill="#5F5E5A">参数、数据、算力同比例增长，能力可预测地提升</text>
+
+  <circle cx="70" cy="360" r="13" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="70" y="360" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#085041">5</text>
+  <text x="100" y="355" font-size="14" font-weight="500" fill="#085041">产物：基座模型</text>
+  <text x="100" y="373" font-size="13" font-weight="400" fill="#5F5E5A">知识渊博但只会"续写"，不会当助手 — 必须再训后训练</text>
+
+  <line x1="40" y1="425" x2="640" y2="425" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <text x="340" y="445" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">关键认知</text>
+
+  <rect x="40" y="460" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="55" y="480" font-size="12" font-weight="500" fill="#444441">知识几乎全部来自预训练</text>
+  <text x="55" y="500" font-size="11" font-weight="400" fill="#5F5E5A">后训练主要负责"行为"，不负责"知识"</text>
+
+  <rect x="350" y="460" width="290" height="56" rx="8" fill="#F1EFE8" stroke="#888780" stroke-width="0.5"/>
+  <text x="365" y="480" font-size="12" font-weight="500" fill="#444441">预训练极贵，只做一次</text>
+  <text x="365" y="500" font-size="11" font-weight="400" fill="#5F5E5A">数千卡 × 数月 × 数千万美元级 — 头部大厂的游戏</text>
+</svg>
