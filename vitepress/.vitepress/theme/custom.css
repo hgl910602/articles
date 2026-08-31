@@ -1,3 +1,30 @@
+/* 侧栏品牌区：站名 + 返回列表，取代顶栏里突兀的孤零零标题 */
+.Layout .side-brand {
+  padding: 20px 24px 12px;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+.Layout .side-brand .brand {
+  display: block;
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--vp-c-text-1);
+}
+.Layout .side-brand .brand:hover {
+  color: var(--toc-active);
+}
+.Layout .side-brand .back-home {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  transition: color 0.25s;
+}
+.Layout .side-brand .back-home:hover {
+  color: var(--toc-active);
+}
+
 /* 侧栏：整体窄字号精致化；宽度加大容纳长标题 */
 .Layout {
   --vp-sidebar-width: 360px;

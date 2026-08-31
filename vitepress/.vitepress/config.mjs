@@ -61,7 +61,7 @@ export default defineConfig({
   lang: 'zh-CN',
   cleanUrls: true,
   themeConfig: {
-    siteTitle: '思享集',
+    siteTitle: false,
     sidebar: buildSidebar(),
     outline: false,
     docFooter: { prev: '上一篇', next: '下一篇' },
