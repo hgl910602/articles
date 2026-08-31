@@ -1,0 +1,11 @@
+{
+  // Cloudflare 部署配置：构建产物位置与静态资源处理方式。
+  // 面板 Build configuration 里根目录 = vitepress，部署命令 npx wrangler deploy 会读本文件。
+  "name": "articles",
+  "compatibility_date": "2026-08-31",
+  "assets": {
+    "directory": ".vitepress/dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
