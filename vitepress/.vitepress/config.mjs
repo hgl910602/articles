@@ -59,7 +59,7 @@ function buildSidebar() {
 
 export default defineConfig({
   title: '文章分享集',
-  description: '业余思考 · 沉淀',
+  description: '业务与技术分享',
   lang: 'zh-CN',
   cleanUrls: true,
   themeConfig: {

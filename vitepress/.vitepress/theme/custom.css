@@ -92,9 +92,35 @@
   border-bottom-color: transparent !important;
 }
 
-/* 首页文章列表：标签筛选 chips + 卡片 */
+/* 首页文章列表：搜索框 + 标签筛选 chips + 卡片 */
 .al-wrap {
   margin-top: 8px;
+}
+/* 整卡是 <a>：压掉 .vp-doc a 的下划线与强调色，观感对齐旧版首页的深色卡片 */
+.Layout .vp-doc a.al-card {
+  text-decoration: none;
+  color: inherit;
+}
+.al-search {
+  margin: 20px 0 16px;
+}
+.al-search input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--vp-c-text-1);
+  font-size: 14px;
+  padding: 10px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.al-search input:focus {
+  border-color: var(--toc-active);
+}
+.al-search input::placeholder {
+  color: var(--vp-c-text-3);
 }
 .al-chips {
   display: flex;
@@ -190,6 +216,21 @@
   color: var(--vp-c-text-3);
   padding: 40px 0;
   text-align: center;
+}
+
+/* 首页（无侧栏文档页）内容列加宽：默认 992/688 太窄，chips 和卡片挤成细长条 */
+@media (min-width: 960px) {
+  .Layout .VPDoc:not(.has-sidebar) .container {
+    max-width: 1080px;
+  }
+  .Layout .VPDoc:not(.has-sidebar) .content {
+    width: 100%;
+    max-width: none;
+  }
+  .Layout .VPDoc:not(.has-sidebar) .content-container {
+    max-width: none !important;
+    width: 100%;
+  }
 }
 
 /*
