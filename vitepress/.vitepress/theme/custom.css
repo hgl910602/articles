@@ -14,9 +14,9 @@
   color: var(--vp-c-text-1);
 }
 .Layout .side-brand .brand-logo {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+  width: 19px;
+  height: 19px;
+  border-radius: 5px;
   flex: none;
 }
 .Layout .side-brand .brand:hover {
