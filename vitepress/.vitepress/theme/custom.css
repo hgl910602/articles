@@ -92,6 +92,106 @@
   border-bottom-color: transparent !important;
 }
 
+/* 首页文章列表：标签筛选 chips + 卡片 */
+.al-wrap {
+  margin-top: 8px;
+}
+.al-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 24px;
+}
+.al-chip {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--vp-c-text-2);
+  font-size: 12px;
+  line-height: 1;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.al-chip small {
+  margin-left: 4px;
+  color: var(--vp-c-text-3);
+}
+.al-chip:hover,
+.al-chip.active {
+  color: var(--toc-active);
+  border-color: var(--toc-active);
+}
+.al-card {
+  display: block;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 14px;
+  text-decoration: none;
+  transition: border-color 0.2s;
+}
+.al-card:hover {
+  border-color: var(--toc-active);
+}
+.al-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.al-card-head h2 {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  padding: 0;
+  border: none;
+  color: var(--vp-c-text-1);
+}
+.al-card:hover .al-card-head h2 {
+  color: var(--toc-active);
+}
+.al-card-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--vp-c-text-3);
+  white-space: nowrap;
+}
+.al-cat {
+  color: var(--vp-c-text-2);
+}
+.al-desc {
+  margin: 10px 0 12px;
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: var(--vp-c-text-2);
+}
+.al-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.al-tag {
+  font-size: 11px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--vp-c-default-soft);
+  color: var(--vp-c-text-3);
+}
+.al-tag.hit {
+  background: var(--toc-active);
+  color: #fff;
+}
+.al-empty {
+  color: var(--vp-c-text-3);
+  padding: 40px 0;
+  text-align: center;
+}
+
 /*
  * 正文区域占满左侧栏右边全部可用空间：窗口多宽正文就多宽。
  * 真实 DOM 链：#app > .Layout > #VPContent.VPContent.has-sidebar
