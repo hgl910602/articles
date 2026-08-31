@@ -30,10 +30,12 @@ function buildSidebar() {
       const title =
         text.match(/^# (.+)$/m)?.[1] ?? file.replace('.md', '');
       const items = [];
+      const pagePath = '/' + file.replace('.md', '');
       for (const line of text.split('\n')) {
         const m = line.match(/^(#{2,4}) (.+)$/);
         if (!m) continue;
-        const link = `#${slugify(m[2].trim())}`;
+        // 锚点必须带文章路径前缀：纯 #anchor 在别的页面上点击只改本页 hash，不会跳转
+        const link = `${pagePath}#${slugify(m[2].trim())}`;
         if (m[1] === '##') {
           items.push({ text: m[2].trim(), link, collapsed: false, items: [] });
         } else if (m[1] === '###' && items.length) {
