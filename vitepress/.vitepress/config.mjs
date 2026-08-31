@@ -56,7 +56,7 @@ function buildSidebar() {
 }
 
 export default defineConfig({
-  title: '思享集',
+  title: '文章分享集',
   description: '业余思考 · 沉淀',
   lang: 'zh-CN',
   cleanUrls: true,
