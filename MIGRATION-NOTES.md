@@ -1,7 +1,7 @@
 # 文章分享集 · 新站迁移进度与任务清单
 
 > 分支:`astro-poc`(全部实验代码在此分支;`main` 是现行线上站,未动)
-> 最后更新:2026-08-31
+> 最后更新:2026-08-31(第二批:9 篇全部迁完)
 
 ## 目标
 
@@ -16,65 +16,78 @@
 ## 目录结构(本分支)
 
 ```
-blog/       AstroPaper 博客版(候选落选,保留参考)
-starlight/  Starlight 版(候选落选,保留参考)
-vitepress/  ✅ 选定方案,持续迭代中
-articles/   旧站 9 篇整页 HTML(迁移源,未动)
+vitepress/            ✅ 选定方案,内容迁移已完成
+  <slug>.md           9 篇文章正文(frontmatter + Markdown)
+  index.md            首页 = 文章列表页(卡片 + 标签筛选)
+  .vitepress/
+    config.mjs        侧栏自动扫描 md 生成(收录 ##..####)
+    posts.data.js     数据加载器:扫 *.md frontmatter 供首页消费
+    theme/            custom.css + tocSpy.js + 品牌区/列表组件
+  public/images/<slug>/  图片资产(82 个:webp 截图 + SVG)
+articles/             旧站 9 篇整页 HTML(迁移源,保留不动)
+scripts/
+  html2vitepress.py   HTML→Markdown 批量转换器(可重跑)
+  verify_md_text.py   文字保真校验器(HTML vs MD 字符级比对)
+blog/ starlight/      候选落选,保留参考
 ```
 
 ## 已完成
 
-- VitePress 环境搭建(`vitepress/`,依赖已入 package.json)
-- 样板文章迁移:`youth-and-destiny.md`(HTML→Markdown,纯文字零标签)
-- 样式定制(全部集中在 `vitepress/.vitepress/theme/custom.css`):
-  - 正文宽度流式自适应,跟随窗口无上限,贴右侧边距 48px
-  - 左侧栏 360px、目录字号 12px、**三级目录(##/###/####)全部默认展开**
-  - 滚动跟随高亮(`tocSpy.js`,亮蓝 #0a6cf5)
-  - 标题衬线字体(Noto Serif SC→Songti SC 回退),副标题弱化
-  - 顶栏:无站名、无分隔线、无标题底边线(都移除过错位/孤线问题)
-  - 侧栏头部品牌区:「文章分享集」+「← 全部文章」
-  - 站名由「思享集」更名「**文章分享集**」(config/品牌区/首页三处)
-- 已推送 origin/astro-poc
+### 第一批(环境与样板)
+
+- VitePress 环境搭建,样式定制集中在 `theme/custom.css`(流式正文宽度、360px 侧栏、三级目录全展开、衬线标题、品牌区)
+- 样板迁移 `youth-and-destiny.md`
+
+### 第二批(9 篇全部迁完)
+
+- **批量转换器** `scripts/html2vitepress.py`:标题/段落/加粗小节/四类 callout(`::: tip/info/warning/danger`)/diagram 示意图(```text 围栏)/代码围栏(带语法高亮)/figure→图片/表格保留原生 HTML/嵌图表 figure 原样保留/有序无序列表/引用/hr
+- **文字保真校验** `scripts/verify_md_text.py`:9 篇全部字符级比对通过(正文一字不改的机器闸门)
+- 9 篇文章全量迁移,82 个资产拷贝到 `public/images/<slug>/`,17 张章末内联 SVG 抽取为独立文件(summary-NN.svg)
+- 文内旧锚点(`#sec8-3` 等 300+ 处)按 VitePress slug 算法重映射,全站 0 死锚点(已机器验证)
+- 章节徽章(「重点」badge)迁移时丢弃——纯装饰,标题文字保留
+- **首页升级为文章列表页**:9 张卡片(标题/分类/日期/约 N 分钟/摘要/标签)+ 标签 chips 筛选(客户端),数据来自各篇 frontmatter(posts.data.js)
+- 每篇 md 统一 frontmatter(title/description/date/category/tags,源自 articles.json)
+- 修 config.mjs 侧栏锚点:子项链接带文章路径前缀(纯 `#anchor` 跨页点击不跳转)
+- 浏览器实测:首页列表、文章页(callout/表格/代码/SVG 总结图/滚动高亮)、商家文嵌图表格(31 图全加载)均正常
 
 ## 踩坑记录(重要,勿重蹈)
 
 1. **不要改 `--vp-layout-max-width`**:主题在 ≥1440 视口用 `(100vw-该值)/2` 算边距,调大在中等窗口产生负边距,内容会钻到侧栏底下
 2. **侧栏实际占宽 ≠ 272px**:主题给侧栏写了随视口变宽的公式,若只改内容边距不改侧栏,正文会被盖住
-3. **`tocSpy.js` 顶层禁止访问 `document`**:会让 SSR 崩溃退化成纯客户端渲染(curl 拿到空壳是 dev 模式正常现象,不是故障)
-4. **dev 必须在 `vitepress/` 子目录跑**,在仓库根跑会起成空站(404)
-5. 主题自带样式带 `data-v` 作用域属性,覆盖时选择器要挂 `.Layout` 前缀、必要时 `!important`
+3. **`tocSpy.js` 顶层禁止访问 `document`**:SSR 会崩(curl 拿到空壳是 dev 模式正常现象)
+4. **dev 必须在 `vitepress/` 子目录跑**;端口以终端输出为准(本轮实测 5173,非固定)
+5. 主题自带样式带 `data-v` 作用域,覆盖时选择器挂 `.Layout` 前缀、必要时 `!important`
+6. **`git add` 漏了未跟踪文件曾导致 theme 文件丢失**:上批工作只提交了 index.js/custom.css,`tocSpy.js` 和 `components/SidebarTop.vue` 从未入库,切机器即崩。本轮已按 CSS 类名线索重建并入库。**提交前跑 `git status` 确认无未跟踪的必要文件**
+7. **Windows 上 Python 写文件默认 CRLF**:会打破 JS 侧的行首正则(frontmatter 解析、config.mjs 标题扫描全失灵,症状是首页标题退化成文件名)。转换器已强制 `newline='\n'`;手写文件也要留意
+8. **旧 HTML 里裸写的 `<xxx>` 标签浏览器不显示**(如 llm 工程文代码里的 `<task>`、散文里的 `<untrusted_input>`,作者是想展示标签文本但没转义):迁移时按"旧站实际渲染效果"剥掉了;将来若要真正展示这些标签,得在 md 里写 `\&lt;task\&gt;` 形式
+9. 转换器遇到的形态差异备忘:`<table class="article-table">`(带 class)、`<ul class="appendix-list">`、`<h5>` 五级标题、callout 内嵌 `<ul>`、裸文本 `<blockquote>`、代码块闭合标签带换行(`</code>\n</pre>`)——全部已兼容
 
 ## 后续任务
 
-### 1. 批量迁移剩余 8 篇(核心工作)
+### 1. 切换上线(决策点,需用户确认节奏)
 
-源:`articles/<slug>/index.html` → 目标:`vitepress/<slug>.md`
-
-转换规则(以 youth-and-destiny.md 为样板):
-
-- `<h1..h4>` → `#..####`(现有侧栏脚本已收录到四级)
-- callout 提示块 → VitePress `::: tip` 容器
-- diagram/SVG 图 → 拷贝 SVG 到 `vitepress/public/images/<slug>/`,Markdown 里用 `![图注](/images/<slug>/x.svg)`
-- 代码块 `<pre><code class="language-x">` → ```lang 围栏
-- 表格可保留原生 HTML(VitePress 能渲染)
-- 元信息(标题/日期/分类/标签)从 `articles.json` 取,放 frontmatter
-- **正文文字一字不改**(AGENTS.md 的去 AI 腔要求:内容不变,转换是纯机械操作)
-
-### 2. 首页升级为文章列表页
-
-现在 `vitepress/index.md` 是单篇入口的 splash。迁移完成后改为列出全部文章(标题/日期/分类/标签来自各篇 frontmatter),形成真正的"列表页"。
-
-### 3. 切换上线(决策点,需用户确认节奏)
-
-- Cloudflare Pages 项目改为构建模式:构建命令 `cd vitepress && npm run build`,输出目录 `vitepress/.vitepress/dist`
-- 旧 URL 重定向:`/articles/<slug>/*` → `/<slug>/*`(`public/_redirects`)
+- Cloudflare Pages 项目改为构建模式:构建命令 `cd vitepress && npm install && npm run build`,输出目录 `vitepress/.vitepress/dist`
+- 旧 URL 重定向:`/articles/<slug>/*` → `/<slug>`(`public/_redirects`)
 - `main` 分支旧站的下线/归档方式
 - `.pages.yml`(在 main)后续指向新结构,Pages CMS 继续可用
 
-### 4. 不做的事(已明确)
+### 2. 可选增强(不影响上线)
+
+- 首页搜索:VitePress 本地搜索一行配置(`themeConfig.search = { provider: 'local' }`),旧站有搜索框,迁移后暂缺
+- 顶层 figure 的图注目前只进 alt(悬停可见),页面不显示;旧站 figcaption 是可见文字。如需恢复,做一个带 caption 的图片组件替换 `![]()` 写法
+- 嵌图表格(merchant/ecommerce 的对照表)保留原生 HTML,后续可择机改造成 Markdown 表 + 组件
+
+### 3. 不做的事(已明确)
 
 - 不引入数据库/动态服务(WordPress/Ghost 路线已否)
 - 不追求所见即所得编辑(Obsidian + Pages CMS 覆盖该需求)
+
+## 新文章怎么写(迁移后工作流)
+
+1. `vitepress/<slug>.md` 新建文件,从现有文章抄 frontmatter 格式
+2. 图片放 `vitepress/public/images/<slug>/`,正文引用 `![图注](/images/<slug>/x.png)`
+3. 侧栏、首页列表自动收录,无需改配置
+4. 正文照常过 de-ai-tone(AGENTS.md 要求不变)
 
 ## 新机器快速开始
 
@@ -82,5 +95,12 @@ articles/   旧站 9 篇整页 HTML(迁移源,未动)
 git clone git@github.com:hgl910602/articles.git
 cd articles && git checkout astro-poc
 cd vitepress && npm install
-npm run dev        # http://localhost:4323
+npm run dev        # 端口看终端输出
+```
+
+转换器/校验器重跑(仅当旧 HTML 又有修订需要同步时):
+
+```bash
+python scripts/html2vitepress.py <slug>   # 注意用 python,Windows 的 python3 是商店占位符
+python scripts/verify_md_text.py <slug>
 ```
