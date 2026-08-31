@@ -92,6 +92,43 @@
   border-bottom-color: transparent !important;
 }
 
+/* 首页头部：logo + 居中标题 + 蓝色短线 + 副标题（对齐旧版 site-header 的居中结构） */
+.home-hero {
+  text-align: center;
+  padding: 56px 0 20px;
+}
+.home-logo {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.18);
+}
+.home-title {
+  margin: 18px 0 0;
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--vp-c-text-1);
+  border: none;
+  padding: 0;
+}
+.home-underline {
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin: 14px auto 0;
+  background: var(--toc-active);
+  border-radius: 2px;
+}
+.home-subtitle {
+  margin-top: 12px;
+  font-size: 15px;
+  color: var(--vp-c-text-3);
+}
+
 /* 首页文章列表：搜索框 + 标签筛选 chips + 卡片 */
 .al-wrap {
   margin-top: 8px;

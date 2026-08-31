@@ -62,6 +62,9 @@ export default defineConfig({
   description: '业务与技术分享',
   lang: 'zh-CN',
   cleanUrls: true,
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+  ],
   themeConfig: {
     siteTitle: false,
     sidebar: buildSidebar(),

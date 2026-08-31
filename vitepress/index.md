@@ -5,11 +5,10 @@ next: false
 ---
 
 <script setup>
+import HomeHero from './.vitepress/theme/components/HomeHero.vue';
 import ArticleList from './.vitepress/theme/components/ArticleList.vue';
 </script>
 
-# 文章分享集
-
-业务与技术分享
+<HomeHero />
 
 <ArticleList />
