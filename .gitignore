@@ -1,4 +1,5 @@
-.vitepress/
+/.vitepress/
+__pycache__/
 .DS_Store
 .zcode/
 .workbuddy/
