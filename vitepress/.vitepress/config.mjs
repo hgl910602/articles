@@ -20,41 +20,43 @@ const slugify = (str) =>
     .replace(/^(\d)/, '_$1')
     .toLowerCase();
 
-// 扫描每篇 md 的 ##/###/#### 标题，生成"文章标题 + 本页目录"式侧边栏，
-// 全部默认展开不折叠（目录长不是问题）
+// 扫描每篇 md 的 ##/###/#### 标题，生成"当前文章目录"式侧边栏：
+// 按路径前缀映射，每页只显示该篇文章自己的目录（对齐旧站行为），全部默认展开
 function buildSidebar() {
-  return readdirSync(srcDir)
-    .filter((f) => f.endsWith('.md') && f !== 'index.md')
-    .map((file) => {
-      const text = readFileSync(join(srcDir, file), 'utf-8');
-      const title =
-        text.match(/^# (.+)$/m)?.[1] ?? file.replace('.md', '');
-      const items = [];
-      const pagePath = '/' + file.replace('.md', '');
-      for (const line of text.split('\n')) {
-        const m = line.match(/^(#{2,4}) (.+)$/);
-        if (!m) continue;
-        // 锚点必须带文章路径前缀：纯 #anchor 在别的页面上点击只改本页 hash，不会跳转
-        const link = `${pagePath}#${slugify(m[2].trim())}`;
-        if (m[1] === '##') {
-          items.push({ text: m[2].trim(), link, collapsed: false, items: [] });
-        } else if (m[1] === '###' && items.length) {
-          const parent = items[items.length - 1];
-          parent.items.push({ text: m[2].trim(), link, collapsed: false, items: [] });
-        } else if (items.length) {
-          // #### 挂到最近的 ###，没有 ### 就挂到 ##
-          const chapter = items[items.length - 1];
-          const section = chapter.items[chapter.items.length - 1];
-          (section?.items ?? chapter.items).push({ text: m[2].trim(), link });
-        }
+  const map = {};
+  for (const file of readdirSync(srcDir).filter((f) => f.endsWith('.md') && f !== 'index.md')) {
+    const text = readFileSync(join(srcDir, file), 'utf-8');
+    const title =
+      text.match(/^# (.+)$/m)?.[1] ?? file.replace('.md', '');
+    const items = [];
+    const pagePath = '/' + file.replace('.md', '');
+    for (const line of text.split('\n')) {
+      const m = line.match(/^(#{2,4}) (.+)$/);
+      if (!m) continue;
+      // 锚点必须带文章路径前缀：纯 #anchor 在别的页面上点击只改本页 hash，不会跳转
+      const link = `${pagePath}#${slugify(m[2].trim())}`;
+      if (m[1] === '##') {
+        items.push({ text: m[2].trim(), link, collapsed: false, items: [] });
+      } else if (m[1] === '###' && items.length) {
+        const parent = items[items.length - 1];
+        parent.items.push({ text: m[2].trim(), link, collapsed: false, items: [] });
+      } else if (items.length) {
+        // #### 挂到最近的 ###，没有 ### 就挂到 ##
+        const chapter = items[items.length - 1];
+        const section = chapter.items[chapter.items.length - 1];
+        (section?.items ?? chapter.items).push({ text: m[2].trim(), link });
       }
-      return {
+    }
+    map[pagePath] = [
+      {
         text: title,
-        link: '/' + file.replace('.md', ''),
+        link: pagePath,
         items,
         collapsed: false,
-      };
-    });
+      },
+    ];
+  }
+  return map;
 }
 
 export default defineConfig({

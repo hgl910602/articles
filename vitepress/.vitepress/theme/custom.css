@@ -95,20 +95,20 @@
 /* 首页头部：logo + 居中标题 + 蓝色短线 + 副标题（对齐旧版 site-header 的居中结构） */
 .home-hero {
   text-align: center;
-  padding: 56px 0 20px;
+  padding: 28px 0 6px;
 }
 .home-logo {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   margin: 0 auto;
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.18);
+  border-radius: 11px;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.18);
 }
 .home-title {
-  margin: 18px 0 0;
+  margin: 12px 0 0;
   font-family: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', STSong, SimSun, serif;
-  font-size: 2.2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: var(--vp-c-text-1);
@@ -117,15 +117,15 @@
 }
 .home-underline {
   display: block;
-  width: 56px;
+  width: 48px;
   height: 3px;
-  margin: 14px auto 0;
+  margin: 10px auto 0;
   background: var(--toc-active);
   border-radius: 2px;
 }
 .home-subtitle {
-  margin-top: 12px;
-  font-size: 15px;
+  margin-top: 8px;
+  font-size: 14px;
   color: var(--vp-c-text-3);
 }
 

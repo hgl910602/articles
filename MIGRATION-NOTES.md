@@ -61,6 +61,8 @@ blog/ starlight/      候选落选,保留参考
 7. **Windows 上 Python 写文件默认 CRLF**:会打破 JS 侧的行首正则(frontmatter 解析、config.mjs 标题扫描全失灵,症状是首页标题退化成文件名)。转换器已强制 `newline='\n'`;手写文件也要留意
 8. **旧 HTML 里裸写的 `<xxx>` 标签浏览器不显示**(如 llm 工程文代码里的 `<task>`、散文里的 `<untrusted_input>`,作者是想展示标签文本但没转义):迁移时按"旧站实际渲染效果"剥掉了;将来若要真正展示这些标签,得在 md 里写 `\&lt;task\&gt;` 形式
 9. 转换器遇到的形态差异备忘:`<table class="article-table">`(带 class)、`<ul class="appendix-list">`、`<h5>` 五级标题、callout 内嵌 `<ul>`、裸文本 `<blockquote>`、代码块闭合标签带换行(`</code>\n</pre>`)——全部已兼容
+10. **CommonMark 强调的侧翼规则对中文不友好**:`**核心目标：**辅助` 这种"闭合 ** 后紧跟中文"不会渲染成粗体(星号原样露出)。转换器因此把 `<strong>/<em>` 输出为 HTML 标签而非 `**/*`。手写 md 时要么在闭合 ** 后加空格,要么直接写 `<strong>` 标签
+11. **侧栏是按路径前缀映射的**(config.mjs 里 `map[pagePath] = [...]`):每页只显示该篇文章自己的目录,对齐旧站。新增文章无需改配置,扫描器自动收录
 
 ## 后续任务
 

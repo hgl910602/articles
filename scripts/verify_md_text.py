@@ -75,6 +75,8 @@ def md_side(slug: str) -> str:
     # 只剥成对的强调标记；孤立的 * 是字面文字（如 *.mdc），保留
     md = re.sub(r'\*\*(?=\S)(.+?)(?<=\S)\*\*', r'\1', md, flags=re.S)
     md = re.sub(r'(?<!\*)\*(?=\S)([^*\n]+?)(?<=\S)\*(?!\*)', r'\1', md)
+    # 转换器输出的强调为 HTML 标签（CommonMark 侧翼规则对中文邻接不友好）
+    md = re.sub(r'</?(?:strong|em|b|i)>', '', md)
     # 只对原始 HTML 表格剥标签；正文里解码后的 <xxx>（如 <String>、<|im_start|>）是文字不是标签
     md = re.sub(r'<table[^>]*>.*?</table>', lambda m: re.sub(r'<[^>]+>', '', m.group(0)), md, flags=re.S)
     md = re.sub(r'\x00(\d+)\x00', lambda m: keep[int(m.group(1))], md)

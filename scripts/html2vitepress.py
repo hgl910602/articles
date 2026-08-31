@@ -75,6 +75,7 @@ def strip_tags(fragment: str) -> str:
 
 def inline(text: str, anchors: dict) -> str:
     codes = []
+    marks = []
 
     def stash_code(m):
         inner = decode(m.group(1))
@@ -85,10 +86,19 @@ def inline(text: str, anchors: dict) -> str:
             codes.append('`' + inner + '`')
         return f'\x00{len(codes) - 1}\x00'
 
-    text = re.sub(r'<code>(.*?)</code>', stash_code, text, flags=re.S)
+    def stash_mark(m):
+        # 输出 HTML 标签而非 **/*：CommonMark 的侧翼规则在「闭合 ** 后紧跟中文」时
+        # 不识别强调（如 **核心目标：**辅助），HTML 标签无此问题。
+        # 内部递归做 inline 转换，<strong> 里嵌的文内链接也会被正确重映射
+        tag, inner = m.group(1), m.group(2)
+        marks.append(f'<{tag}>' + inline(inner, anchors) + f'</{tag}>')
+        return f'\x01{len(marks) - 1}\x01'
 
-    text = re.sub(r'<(?:strong|b)>(.*?)</(?:strong|b)>', lambda m: '**' + m.group(1) + '**', text, flags=re.S)
-    text = re.sub(r'<(?:em|i)>(.*?)</(?:em|i)>', lambda m: '*' + m.group(1) + '*', text, flags=re.S)
+    text = re.sub(r'<code>(.*?)</code>', stash_code, text, flags=re.S)
+    text = re.sub(r'<(strong|em)>(.*?)</\1>', stash_mark, text, flags=re.S)
+
+    text = re.sub(r'<(?:strong|b)>(.*?)</(?:strong|b)>', stash_mark, text, flags=re.S)
+    text = re.sub(r'<(?:em|i)>(.*?)</(?:em|i)>', stash_mark, text, flags=re.S)
 
     def conv_a(m):
         attrs, body = m.group(1), m.group(2)
@@ -121,6 +131,7 @@ def inline(text: str, anchors: dict) -> str:
     text = RAW_TAG.sub('', text)
     text = decode(text)
     text = re.sub(r'\x00(\d+)\x00', lambda m: codes[int(m.group(1))], text)
+    text = re.sub(r'\x01(\d+)\x01', lambda m: marks[int(m.group(1))], text)
     return text.strip()
 
 
