@@ -26,7 +26,6 @@ vitepress/            ✅ 线上站点(2026-08-31 起唯一站点)
     theme/            custom.css + tocSpy.js + 品牌区/列表/首页头部组件
   public/images/<slug>/  图片资产(82 个:webp 截图 + SVG)
 scripts/              迁移期工具(html2vitepress.py 等),旧 HTML 已删,仅作历史记录
-blog/ starlight/      候选落选,保留参考(后续可删)
 ```
 
 ## 已完成
