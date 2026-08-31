@@ -1,79 +1,55 @@
-# 思享集
+# 文章分享集
 
-对外分享的纯静态文章站（域名 [articleshare.cn](https://www.articleshare.cn/)）：所有文章都是 HTML，共享同一套样式，部署在 Cloudflare Pages，push 到 main 自动上线。
+对外分享的纯静态文章站（域名 [www.articleshare.cn](https://www.articleshare.cn/)）：Markdown 写作、VitePress 构建，部署在 Cloudflare，push 到 main 自动构建上线。
 
 ## 目录结构
 
 ```
-├── articles.json                # 站点配置 + 文章清单（新增文章唯一要手动维护的文件）
-├── index.html                   # 首页（由脚本生成，勿手改）
-├── template.html                # 新文章模板
-├── skills/de-ai-tone/           # 去 AI 腔 skill（版本化；~/.zcode/skills/de-ai-tone 是指向这里的软链）
-├── articles/<slug>/index.html   # 每篇文章一个目录，目录内可放文章专属图片等资源
-├── assets/
-│   ├── css/theme.css            # 设计变量 + 基础样式（全站共用，改风格改这里）
-│   ├── css/article.css          # 文章页样式（侧边栏目录、排版、提示框等）
-│   ├── css/site.css             # 首页样式
-│   ├── js/article.js            # 文章页脚本（目录高亮跟随、平滑滚动、移动端目录）
-│   ├── img/                     # favicon 三件套 + og-image 分享卡片图
-│   └── vendor/prism/            # 代码高亮（本地化，不依赖外网 CDN）
-└── scripts/
-    ├── build-index.mjs          # 读 articles.json → 生成首页
-    └── adopt.mjs                # 一键把自包含 HTML 适配成站点文章
+├── vitepress/                       # 站点源码（唯一站点）
+│   ├── <slug>.md                    # 文章正文（frontmatter: title/description/date/category/tags）
+│   ├── index.md                     # 首页 = 文章列表页（搜索 + 标签筛选 + 卡片，数据自动扫描各篇 frontmatter）
+│   ├── public/
+│   │   ├── logo.svg                 # 站点 logo（浏览器 favicon 同源）
+│   │   └── images/<slug>/           # 文章图片资产
+│   ├── wrangler.jsonc               # Cloudflare 部署配置（产物目录、404 处理）
+│   └── .vitepress/
+│       ├── config.mjs               # 站点配置：侧栏按路径映射（每页只显示本篇目录）、sitemap、favicon
+│       ├── posts.data.js            # 首页列表数据加载器（扫 *.md frontmatter）
+│       └── theme/
+│           ├── custom.css           # 全部样式定制（首页头部/列表、文章页排版、侧栏）
+│           ├── tocSpy.js            # 侧栏目录滚动跟随高亮
+│           └── components/          # HomeHero / ArticleList / SidebarTop 组件
+├── scripts/                         # 旧站 HTML → VitePress 的一次性迁移工具（历史记录，站点运行不依赖）
+├── skills/de-ai-tone/               # 去 AI 腔 skill（版本化；~/.zcode/skills/de-ai-tone 是指向这里的软链）
+├── MIGRATION-NOTES.md               # 旧站迁移与部署配置的完整记录（含踩坑清单）
+└── AGENTS.md                        # AI 助手在本仓库工作的纪律
 ```
 
-## 新增一篇文章
-
-### 方式一：从模板开始（推荐）
+## 写新文章
 
 ```bash
-cp template.html articles/my-article/index.html   # slug 用英文，决定 URL：/articles/my-article/
+# 1. vitepress/ 下新建 <slug>.md，frontmatter 抄现有文章
+# 2. 图片放 vitepress/public/images/<slug>/，正文用 ![图注](/images/<slug>/x.png) 引用
+# 3. 侧栏与首页列表自动收录，无需改任何配置
+
+cd vitepress && npm install
+npm run dev                        # 本地预览（端口看终端输出）
+git add . && git commit -m "feat: 新增文章：xxx" && git push   # push 后自动构建上线
 ```
 
-编辑文章内容（`<title>`、侧边栏目录、正文；正文可用的样式类见模板内注释），然后在 `articles.json` 的 `articles` 数组加一条：
+正文照常过"去 AI 腔"（见下方写作规范）。
 
-```json
-{
-  "slug": "my-article",
-  "title": "文章标题",
-  "description": "首页卡片上显示的摘要，一两句话。",
-  "date": "2026-08-18",
-  "tags": ["标签1", "标签2"]
-}
-```
+## 部署（Cloudflare，已配置完成）
 
-### 方式二：适配一篇现成的自包含 HTML（如 AI 生成的整页文章）
-
-```bash
-node scripts/adopt.mjs ~/Downloads/新文章.html my-article
-```
-
-脚本会自动：删除内联 style/script 改为引用公共文件、把 cdnjs 的 Prism 替换为本地（缺的组件自动下载）、侧边栏插入「← 返回首页」。之后同样在 `articles.json` 加一条记录。
-
-### 生成首页并上线
-
-```bash
-node scripts/build-index.mjs    # 重新生成 index.html
-python3 -m http.server 8765     # 本地预览 http://localhost:8765
-git add . && git commit -m "新增文章：xxx" && git push   # push 后 Pages 自动部署
-```
-
-## 部署（Cloudflare Pages，一次性配置）
-
-1. 推送仓库到 GitHub / GitLab
-2. Cloudflare Dashboard → Workers & Pages → Create → Pages → **Connect to Git**，选择本仓库
-3. 构建配置：
-   - Framework preset: **None**
-   - Build command: **留空**（首页已生成好并提交在仓库里）
-   - Build output directory: **/**（仓库根目录）
-4. Save and Deploy，之后每次 push 到 main 自动上线
+- Git 连接本仓库，根目录 `vitepress`，构建命令 `npm ci && npm run build`，部署命令 `npx wrangler deploy`（读 `vitepress/wrangler.jsonc`）
+- push 到 main 自动构建上线；部署问题与历史决策见 [MIGRATION-NOTES.md](MIGRATION-NOTES.md)
 
 ## 写作规范（所有文章适用，不限技术文章）
 
 - 正文写作或改写完成后，必须过一遍"去 AI 腔"：skill 收录在本仓库 `skills/de-ai-tone/`（`~/.zcode/skills/de-ai-tone` 是指向这里的软链），配套自检脚本：
 
   ```bash
-  python3 skills/de-ai-tone/scripts/tone_scan.py articles/<slug>/index.html
+  python3 skills/de-ai-tone/scripts/tone_scan.py vitepress/<slug>.md
   ```
 
 - 常见症状与改法见 skill 内清单（破折号过密、"不是 X 而是 Y"对仗、总结腔、段末金句落点、绝对化用词等）。核心原则：**只动语气，不动事实、数据、引用与排版体系**；扫描 0 标记不等于过关，仍需人工做落点自检。
@@ -81,7 +57,6 @@ git add . && git commit -m "新增文章：xxx" && git push   # push 后 Pages �
 
 ## 风格统一机制
 
-- 所有颜色、字体、间距等设计变量在 `assets/css/theme.css` 的 `:root` 中，首页与文章页共用
-- 文章页全部样式在 `assets/css/article.css`，改这一个文件即可全站生效
-- 文章内图片等资源放在 `articles/<slug>/` 目录内，用相对路径引用（如 `<img src="fig1.png">`）
-- favicon 与 Open Graph 由模板/脚本自动带上：首页的标签筛选与阅读时长由 `build-index.mjs` 生成（chips 只展示 ≥2 篇的热门标签）；分享卡片图要生效，需在 `articles.json` 的 `site.url` 填上线上域名（如 `https://xxx.pages.dev`）后重跑构建脚本
+- 样式定制全部集中在 `vitepress/.vitepress/theme/custom.css`（衬线标题、首页头部/卡片、侧栏宽度与高亮），改风格改这一个文件
+- 首页头部（logo + 标题 + 副标题）在 `theme/components/HomeHero.vue`，品牌色 `--toc-active`（亮蓝）统一点缀
+- 文章内图片放 `vitepress/public/images/<slug>/`，用绝对路径引用（如 `/images/<slug>/fig1.png`）

@@ -16,19 +16,17 @@
 ## 目录结构(本分支)
 
 ```
-vitepress/            ✅ 选定方案,内容迁移已完成
+vitepress/            ✅ 线上站点(2026-08-31 起唯一站点)
   <slug>.md           9 篇文章正文(frontmatter + Markdown)
   index.md            首页 = 文章列表页(卡片 + 标签筛选)
+  wrangler.jsonc      Cloudflare 部署配置(产物目录/404 处理)
   .vitepress/
-    config.mjs        侧栏自动扫描 md 生成(收录 ##..####)
+    config.mjs        侧栏按路径映射(每页只显示本篇目录)、sitemap、favicon
     posts.data.js     数据加载器:扫 *.md frontmatter 供首页消费
-    theme/            custom.css + tocSpy.js + 品牌区/列表组件
+    theme/            custom.css + tocSpy.js + 品牌区/列表/首页头部组件
   public/images/<slug>/  图片资产(82 个:webp 截图 + SVG)
-articles/             旧站 9 篇整页 HTML(迁移源,保留不动)
-scripts/
-  html2vitepress.py   HTML→Markdown 批量转换器(可重跑)
-  verify_md_text.py   文字保真校验器(HTML vs MD 字符级比对)
-blog/ starlight/      候选落选,保留参考
+scripts/              迁移期工具(html2vitepress.py 等),旧 HTML 已删,仅作历史记录
+blog/ starlight/      候选落选,保留参考(后续可删)
 ```
 
 ## 已完成
@@ -80,9 +78,9 @@ blog/ starlight/      候选落选,保留参考
 
 #### 替换成本结论
 
-- 面板 2 个字段,5 分钟,这是唯一硬成本
-- 旧站文件(articles/、assets/、index.html、template.html、.pages.yml)随本次合并进 main,但**不再被部署**(输出目录只有 vitepress/dist)。注意:面板切换前旧站还在跑,先别删这些文件;确认新站上线后一把清理:
-  `git rm -r articles assets index.html template.html .pages.yml && git commit -m "chore: 移除旧站整页HTML,新站全量替换"`
+- 面板 2 个字段,5 分钟,这是唯一硬成本;**2026-08-31 已上线成功**(根目录 `vitepress`、构建 `npm ci && npm run build`、部署 `npx wrangler deploy`)
+- 部署踩坑:面板根目录最初误填产物路径导致 "root directory not found";自动生成的 assets.directory 指向 VitePress 默认模板的 `docs/.vitepress/dist`,与本站自定义目录不符——已提交 `vitepress/wrangler.jsonc` 写死产物路径解决
+- 旧站文件(articles/、assets/、index.html、template.html、.pages.yml、articles.json、build-index.mjs、adopt.mjs)**已从 main 删除**,需要时从 git 历史找回;README/AGENTS.md 已同步改写为 VitePress 工作流
 - 遗留小项(不阻塞上线):
   - 每篇文章缺 og:image,社交分享无预览图(要恢复需在主题里按 frontmatter 生成 per-page og 标签)
   - 旧站首页的搜索框在新站首页已补齐;全站 Navbar 搜索未开(VitePress local search 对中文分词弱,首页搜索够用)
