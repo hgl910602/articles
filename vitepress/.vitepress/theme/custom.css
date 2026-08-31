@@ -56,6 +56,15 @@
   margin-top: -4px;
 }
 
+/* 顶栏分隔线移除：其定位公式与定制后的内容区几何不一致，会出现错位台阶。
+   主题还会给"思享集"标题链接配一条底边线与分隔线相连，一并关掉，否则是条孤线 */
+.Layout .VPNavBar .divider {
+  display: none;
+}
+.Layout .VPNavBarTitle.has-sidebar .title {
+  border-bottom-color: transparent !important;
+}
+
 /*
  * 正文区域占满左侧栏右边全部可用空间：窗口多宽正文就多宽。
  * 真实 DOM 链：#app > .Layout > #VPContent.VPContent.has-sidebar
