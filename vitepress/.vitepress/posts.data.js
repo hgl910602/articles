@@ -1,6 +1,5 @@
 // 文章列表数据加载器：扫描根目录 *.md（index.md 除外），解析 frontmatter 供首页列表消费。
-// frontmatter 由 scripts/html2vitepress.py 从 articles.json 生成，格式受控（一行一键），
-// 故用轻量解析而非完整 YAML。
+// frontmatter 为一行一键的受控格式（迁移批处理与手写文章均如此），故用轻量解析而非完整 YAML。
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

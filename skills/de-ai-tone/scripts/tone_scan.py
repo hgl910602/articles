@@ -46,12 +46,20 @@ SENT_SPLIT = re.compile(r"[。！？\n]")
 
 def extract_text(path: Path) -> str:
     raw = path.read_text(encoding="utf-8", errors="replace")
-    if path.suffix.lower() in (".html", ".htm"):
+    suffix = path.suffix.lower()
+    if suffix in (".html", ".htm"):
         raw = re.sub(r"<script\b.*?</script>", "", raw, flags=re.S | re.I)
         raw = re.sub(r"<style\b.*?</style>", "", raw, flags=re.S | re.I)
         raw = re.sub(r"<[^>]+>", "", raw)
         import html as h
         raw = h.unescape(raw)
+    elif suffix in (".md", ".mdx", ".markdown"):
+        # Markdown 只扫散文：frontmatter、代码/示意图围栏、行内代码、链接句法不计入密度
+        raw = re.sub(r"^---\n.*?\n---\n", "", raw, count=1, flags=re.S)
+        raw = re.sub(r"^[ \t]*(`{3,}|~{3,}).*?\n.*?^[ \t]*\1[ \t]*$", "", raw, flags=re.S | re.M)
+        raw = re.sub(r"`[^`\n]+`", "", raw)
+        raw = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", raw)
+        raw = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", raw)
     return raw
 
 

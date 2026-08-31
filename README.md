@@ -49,7 +49,7 @@ git add . && git commit -m "feat: 新增文章：xxx" && git push   # push 后�
 - 正文写作或改写完成后，必须过一遍"去 AI 腔"：skill 收录在本仓库 `skills/de-ai-tone/`（`~/.zcode/skills/de-ai-tone` 是指向这里的软链），配套自检脚本：
 
   ```bash
-  python3 skills/de-ai-tone/scripts/tone_scan.py vitepress/<slug>.md
+  python skills/de-ai-tone/scripts/tone_scan.py vitepress/<slug>.md
   ```
 
 - 常见症状与改法见 skill 内清单（破折号过密、"不是 X 而是 Y"对仗、总结腔、段末金句落点、绝对化用词等）。核心原则：**只动语气，不动事实、数据、引用与排版体系**；扫描 0 标记不等于过关，仍需人工做落点自检。

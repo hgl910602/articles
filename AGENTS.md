@@ -12,7 +12,7 @@
 - 交付前自检：
 
   ```bash
-  python3 skills/de-ai-tone/scripts/tone_scan.py vitepress/<slug>.md
+  python skills/de-ai-tone/scripts/tone_scan.py vitepress/<slug>.md
   ```
 
   改写后 AI 腔标记密度应明显下降（重点看破折号"——"密度和"一段 ≥2 个——"的段落数），读起来不顺眼的热点句子清零。**扫描 0 标记不等于过关**：段末金句落点、对偶句密度、姊妹篇共用结尾模板这些"读感"问题脚本抓不到，交付前把每章最后一句连起来读一遍做落点自检，并和站内旧文比对收尾句式（详见 skill 工作流程）。
