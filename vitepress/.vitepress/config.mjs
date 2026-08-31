@@ -64,6 +64,7 @@ export default defineConfig({
   description: '业务与技术分享',
   lang: 'zh-CN',
   cleanUrls: true,
+  sitemap: { hostname: 'https://www.articleshare.cn' },
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],

@@ -66,18 +66,32 @@ blog/ starlight/      候选落选,保留参考
 
 ## 后续任务
 
-### 1. 切换上线(决策点,需用户确认节奏)
+### 1. 切换上线(2026-08-31 已合并 main,只差面板一步)
 
-- Cloudflare Pages 项目改为构建模式:构建命令 `cd vitepress && npm install && npm run build`,输出目录 `vitepress/.vitepress/dist`
-- 旧 URL 重定向:`/articles/<slug>/*` → `/<slug>`(`public/_redirects`)
-- `main` 分支旧站的下线/归档方式
-- `.pages.yml`(在 main)后续指向新结构,Pages CMS 继续可用
+用户决策:**直接全量替换,不做任何旧链接兼容(无 301 重定向)**。
+
+仓库侧已全部就绪:sitemap(config 里 hostname 指向 articleshare.cn)、favicon。**剩余唯一动作在 Cloudflare Pages 面板**(旧项目是纯静态直传,没有构建配置,仓库里改不了):
+
+- Settings → Builds & deployments → Build configuration,改 Custom:
+  - Build command: `cd vitepress && npm ci && npm run build`
+  - Build output directory: `vitepress/.vitepress/dist`
+- 环境变量 `NODE_VERSION` 设 `20`(默认镜像一般也够,VitePress 1.6 要 node 18+)
+- 保存后重试部署,域名不变,老 URL(`articles/*` 路径)会 404,按决策不处理
+
+#### 替换成本结论
+
+- 面板 2 个字段,5 分钟,这是唯一硬成本
+- 旧站文件(articles/、assets/、index.html、template.html、.pages.yml)随本次合并进 main,但**不再被部署**(输出目录只有 vitepress/dist)。注意:面板切换前旧站还在跑,先别删这些文件;确认新站上线后一把清理:
+  `git rm -r articles assets index.html template.html .pages.yml && git commit -m "chore: 移除旧站整页HTML,新站全量替换"`
+- 遗留小项(不阻塞上线):
+  - 每篇文章缺 og:image,社交分享无预览图(要恢复需在主题里按 frontmatter 生成 per-page og 标签)
+  - 旧站首页的搜索框在新站首页已补齐;全站 Navbar 搜索未开(VitePress local search 对中文分词弱,首页搜索够用)
 
 ### 2. 可选增强(不影响上线)
 
-- 首页搜索:VitePress 本地搜索一行配置(`themeConfig.search = { provider: 'local' }`),旧站有搜索框,迁移后暂缺
 - 顶层 figure 的图注目前只进 alt(悬停可见),页面不显示;旧站 figcaption 是可见文字。如需恢复,做一个带 caption 的图片组件替换 `![]()` 写法
 - 嵌图表格(merchant/ecommerce 的对照表)保留原生 HTML,后续可择机改造成 Markdown 表 + 组件
+- 每篇文章 og:image(社交分享预览图)
 
 ### 3. 不做的事(已明确)
 
