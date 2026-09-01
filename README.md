@@ -21,8 +21,7 @@
 │           └── components/          # HomeHero / ArticleList / SidebarTop 组件
 ├── scripts/                         # 旧站 HTML → VitePress 的一次性迁移工具（历史记录，站点运行不依赖）
 ├── skills/de-ai-tone/               # 去 AI 腔 skill（版本化；~/.zcode/skills/de-ai-tone 是指向这里的软链）
-├── MIGRATION-NOTES.md               # 旧站迁移与部署配置的完整记录（含踩坑清单）
-└── AGENTS.md                        # AI 助手在本仓库工作的纪律
+└── AGENTS.md                        # AI 助手在本仓库工作的纪律（含 VitePress 定制红线）
 ```
 
 ## 写新文章
@@ -55,7 +54,13 @@ git add . && git commit -m "feat: 新增文章：xxx" && git push   # push 后�
 ## 部署（Cloudflare，已配置完成）
 
 - Git 连接本仓库，根目录 `vitepress`，构建命令 `npm ci && npm run build`，部署命令 `npx wrangler deploy`（读 `vitepress/wrangler.jsonc`）
-- push 到 main 自动构建上线；部署问题与历史决策见 [MIGRATION-NOTES.md](MIGRATION-NOTES.md)
+- push 到 main 自动构建上线；迁移历史与部署决策过程见 git log（`MIGRATION-NOTES.md` 已归档删除）
+
+## 已知限制（不阻塞使用，择机改进）
+
+- 每篇文章缺 og:image，社交分享无预览图；要恢复需在主题里按 frontmatter 生成 per-page og 标签
+- 文内图片的图注只进 alt（悬停可见），页面不显示文字图注；如需可见图注，做一个带 caption 的图片组件
+- 部分对照表格保留原生 HTML（渲染正常），后续可择机改造成 Markdown 表 + 组件
 
 ## 写作规范（所有文章适用，不限技术文章）
 
