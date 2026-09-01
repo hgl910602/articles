@@ -91,6 +91,17 @@
   margin-top: -4px;
 }
 
+/* 标题后直接放头图时，不要套用上面的副标题负边距 */
+.Layout .vp-doc h1 + p:has(> img:only-child) {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.Layout .vp-doc h1 + p:has(> img:only-child) > img {
+  display: block;
+  border-radius: 12px;
+}
+
 /* 顶栏分隔线移除：其定位公式与定制后的内容区几何不一致，会出现错位台阶。
    主题还会给站名标题链接配一条底边线与分隔线相连，一并关掉，否则是条孤线 */
 .Layout .VPNavBar .divider {
