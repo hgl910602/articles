@@ -1,0 +1,12 @@
+{
+  "useMarkdownLinks": true,
+  "newLinkFormat": "relative",
+  "attachmentFolderPath": "vitepress/public/images",
+  "userIgnoreFilters": [
+    "**/node_modules/",
+    "**/dist/",
+    "**/.vitepress/cache",
+    ".workbuddy/",
+    ".zcode/"
+  ]
+}

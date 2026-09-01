@@ -39,6 +39,19 @@ git add . && git commit -m "feat: 新增文章：xxx" && git push   # push 后�
 
 正文照常过"去 AI 腔"（见下方写作规范）。
 
+## 用 Obsidian 写作与编辑（仓库已预置配置）
+
+仓库根带 `.obsidian/app.json`（随 Git 同步）：标准 Markdown 链接（非 wikilink，VitePress 才认）、粘贴图片自动存 `vitepress/public/images/`、忽略 node_modules/dist 等噪音目录。
+
+每台新机器一次性设置：
+
+1. Obsidian →「打开本地仓库作为 vault」→ 选**仓库根目录**
+2. 设置 → 第三方插件 → 关闭安全模式 → 浏览 → 搜 **Git**（obsidian-git）→ 安装并启用
+3. 插件设置里把自动 pull/push 间隔设 10 分钟，之后写作即自动同步，不碰终端
+4. 日常写作：`vitepress/` 下新建 `<slug>.md`，截图直接 Cmd/Ctrl+V
+5. 真实排版效果：Obsidian 里是裸 Markdown，另开终端 `cd vitepress && npm run dev`（端口看终端输出），存盘即热更新
+6. push 前看一眼 `git status`，别把无关文件带进提交
+
 ## 部署（Cloudflare，已配置完成）
 
 - Git 连接本仓库，根目录 `vitepress`，构建命令 `npm ci && npm run build`，部署命令 `npx wrangler deploy`（读 `vitepress/wrangler.jsonc`）

@@ -1,7 +1,7 @@
-# 文章分享集 · 新站迁移进度与任务清单
+# 旧站迁移与部署配置记录（已完成，归档）
 
-> 分支:`astro-poc`(全部实验代码在此分支;`main` 是现行线上站,未动)
-> 最后更新:2026-08-31(第二批:9 篇全部迁完)
+> 日常写作/编辑/部署用法见 [README.md](README.md)，本文只作历史记录备查。
+> 迁移于 2026-08-31 完成并上线。
 
 ## 目标
 
@@ -101,6 +101,19 @@ scripts/              迁移期工具(html2vitepress.py 等),旧 HTML 已删,仅
 2. 图片放 `vitepress/public/images/<slug>/`,正文引用 `![图注](/images/<slug>/x.png)`
 3. 侧栏、首页列表自动收录,无需改配置
 4. 正文照常过 de-ai-tone(AGENTS.md 要求不变)
+
+## 用 Obsidian 编辑(仓库已预置配置)
+
+仓库根带 `.obsidian/app.json`(随 Git 同步到每台机器):标准 Markdown 链接(非 wikilink)、粘贴图片自动存 `vitepress/public/images/`、忽略 node_modules/dist 等噪音目录。
+
+上手步骤(每台新机器一次性):
+
+1. Obsidian →「打开本地仓库作为 vault」→ 选**仓库根目录**
+2. 设置 → 第三方插件 → 关闭安全模式 → 浏览 → 搜 **Git**(obsidian-git)→ 安装并启用
+3. 插件设置里把自动 pull/push 间隔设 10 分钟;之后写作即自动同步,不碰终端
+4. 日常写作:`vitepress/` 下新建 `<slug>.md`(frontmatter 抄现有文章),截图直接 Cmd/Ctrl+V
+5. 真实效果预览:Obsidian 看到的是裸 Markdown,另开终端 `cd vitepress && npm run dev`(端口看终端输出),存盘即热更新
+6. 提交纪律:push 前看一眼 `git status`(踩坑记录 #6),别把无关文件带进去
 
 ## 新机器快速开始
 
