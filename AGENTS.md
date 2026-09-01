@@ -9,6 +9,7 @@
 **适用范围是全部文章，不限技术文章**——业务分析、领域建模、随笔感想，凡新写、扩写、改写的正文都算。
 
 - 加载并遵循仓库内 `skills/de-ai-tone/SKILL.md`（skill 已版本化在本仓库；ZCode 环境通过 `~/.zcode/skills/de-ai-tone` 软链自动发现，其他环境直接读仓库内文件照做）。
+- 起草或扩写正文前，先加载 `skills/author-voice/`（作者笔锋画像、真实句库与场景模板）：de-ai-tone 管"像人"，author-voice 管"像作者本人"，两个都要过。文章定稿后把新好句和"AI 初稿 vs 作者手改"对比回填进 `author-voice/references/style_examples.md`，句库只收作者纯手写的部分。
 - 交付前自检：
 
   ```bash
