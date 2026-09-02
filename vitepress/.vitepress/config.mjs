@@ -20,10 +20,30 @@ const slugify = (str) =>
     .replace(/^(\d)/, '_$1')
     .toLowerCase();
 
+// 站点对外域名：OG 标签（微信/社交卡片）必须用绝对 URL
+const SITE_URL = 'https://www.articleshare.cn';
+const OG_DEFAULT_IMAGE = '/images/og-default.png';
+
+// 每页注入 Open Graph 标签：标题/摘要取页面自身，卡图优先用文章 frontmatter 的 cover，否则用站点默认卡图
+function transformHead({ pageData, title, description }) {
+  const relativePath = pageData.relativePath ?? '';
+  const cover = pageData.frontmatter?.cover;
+  const pageUrl =
+    '/' + relativePath.replace(/\.md$/, '').replace(/(^|\/)index$/, '') || '/';
+  return [
+    ['meta', { property: 'og:site_name', content: '文章分享集' }],
+    ['meta', { property: 'og:type', content: relativePath === 'index.md' ? 'website' : 'article' }],
+    ['meta', { property: 'og:url', content: SITE_URL + (pageUrl === '/' ? '/' : pageUrl) }],
+    ['meta', { property: 'og:title', content: title }],
+    ['meta', { property: 'og:description', content: description }],
+    ['meta', { property: 'og:image', content: SITE_URL + (cover || OG_DEFAULT_IMAGE) }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+  ];
+}
+
 // 扫描每篇 md 的 ##/###/#### 标题，生成"当前文章目录"式侧边栏：
 // 按路径前缀映射，每页只显示该篇文章自己的目录（对齐旧站行为），全部默认展开
-function buildSidebar() {
-  const map = {};
+function buildSidebar() {  const map = {};
   for (const file of readdirSync(srcDir).filter((f) => f.endsWith('.md') && f !== 'index.md')) {
     const text = readFileSync(join(srcDir, file), 'utf-8');
     const title =
@@ -68,6 +88,7 @@ export default defineConfig({
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],
+  transformHead,
   themeConfig: {
     siteTitle: false,
     sidebar: buildSidebar(),
