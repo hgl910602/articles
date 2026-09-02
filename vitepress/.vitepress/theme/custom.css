@@ -91,6 +91,14 @@
   margin-top: -4px;
 }
 
+/* 豁免：标题下直接是正文第一段（而非副标题引导行）时，挂 .first-para 恢复正文样式 */
+.Layout .vp-doc h1 + p.first-para {
+  color: var(--vp-c-text-1);
+  font-size: 1rem;
+  letter-spacing: normal;
+  margin-top: 16px;
+}
+
 /* 标题后直接放头图时，不要套用上面的副标题负边距 */
 .Layout .vp-doc h1 + p:has(> img:only-child) {
   margin-top: 24px;
@@ -100,6 +108,22 @@
 .Layout .vp-doc h1 + p:has(> img:only-child) > img {
   display: block;
   border-radius: 12px;
+}
+
+/* 正文配图：图片居中，下方配图注（图注文本随图居中、弱化显示） */
+.Layout .vp-doc .img-figure {
+  margin: 24px 0;
+  text-align: center;
+}
+.Layout .vp-doc .img-figure img {
+  display: inline-block;
+  max-width: 100%;
+  border-radius: 8px;
+}
+.Layout .vp-doc .img-figure figcaption {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--vp-c-text-3);
 }
 
 /* 顶栏分隔线移除：其定位公式与定制后的内容区几何不一致，会出现错位台阶。
