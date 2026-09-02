@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitepress';
 import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 
 // config 在 .vitepress/ 下，Markdown 源文件在上一级（项目根）
 const srcDir = join(import.meta.dirname, '..');
@@ -43,7 +43,8 @@ function transformHead({ pageData, title, description }) {
 
 // 扫描每篇 md 的 ##/###/#### 标题，生成"当前文章目录"式侧边栏：
 // 按路径前缀映射，每页只显示该篇文章自己的目录（对齐旧站行为），全部默认展开
-function buildSidebar() {  const map = {};
+function buildSidebar() {
+  const map = {};
   for (const file of readdirSync(srcDir).filter((f) => f.endsWith('.md') && f !== 'index.md')) {
     const text = readFileSync(join(srcDir, file), 'utf-8');
     const title =
@@ -79,6 +80,26 @@ function buildSidebar() {  const map = {};
   return map;
 }
 
+// sidebar 是从 Markdown 标题同步生成的，开发时标题变化需要重新加载站点配置。
+// 普通 Markdown HMR 只更新正文，保留旧 sidebar 会让链接仍指向改名前的 hash。
+function refreshSidebarOnMarkdownChange() {
+  return {
+    name: 'refresh-sidebar-on-markdown-change',
+    async handleHotUpdate({ file, server }) {
+      const articleFile = relative(srcDir, file);
+      const isTopLevelMarkdown =
+        articleFile.endsWith('.md') &&
+        !articleFile.includes('/') &&
+        !articleFile.includes('\\');
+
+      if (isTopLevelMarkdown) {
+        await server.restart();
+        return [];
+      }
+    },
+  };
+}
+
 export default defineConfig({
   title: '文章分享集',
   description: '业务与技术分享',
@@ -88,6 +109,9 @@ export default defineConfig({
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],
+  vite: {
+    plugins: [refreshSidebarOnMarkdownChange()],
+  },
   transformHead,
   themeConfig: {
     siteTitle: false,
