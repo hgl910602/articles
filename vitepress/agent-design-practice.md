@@ -69,26 +69,64 @@ Claude Code 对外更多使用 session 和 message，但要解决的状态问题
 
 ### 2.2 一次采样只决定下一步
 
+先对齐一个用词：本文说的一次采样，指一次完整的模型调用，把编译好的请求发给模型，取回一段输出，输出可能是文本、tool call，或两者兼有。叫法来自生成模型的机制，模型逐 token 从概率分布里抽取样本，一次生成过程就是一次采样。
+
 模型通常不会一次性完成整项任务。第一次采样可能只决定搜索登录入口，第二次看到搜索结果后再读文件，第三次才修改代码。最小执行内核可以写成下面这样：
 
+<div class="code-with-figure">
+<div class="code-block-col">
+
 ```python
-while turn.active:
+while turn.active:                              # Turn 仍在进行：未收尾、未中断、预算未耗尽
+    # 采样前重新编译模型视图：从事实账本、工作区、工具目录和指令里挑出本轮内容
     view = context_builder.build(thread, workspace, tools, instructions)
+    # 一次采样：把视图发给模型，取回输出 item（文本或 tool call，可能多个）
     output_items = model_adapter.sample(view)
-    event_store.append(output_items)
+    event_store.append(output_items)            # 先落账再执行：模型已产生的输出先成为事实
 
-    calls = collect_tool_calls(output_items)
-    if not calls:
-        return finish_turn(output_items.last_message)
+    calls = collect_tool_calls(output_items)    # 从输出里取出全部工具调用
+    if not calls:                               # 没有工具调用 = 模型认为可以收尾
+        return finish_turn(output_items.last_message)   # 最后一段文本即最终回答
 
-    results = tool_runtime.dispatch(
+    results = tool_runtime.dispatch(            # 执行工具调用
         calls,
-        before=[hooks, policy, approval],
-        executor=sandbox,
-        concurrency=conflict_aware,
+        before=[hooks, policy, approval],       # 副作用前的拦截链：钩子 → 权限规则 → 审批
+        executor=sandbox,                       # 实际执行发生在沙箱限定的边界内
+        concurrency=conflict_aware,             # 冲突感知调度：只读并行，写集重叠串行
     )
+    # 结果按 call_id 与调用配对，写回事实账本，成为下一次编译的输入
     event_store.append(match_by_call_id(results))
 ```
+
+</div>
+
+<figure class="img-figure agent-diagram">
+  <div class="agent-diagram-scroll">
+    <img src="/images/agent-design-practice/turn-loop-flow.svg" alt="执行内核流程图。编译模型视图、采样、输出先落账；没有 tool call 即收尾，有则经过拦截链在沙箱内执行，结果按 call_id 配对写回账本后回到编译，中断或预算耗尽时结束。">
+  </div>
+  <figcaption>图 2：执行内核一圈的完整流程，先落账、再拦截、再执行，结果按 call_id 回写。</figcaption>
+</figure>
+</div>
+
+::: details 图 2 的 mermaid 源码（改图后可用 mmdc 重新渲染）
+
+```text
+flowchart TD
+    START([Turn 开始]) --> BUILD["① 编译模型视图<br/>从事实账本、工作区、工具目录、指令取内容"]
+    BUILD --> SAMPLE["② 采样：调用模型<br/>返回文本和/或 tool call"]
+    SAMPLE --> LOG["③ 输出 item 先落账"]
+    LOG --> CHECK{"④ 有 tool call？"}
+    CHECK -- "没有" --> DONE(["finish_turn<br/>最后一段文本即最终回答"])
+    CHECK -- "有" --> GATE["⑤ 拦截链<br/>hooks → 权限规则 → 审批"]
+    GATE -- "allow" --> EXEC["⑥ 沙箱内执行<br/>只读并行、写集重叠串行"]
+    GATE -- "deny / 未获批" --> REJ["拒绝原因作为 tool result"]
+    EXEC --> PAIR["⑦ 结果按 call_id 配对写回账本"]
+    REJ --> PAIR
+    PAIR --> BUILD
+    PAIR -. "中断 / 预算耗尽" .-> ABORT(["Turn 结束<br/>未自然收尾"])
+```
+
+:::
 
 `event_store.append(output_items)` 要放在工具执行前。模型已经产生了什么调用，应该先成为事实；即使进程在工具执行中间崩了，恢复时也能知道有一条 `call-7` 没有结果。工具完成后，result 再用相同的 `call_id` 配回来。
 
@@ -106,7 +144,7 @@ while turn.active:
   <div class="agent-diagram-scroll">
     <img src="/images/agent-design-practice/turn-sequence.svg" alt="一个 Turn 的完整时序。用户输入先写入事件账本，每次工具结果回来后重新编译 Model View；steering 在下一个安全采样点生效。">
   </div>
-  <figcaption>图 2：输入先落账，steering 在下一个安全采样点进入模型视图。</figcaption>
+  <figcaption>图 3：输入先落账，steering 在下一个安全采样点进入模型视图。</figcaption>
 </figure>
 
 “运行时已经收到输入”和“模型已经看到输入”是两件事。前者发生在事件登记时，后者发生在下一次 Context View 编译时。把这两个时间点混在一起，steering、interrupt 和异步工具都容易出现竞态。
@@ -151,7 +189,7 @@ while turn.active:
   <div class="agent-diagram-scroll">
     <img src="/images/agent-design-practice/context-view-composition.svg" alt="上下文来源与模型视图。项目指令、Thread 历史、Memory、Skills、工具目录、Artifact 和当前 Workspace 经过 Context Builder 选择后，组成一次性的 Model Request。">
   </div>
-  <figcaption>图 3：Context Builder 从不同寿命的数据里选内容，编译出一次性的 Model Request。</figcaption>
+  <figcaption>图 4：Context Builder 从不同寿命的数据里选内容，编译出一次性的 Model Request。</figcaption>
 </figure>
 
 Event Store 是事实账本，Derived State 更像索引和缓存。计划可以从 plan item 重算，运行中进程可以向进程管理器核对，Git 状态也应该重新读取。恢复时不能因为摘要写着“测试通过”，就跳过对当前 diff 和测试状态的检查。
@@ -395,7 +433,7 @@ tool executor               在边界内产生副作用，并记录结果
   <div class="agent-diagram-scroll">
     <img src="/images/agent-design-practice/multi-agent-context.svg" alt="多 Agent 的两层隔离。主线程派发任务包，子 Agent 各自运行独立上下文和工具循环；写任务是否进入独立 worktree，由文件冲突风险决定。">
   </div>
-  <figcaption>图 4：先隔离 Context View，再按写冲突决定是否隔离工作区。</figcaption>
+  <figcaption>图 5：先隔离 Context View，再按写冲突决定是否隔离工作区。</figcaption>
 </figure>
 
 ### 5.1 上下文隔离主要解决噪声问题

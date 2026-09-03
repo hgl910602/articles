@@ -126,6 +126,45 @@
   color: var(--vp-c-text-3);
 }
 
+/* 图片放大遮罩：hidden 属性必须压过 display:flex，否则透明遮罩会盖住整页吞掉点击。
+   遮罩挂在 body 下、不在 .Layout 内，选择器不能带 .Layout 前缀 */
+.img-lightbox[hidden] {
+  display: none !important;
+}
+
+/* 代码 + 配图左右并排：左代码右图，窄屏退化为上下堆叠 */
+.Layout .vp-doc .code-with-figure {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  margin: 24px 0;
+}
+.Layout .vp-doc .code-with-figure > .code-block-col {
+  min-width: 0;
+}
+/* 并排模式下代码块横向滚动兜底，不撑破列宽 */
+.Layout .vp-doc .code-with-figure > .code-block-col [class*='vp-code'] {
+  overflow-x: auto;
+}
+/* 列宽减半后行注释容易溢出：代码字号压一档、行高收紧 */
+.Layout .vp-doc .code-with-figure > .code-block-col [class*='vp-code'] code {
+  font-size: 12px;
+  line-height: 1.55;
+}
+.Layout .vp-doc .code-with-figure > figure.img-figure {
+  margin: 0;
+}
+@media (max-width: 960px) {
+  .Layout .vp-doc .code-with-figure {
+    grid-template-columns: 1fr;
+  }
+  /* 堆叠时恢复默认字号，代码块限高滚动 */
+  .Layout .vp-doc .code-with-figure > .code-block-col [class*='vp-code'] code {
+    font-size: 13px;
+  }
+}
+
 /* 架构图横向信息较多。窄屏保持可读尺寸，通过横向滚动查看，不把小字压成像素点。 */
 .Layout .vp-doc .agent-diagram-scroll {
   overflow-x: auto;

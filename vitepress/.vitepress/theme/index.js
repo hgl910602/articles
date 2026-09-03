@@ -2,6 +2,7 @@ import DefaultTheme from 'vitepress/theme';
 import { h } from 'vue';
 import './custom.css';
 import './tocSpy.js';
+import './lightbox.js';
 import SidebarTop from './components/SidebarTop.vue';
 
 export default {
