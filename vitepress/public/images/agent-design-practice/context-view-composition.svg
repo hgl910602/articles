@@ -1,59 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">上下文来源与一次 Model View 的组成</title>
+  <desc id="desc">项目规则、Thread 历史、Memory、Skills、工具目录、Artifact 和当前 Workspace 经过 Context Builder 选择后，组成一次性的 Model Request。</desc>
   <defs>
-    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08264d"/><stop offset="1" stop-color="#0a5bff"/></linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="7" stdDeviation="10" flood-color="#062452" flood-opacity=".10"/></filter>
-    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#0a5bff"/></marker>
-    <style>
-      text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif}.title{font-size:39px;font-weight:760}.subtitle{font-size:18px;fill:#4a6480}.eyebrow{font-size:14px;font-weight:760;letter-spacing:1.7px}.section{font-size:18px;font-weight:760}.cardTitle{font-size:18px;font-weight:760}.body{font-size:15px;fill:#4b6580}.tiny{font-size:13px;fill:#607894}.white{fill:#fff}.whiteSoft{fill:#dceaff}.blue{fill:#0a5bff}.flow{fill:none;stroke:#0a5bff;stroke-width:2.5;marker-end:url(#a)}.dash{fill:none;stroke:#79a8f3;stroke-width:2;stroke-dasharray:7 7;marker-end:url(#a)}
-    </style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#185FA5"/></marker>
+    <marker id="grayArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#888780"/></marker>
+    <style>text{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}.title{font-size:30px;font-weight:700;fill:#2C2C2A}.sub{font-size:17px;fill:#6B6A66}.label{font-size:14px;font-weight:700;letter-spacing:1.5px;fill:#185FA5}.head{font-size:21px;font-weight:700;fill:#2C2C2A}.body{font-size:17px;fill:#55544F}.small{font-size:15px;fill:#6B6A66}.white{fill:#fff}.line{fill:none;stroke:#185FA5;stroke-width:2;marker-end:url(#arr)}.read{fill:none;stroke:#888780;stroke-width:1.5;stroke-dasharray:6 5;marker-end:url(#grayArr)}</style>
   </defs>
-  <rect width="1600" height="1080" fill="#f5f8fc"/>
-  <text x="72" y="66" class="title">上下文生命周期：存储、编译与压缩</text>
-  <text x="72" y="98" class="subtitle">Thread 保存完整事实，Context Builder 为每次采样编译临时视图；窗口预算触发分级压缩。</text>
-
-  <g filter="url(#shadow)"><rect x="72" y="130" width="1456" height="88" rx="14" fill="#fff" stroke="#d8e2ef"/><rect x="72" y="130" width="176" height="88" rx="14" fill="url(#hero)"/><path d="M234 130H248V218H234" fill="url(#hero)"/></g>
-  <text x="102" y="165" class="eyebrow whiteSoft">PROBLEM</text><text x="102" y="191" class="section white">上下文问题</text>
-  <text x="286" y="165" class="cardTitle">完整历史持续增长，模型窗口却有固定预算</text>
-  <text x="286" y="192" class="body">系统需要保留审计事实，同时给模型提供稳定前缀、最近证据和当前任务。</text>
-
-  <rect x="72" y="248" width="1456" height="626" rx="18" fill="#fff" stroke="#d8e2ef" filter="url(#shadow)"/>
-
-  <text x="98" y="286" class="eyebrow blue">LAYER 1 · SOURCE OF TRUTH</text><text x="98" y="313" class="section">Thread Event Store：完整事实账本</text>
-  <g>
-    <rect x="104" y="334" width="168" height="70" rx="10" fill="#edf4ff" stroke="#8cb6f4"/><text x="188" y="363" text-anchor="middle" class="cardTitle">u-1</text><text x="188" y="386" text-anchor="middle" class="tiny">user message</text>
-    <rect x="302" y="334" width="168" height="70" rx="10" fill="#edf4ff" stroke="#8cb6f4"/><text x="386" y="363" text-anchor="middle" class="cardTitle">a-1</text><text x="386" y="386" text-anchor="middle" class="tiny">assistant item</text>
-    <rect x="500" y="334" width="168" height="70" rx="10" fill="#e1ecff" stroke="#5e98f4"/><text x="584" y="363" text-anchor="middle" class="cardTitle">call-7</text><text x="584" y="386" text-anchor="middle" class="tiny">search_code</text>
-    <rect x="698" y="334" width="168" height="70" rx="10" fill="#e1ecff" stroke="#5e98f4"/><text x="782" y="363" text-anchor="middle" class="cardTitle">result-7</text><text x="782" y="386" text-anchor="middle" class="tiny">preview + artifact_ref</text>
-    <rect x="896" y="334" width="168" height="70" rx="10" fill="#edf4ff" stroke="#8cb6f4"/><text x="980" y="363" text-anchor="middle" class="cardTitle">steer-2</text><text x="980" y="386" text-anchor="middle" class="tiny">保持接口稳定</text>
-    <rect x="1094" y="334" width="168" height="70" rx="10" fill="#e1ecff" stroke="#5e98f4"/><text x="1178" y="363" text-anchor="middle" class="cardTitle">call-8</text><text x="1178" y="386" text-anchor="middle" class="tiny">read_file</text>
-    <rect x="1292" y="334" width="168" height="70" rx="10" fill="#0b2b55"/><text x="1376" y="363" text-anchor="middle" class="cardTitle white">result-8</text><text x="1376" y="386" text-anchor="middle" class="tiny whiteSoft">full output in artifact</text>
-    <path d="M272 369H302M470 369H500M668 369H698M866 369H896M1064 369H1094M1262 369H1292" stroke="#0a5bff" stroke-width="2"/>
-  </g>
-
-  <line x1="98" y1="436" x2="1502" y2="436" stroke="#d8e2ef"/>
-  <text x="98" y="472" class="eyebrow blue">LAYER 2 · REQUEST COMPILER</text><text x="98" y="499" class="section">Context Builder：把四类输入编译成一次 Model Request</text>
-
-  <g>
-    <rect x="104" y="526" width="260" height="118" rx="13" fill="#0a5bff"/><text x="130" y="558" class="eyebrow whiteSoft">STABLE PREFIX</text><text x="130" y="586" class="cardTitle white">稳定前缀</text><text x="130" y="612" class="body whiteSoft">tool schemas · runtime rules</text><text x="130" y="632" class="tiny whiteSoft">project instructions · versions</text>
-    <rect x="390" y="526" width="260" height="118" rx="13" fill="#edf4ff" stroke="#78a9f5"/><text x="416" y="558" class="eyebrow blue">HISTORY</text><text x="416" y="586" class="cardTitle">历史视图</text><text x="416" y="612" class="body">compaction item</text><text x="416" y="632" class="tiny">最近几个原始 turn</text>
-    <rect x="676" y="526" width="260" height="118" rx="13" fill="#edf4ff" stroke="#78a9f5"/><text x="702" y="558" class="eyebrow blue">CURRENT STATE</text><text x="702" y="586" class="cardTitle">当前现场</text><text x="702" y="612" class="body">cwd · git · plan · process</text><text x="702" y="632" class="tiny">workspace revision</text>
-    <rect x="962" y="526" width="260" height="118" rx="13" fill="#edf4ff" stroke="#78a9f5"/><text x="988" y="558" class="eyebrow blue">DYNAMIC TAIL</text><text x="988" y="586" class="cardTitle">当前增量</text><text x="988" y="612" class="body">user · steering · tool_result</text><text x="988" y="632" class="tiny">每次采样变化</text>
-    <rect x="1270" y="526" width="190" height="118" rx="13" fill="#08264d"/><text x="1365" y="572" text-anchor="middle" class="cardTitle white">Model Request N</text><text x="1365" y="601" text-anchor="middle" class="body whiteSoft">ordered input</text><text x="1365" y="625" text-anchor="middle" class="tiny whiteSoft">within token budget</text>
-    <path d="M364 585H390M650 585H676M936 585H962M1222 585H1270" class="flow"/>
-  </g>
-
-  <line x1="98" y1="680" x2="1502" y2="680" stroke="#d8e2ef"/>
-  <text x="98" y="716" class="eyebrow blue">LAYER 3 · BUDGET CONTROL</text><text x="98" y="743" class="section">超过输入预算：按成本从低到高处理</text>
-  <g>
-    <rect x="104" y="766" width="300" height="80" rx="12" fill="#f7faff" stroke="#9fc0f5"/><text x="130" y="798" class="cardTitle">1　折叠传输噪声</text><text x="130" y="824" class="body">delta → completed item</text>
-    <rect x="446" y="766" width="300" height="80" rx="12" fill="#edf4ff" stroke="#78a9f5"/><text x="472" y="798" class="cardTitle">2　外置大结果</text><text x="472" y="824" class="body">日志 → preview + artifact_ref</text>
-    <rect x="788" y="766" width="300" height="80" rx="12" fill="#e3eeff" stroke="#5d97f0"/><text x="814" y="798" class="cardTitle">3　压缩已完成区间</text><text x="814" y="824" class="body">items 1…82 → cmp-3</text>
-    <rect x="1130" y="766" width="330" height="80" rx="12" fill="#0a5bff"/><text x="1156" y="798" class="cardTitle white">4　恢复检查</text><text x="1156" y="824" class="body whiteSoft">约束 · 决策 · 证据 · open loops</text>
-    <path d="M404 806H446M746 806H788M1088 806H1130" class="flow"/>
-  </g>
-
-  <rect x="72" y="908" width="1456" height="106" rx="14" fill="url(#hero)"/>
-  <text x="102" y="947" class="eyebrow whiteSoft">CONTEXT SOLUTION</text><text x="102" y="977" class="section white">Event Store 完整保留事实，Model View 按当前任务和预算重新编译</text>
-  <text x="102" y="1000" class="tiny whiteSoft">缓存负责减少重复计算；compaction 负责控制窗口；artifact 负责保留完整证据。</text>
-  <text x="1160" y="974" class="cardTitle white">完整存储 · 按需入模</text>
+  <rect width="1200" height="720" fill="#fff"/>
+  <text x="36" y="45" class="title">Context Builder：不同寿命的数据，编译成一次请求</text>
+  <text x="36" y="73" class="sub">规则、记忆、任务历史和当前现场分开保存；进入 Model View 时再按用途选择。</text>
+  <text x="38" y="116" class="label">CONTEXT SOURCES</text>
+  <rect x="36" y="134" width="312" height="130" rx="14" fill="#F7F7F5" stroke="#B4B2A9"/>
+  <text x="60" y="169" class="head">长期上下文</text><text x="60" y="201" class="body">项目规则　人写，按作用域加载</text><text x="60" y="232" class="body">Memory　模型提炼，使用前核对</text>
+  <rect x="36" y="286" width="312" height="130" rx="14" fill="#E6F1FB" stroke="#9FC0D9"/>
+  <text x="60" y="321" class="head">当前 Thread</text><text x="60" y="353" class="body">Event Store　完整有序的事实</text><text x="60" y="384" class="body">recent turn · steering · tool result</text>
+  <rect x="36" y="438" width="312" height="166" rx="14" fill="#F7F7F5" stroke="#B4B2A9"/>
+  <text x="60" y="473" class="head">按需内容与当前现场</text><text x="60" y="505" class="body">Skills · tool catalog · Artifact</text><text x="60" y="536" class="body">Workspace · cwd · git · process</text><text x="60" y="573" class="small">大结果留句柄，现场在采样前重读</text>
+  <rect x="430" y="166" width="270" height="398" rx="16" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.4"/>
+  <text x="456" y="204" class="label">CONTEXT BUILDER</text><text x="456" y="241" class="head">一次请求的编译器</text><text x="456" y="286" class="body">1　按相关性选择</text><text x="456" y="324" class="body">2　按确定顺序组装</text><text x="456" y="362" class="body">3　校验 call / result 配对</text><text x="456" y="400" class="body">4　外置大结果，保留句柄</text><text x="456" y="438" class="body">5　估算 token，触发压缩</text><line x1="456" y1="469" x2="674" y2="469" stroke="#9FC0D9"/><text x="456" y="500" class="small">输出不是新的事实源</text><rect x="448" y="522" width="234" height="26" rx="13" fill="#185FA5"/><text x="565" y="540" text-anchor="middle" class="small white">input = context - output - buffer</text>
+  <text x="780" y="116" class="label">MODEL REQUEST N</text>
+  <rect x="778" y="134" width="386" height="470" rx="16" fill="#fff" stroke="#534AB7" stroke-width="1.5"/>
+  <rect x="800" y="158" width="342" height="92" rx="10" fill="#534AB7"/><text x="824" y="189" class="label white">STABLE PREFIX</text><text x="824" y="221" class="head white">Runtime + Project Rules</text>
+  <rect x="800" y="268" width="342" height="86" rx="10" fill="#EEEDFE"/><text x="824" y="299" class="head">Capabilities</text><text x="824" y="328" class="body">tool schemas · loaded Skills</text>
+  <rect x="800" y="372" width="342" height="86" rx="10" fill="#E6F1FB"/><text x="824" y="403" class="head">History + Recall</text><text x="824" y="432" class="body">compaction · recent turns · Memory</text>
+  <rect x="800" y="476" width="342" height="104" rx="10" fill="#FAEEDA"/><text x="824" y="507" class="head">Dynamic Tail</text><text x="824" y="536" class="body">live state · user · steering · result</text><text x="824" y="562" class="small">每次采样变化，尽量只在尾部追加</text>
+  <path d="M348 199C392 199 390 252 430 252" class="read"/><path d="M348 351H430" class="read"/><path d="M348 521C392 521 390 438 430 438" class="read"/><path d="M700 365H778" class="line"/>
+  <path d="M971 604V660H192V604" class="line"/><text x="438" y="650" class="small">model output 写回 Event Store，下一次采样重新编译</text>
 </svg>

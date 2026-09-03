@@ -1,59 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="950" viewBox="0 0 1600 950">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="790" viewBox="0 0 1200 790" role="img" aria-labelledby="title desc">
+  <title id="title">一个 Turn 的完整时序</title>
+  <desc id="desc">用户输入写入事件账本，Context Builder 编译视图，模型返回工具调用，工具执行结果回写；用户补充在下一个安全采样点进入模型视图。</desc>
   <defs>
-    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08264d"/><stop offset="1" stop-color="#0a5bff"/></linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="7" stdDeviation="10" flood-color="#062452" flood-opacity=".10"/></filter>
-    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#0a5bff"/></marker>
-    <marker id="ad" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#0b2b55"/></marker>
-    <style>
-      text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif}.title{font-size:39px;font-weight:760}.subtitle{font-size:18px;fill:#4a6480}.eyebrow{font-size:14px;font-weight:760;letter-spacing:1.7px}.section{font-size:18px;font-weight:760}.cardTitle{font-size:18px;font-weight:760}.body{font-size:15px;fill:#4b6580}.tiny{font-size:13px;fill:#607894}.white{fill:#fff}.whiteSoft{fill:#dceaff}.blue{fill:#0a5bff}.flow{fill:none;stroke:#0a5bff;stroke-width:2.6;marker-end:url(#a)}.darkFlow{fill:none;stroke:#0b2b55;stroke-width:2.4;marker-end:url(#ad)}.dash{fill:none;stroke:#6c9eea;stroke-width:2;stroke-dasharray:7 7;marker-end:url(#a)}
-    </style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#185FA5"/></marker>
+    <marker id="arrGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#888780"/></marker>
+    <style>text{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}.title{font-size:30px;font-weight:700;fill:#2C2C2A}.sub{font-size:17px;fill:#6B6A66}.lane{font-size:18px;font-weight:700;fill:#2C2C2A}.body{font-size:16px;fill:#444441}.small{font-size:14px;fill:#6B6A66}.note{font-size:15px;fill:#185FA5}.line{fill:none;stroke:#185FA5;stroke-width:1.8;marker-end:url(#arr)}.gray{fill:none;stroke:#888780;stroke-width:1.4;stroke-dasharray:5 5;marker-end:url(#arrGray)}</style>
   </defs>
-  <rect width="1600" height="950" fill="#f5f8fc"/>
-  <text x="72" y="66" class="title">Turn 状态机：采样、工具执行与安全收尾</text>
-  <text x="72" y="98" class="subtitle">模型采样和工具执行组成循环；call_id、并发策略、steering 与终止条件由运行时统一管理。</text>
+  <rect width="1200" height="790" fill="#fff"/>
+  <text x="36" y="43" class="title">一个 Turn：事件先落账，模型在采样点看见变化</text>
+  <text x="36" y="67" class="sub">示例任务：修复登录接口偶发 500；测试运行期间，用户补充“保持公开接口稳定”。</text>
 
-  <g filter="url(#shadow)"><rect x="72" y="130" width="1456" height="88" rx="14" fill="#fff" stroke="#d8e2ef"/><rect x="72" y="130" width="176" height="88" rx="14" fill="url(#hero)"/><path d="M234 130H248V218H234" fill="url(#hero)"/></g>
-  <text x="102" y="165" class="eyebrow whiteSoft">PROBLEM</text><text x="102" y="191" class="section white">运行时问题</text>
-  <text x="286" y="165" class="cardTitle">工具结果异步返回，用户可以中途补充，多个调用还会发生读写冲突</text>
-  <text x="286" y="192" class="body">Turn 需要显式状态和安全采样点，才能稳定处理并行、失败、中断与回填。</text>
+  <rect x="36" y="94" width="180" height="48" rx="8" fill="#F1EFE8"/><text x="126" y="124" text-anchor="middle" class="lane">Client</text>
+  <rect x="254" y="94" width="214" height="48" rx="8" fill="#E6F1FB"/><text x="361" y="124" text-anchor="middle" class="lane">Runtime / Event Store</text>
+  <rect x="506" y="94" width="190" height="48" rx="8" fill="#E6F1FB"/><text x="601" y="124" text-anchor="middle" class="lane">Context Builder</text>
+  <rect x="734" y="94" width="160" height="48" rx="8" fill="#EEEDFE"/><text x="814" y="124" text-anchor="middle" class="lane">Model</text>
+  <rect x="932" y="94" width="232" height="48" rx="8" fill="#FAEEDA"/><text x="1048" y="124" text-anchor="middle" class="lane">Policy · Sandbox · Tool</text>
 
-  <rect x="72" y="248" width="1456" height="536" rx="18" fill="#fff" stroke="#d8e2ef" filter="url(#shadow)"/>
-  <text x="98" y="286" class="eyebrow blue">TURN STATE MACHINE</text><text x="98" y="313" class="section">主循环</text>
+  <g stroke="#D3D1C7" stroke-width="1" stroke-dasharray="4 5"><line x1="126" y1="142" x2="126" y2="742"/><line x1="361" y1="142" x2="361" y2="742"/><line x1="601" y1="142" x2="601" y2="742"/><line x1="814" y1="142" x2="814" y2="742"/><line x1="1048" y1="142" x2="1048" y2="742"/></g>
 
-  <g>
-    <rect x="112" y="350" width="220" height="108" rx="13" fill="#edf4ff" stroke="#70a6ff"/><text x="222" y="382" text-anchor="middle" class="eyebrow blue">STATE 1</text><text x="222" y="410" text-anchor="middle" class="cardTitle">Build Context</text><text x="222" y="436" text-anchor="middle" class="body">规则 + 历史 + 当前增量</text>
-    <rect x="398" y="350" width="220" height="108" rx="13" fill="#0a5bff"/><text x="508" y="382" text-anchor="middle" class="eyebrow whiteSoft">STATE 2</text><text x="508" y="410" text-anchor="middle" class="cardTitle white">Sample Model</text><text x="508" y="436" text-anchor="middle" class="body whiteSoft">stream response items</text>
-    <rect x="684" y="350" width="220" height="108" rx="13" fill="#edf4ff" stroke="#70a6ff"/><text x="794" y="382" text-anchor="middle" class="eyebrow blue">STATE 3</text><text x="794" y="410" text-anchor="middle" class="cardTitle">Commit Output</text><text x="794" y="436" text-anchor="middle" class="body">message + tool_call[]</text>
-    <rect x="970" y="350" width="220" height="108" rx="13" fill="#e5efff" stroke="#4b8fff"/><text x="1080" y="382" text-anchor="middle" class="eyebrow blue">STATE 4</text><text x="1080" y="410" text-anchor="middle" class="cardTitle">Dispatch Calls</text><text x="1080" y="436" text-anchor="middle" class="body">call_id 配对 · 冲突分组</text>
-    <rect x="1256" y="350" width="220" height="108" rx="13" fill="#08264d"/><text x="1366" y="382" text-anchor="middle" class="eyebrow whiteSoft">STATE 5</text><text x="1366" y="410" text-anchor="middle" class="cardTitle white">Execute Tools</text><text x="1366" y="436" text-anchor="middle" class="body whiteSoft">policy → sandbox → result</text>
-    <path d="M332 404H398" class="flow"/><path d="M618 404H684" class="flow"/><path d="M904 404H970" class="flow"/><path d="M1190 404H1256" class="flow"/>
-  </g>
+  <path d="M126 184H361" class="line"/><text x="146" y="175" class="body">输入 1：修复登录 500</text>
+  <rect x="278" y="196" width="166" height="37" rx="7" fill="#E6F1FB"/><text x="361" y="220" text-anchor="middle" class="body">start Turn 1 · append u-1</text>
 
-  <g>
-    <rect x="112" y="520" width="364" height="116" rx="14" fill="#f8fbff" stroke="#9fc0f5"/>
-    <text x="138" y="554" class="eyebrow blue">PARALLEL PLAN</text><text x="138" y="582" class="cardTitle">按副作用拆分执行批次</text>
-    <text x="138" y="609" class="body">读取与独立调用并发</text><text x="304" y="609" class="body">冲突写入串行 / worktree</text>
+  <path d="M361 260H601" class="line"/><text x="405" y="251" class="body">build Context View v1</text>
+  <path d="M601 292H814" class="line"/><text x="644" y="283" class="body">instructions + tools + u-1</text>
+  <rect x="754" y="304" width="120" height="35" rx="7" fill="#EEEDFE"/><text x="814" y="327" text-anchor="middle" class="body">sample 1</text>
+  <path d="M814 360H361" class="line"/><text x="544" y="351" class="body">append message + call-7</text>
+  <path d="M361 382H1048" class="line"/><text x="624" y="373" class="body">dispatch search_code(call-7)</text>
+  <rect x="960" y="394" width="176" height="52" rx="8" fill="#FAEEDA" stroke="#BA7517"/><text x="1048" y="416" text-anchor="middle" class="small">allow → sandbox → execute</text><text x="1048" y="435" text-anchor="middle" class="small">tool still running</text>
 
-    <rect x="514" y="520" width="364" height="116" rx="14" fill="#f8fbff" stroke="#9fc0f5"/>
-    <text x="540" y="554" class="eyebrow blue">RESULT CONTRACT</text><text x="540" y="582" class="cardTitle">每个 call 都形成结构化结果</text>
-    <text x="540" y="609" class="body">success / error / timeout / denied</text><text x="540" y="629" class="tiny">结果按 call_id 追加到 Event Store</text>
+  <path d="M126 430H361" class="line"/><text x="148" y="421" class="body">输入 2：保持公开接口稳定</text>
+  <rect x="278" y="442" width="166" height="37" rx="7" fill="#E6F1FB"/><text x="361" y="466" text-anchor="middle" class="body">append steering-2</text>
 
-    <rect x="916" y="520" width="560" height="116" rx="14" fill="#e7f0ff" stroke="#4b8fff"/>
-    <text x="942" y="554" class="eyebrow blue">SAFE SAMPLE POINT</text><text x="942" y="582" class="cardTitle">结果回填后再吸收 steering</text>
-    <text x="942" y="609" class="body">最新 tool_result + 用户补充 + 当前计划 → 下一次 Context View</text>
-  </g>
+  <path d="M1048 512H361" class="line"/><text x="618" y="503" class="body">append function_call_output(call-7)</text>
+  <rect x="278" y="524" width="166" height="37" rx="7" fill="#E8F5E9"/><text x="361" y="548" text-anchor="middle" class="body">call-7 ↔ result-7</text>
 
-  <path d="M1366 458V484H696V520" class="darkFlow"/>
-  <path d="M696 636V682H222V458" class="flow"/>
-  <text x="507" y="674" text-anchor="middle" class="tiny">append tool_result[] → rebuild → sample again</text>
+  <path d="M361 594H601" class="line"/><text x="405" y="585" class="body">build Context View v2</text>
+  <path d="M601 626H814" class="line"/><text x="622" y="617" class="body">result-7 + steering-2 + plan</text>
+  <rect x="754" y="638" width="120" height="35" rx="7" fill="#EEEDFE"/><text x="814" y="661" text-anchor="middle" class="body">sample 2</text>
+  <path d="M814 700H361" class="line"/><text x="566" y="691" class="body">继续调用工具，或 final message</text>
+  <path d="M361 738H126" class="gray"/><text x="183" y="730" class="small">turn/completed · stream final</text>
 
-  <g>
-    <rect x="112" y="704" width="1364" height="54" rx="12" fill="#0b2b55"/>
-    <text x="138" y="738" class="section white">终止门</text>
-    <text x="262" y="738" class="body whiteSoft">final message</text><text x="446" y="738" class="body whiteSoft">用户中断</text><text x="610" y="738" class="body whiteSoft">预算耗尽</text><text x="770" y="738" class="body whiteSoft">权限路径耗尽</text><text x="990" y="738" class="body whiteSoft">致命运行时错误</text><text x="1240" y="738" class="body whiteSoft">→ turn/completed</text>
-  </g>
-
-  <rect x="72" y="816" width="1456" height="88" rx="14" fill="url(#hero)"/>
-  <text x="102" y="851" class="eyebrow whiteSoft">RUNTIME SOLUTION</text><text x="102" y="879" class="section white">显式状态机把循环、并发、用户插话和收尾放进同一套生命周期</text>
-  <text x="1018" y="867" class="cardTitle white">可观测 · 可取消 · 可恢复</text>
+  <rect x="930" y="550" width="234" height="76" rx="10" fill="#FFF8ED" stroke="#BA7517"/>
+  <text x="947" y="574" class="note">安全采样点</text>
+  <text x="947" y="596" class="small">在途工具参数保持不变；新输入</text>
+  <text x="947" y="614" class="small">和 tool result 一起进入下一次采样。</text>
 </svg>

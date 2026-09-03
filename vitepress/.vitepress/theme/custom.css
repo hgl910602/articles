@@ -126,6 +126,53 @@
   color: var(--vp-c-text-3);
 }
 
+/* 架构图横向信息较多。窄屏保持可读尺寸，通过横向滚动查看，不把小字压成像素点。 */
+.Layout .vp-doc .agent-diagram-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0 8px;
+  scrollbar-width: thin;
+  overscroll-behavior-inline: contain;
+}
+
+.Layout .vp-doc .agent-diagram-scroll img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .Layout .vp-doc .agent-diagram {
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
+  }
+
+  .Layout .vp-doc .agent-diagram-scroll img {
+    width: 900px;
+  }
+
+  .Layout .vp-doc .agent-diagram-scroll::before {
+    content: '← 横向滑动查看全图 →';
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    display: block;
+    width: max-content;
+    margin-bottom: 8px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--vp-c-bg-soft);
+    color: var(--vp-c-text-3);
+    font-size: 12px;
+  }
+
+  .Layout .vp-doc .agent-diagram figcaption {
+    text-align: center;
+  }
+}
+
 /* 顶栏分隔线移除：其定位公式与定制后的内容区几何不一致，会出现错位台阶。
    主题还会给站名标题链接配一条底边线与分隔线相连，一并关掉，否则是条孤线 */
 .Layout .VPNavBar .divider {

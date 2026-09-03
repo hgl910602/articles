@@ -1,58 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1020" viewBox="0 0 1600 1020">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">多 Agent 的上下文与工作区隔离</title>
+  <desc id="desc">主 Agent 保存用户目标并派发任务包，子 Agent 各自拥有独立上下文和工具循环；只读任务共享 checkout，冲突写任务使用独立 worktree。</desc>
   <defs>
-    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#08264d"/><stop offset="1" stop-color="#0a5bff"/></linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="7" stdDeviation="10" flood-color="#062452" flood-opacity=".10"/></filter>
-    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#0a5bff"/></marker>
-    <style>
-      text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif}.title{font-size:39px;font-weight:760}.subtitle{font-size:18px;fill:#4a6480}.eyebrow{font-size:14px;font-weight:760;letter-spacing:1.7px}.section{font-size:18px;font-weight:760}.cardTitle{font-size:18px;font-weight:760}.body{font-size:15px;fill:#4b6580}.tiny{font-size:13px;fill:#607894}.white{fill:#fff}.whiteSoft{fill:#dceaff}.blue{fill:#0a5bff}.flow{fill:none;stroke:#0a5bff;stroke-width:2.5;marker-end:url(#a)}.dash{fill:none;stroke:#71a4f1;stroke-width:2;stroke-dasharray:7 7;marker-end:url(#a)}
-    </style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#185FA5"/></marker>
+    <marker id="grayArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#888780"/></marker>
+    <style>text{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}.title{font-size:30px;font-weight:700;fill:#2C2C2A}.sub{font-size:17px;fill:#6B6A66}.label{font-size:14px;font-weight:700;letter-spacing:1.5px;fill:#185FA5}.head{font-size:21px;font-weight:700;fill:#2C2C2A}.body{font-size:16px;fill:#5F5E5A}.small{font-size:14px;fill:#6B6A66}.white{fill:#fff}.line{fill:none;stroke:#185FA5;stroke-width:1.9;marker-end:url(#arr)}.return{fill:none;stroke:#888780;stroke-width:1.4;stroke-dasharray:5 5;marker-end:url(#grayArr)}</style>
   </defs>
-  <rect width="1600" height="1020" fill="#f5f8fc"/>
-  <text x="72" y="66" class="title">多 Agent：任务、上下文与工作区协同隔离</text>
-  <text x="72" y="98" class="subtitle">主线程负责拆分、派发和验收；子线程隔离推理过程，worktree 隔离写入现场。</text>
+  <rect width="1200" height="780" fill="#fff"/>
+  <text x="36" y="43" class="title">多 Agent：先隔离上下文，再按写冲突决定工作区</text>
+  <text x="36" y="67" class="sub">子 Agent 不是角色标签，它有自己的 Context View、工具循环和结果协议。</text>
 
-  <g filter="url(#shadow)"><rect x="72" y="130" width="1456" height="88" rx="14" fill="#fff" stroke="#d8e2ef"/><rect x="72" y="130" width="176" height="88" rx="14" fill="url(#hero)"/><path d="M234 130H248V218H234" fill="url(#hero)"/></g>
-  <text x="102" y="165" class="eyebrow whiteSoft">PROBLEM</text><text x="102" y="191" class="section white">协同问题</text>
-  <text x="286" y="165" class="cardTitle">并行能缩短墙上时间，也会引入上下文污染、文件冲突和结果验收成本</text>
-  <text x="286" y="192" class="body">任务依赖、写入集合和返回契约共同决定并行方式。</text>
+  <rect x="36" y="126" width="286" height="358" rx="16" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.3"/>
+  <text x="60" y="159" class="label">MAIN THREAD</text>
+  <text x="60" y="193" class="head">Orchestrator Agent</text>
+  <text x="60" y="224" class="body">保留：用户目标 · 硬约束 · 当前计划</text>
+  <text x="60" y="252" class="body">负责：拆分 · 派发 · 等待 · steering</text>
+  <text x="60" y="280" class="body">验收：证据 · diff · 测试 · 冲突处理</text>
+  <line x1="60" y1="306" x2="298" y2="306" stroke="#9FC0D9"/>
+  <text x="60" y="337" class="head">Task Packet</text>
+  <rect x="60" y="355" width="238" height="96" rx="10" fill="#fff" stroke="#9FC0D9"/>
+  <text x="76" y="379" class="small">目标 · 范围 · 已知事实</text>
+  <text x="76" y="402" class="small">文件所有权 · 工具 / 权限</text>
+  <text x="76" y="425" class="small">返回格式 · 完成条件</text>
 
-  <rect x="72" y="248" width="1456" height="632" rx="18" fill="#fff" stroke="#d8e2ef" filter="url(#shadow)"/>
-  <text x="98" y="286" class="eyebrow blue">ORCHESTRATION PLANE</text>
+  <text x="398" y="112" class="label">ISOLATED AGENT RUNTIMES</text>
+  <rect x="396" y="126" width="768" height="134" rx="14" fill="#F7F7F5" stroke="#B4B2A9"/>
+  <rect x="396" y="126" width="176" height="134" rx="14" fill="#185FA5"/>
+  <rect x="558" y="126" width="14" height="134" fill="#185FA5"/>
+  <text x="418" y="159" class="label white">AGENT A</text><text x="418" y="190" class="head white">代码探索</text><text x="418" y="216" class="small white">Read · Search</text>
+  <text x="604" y="161" class="head">Context View A</text>
+  <text x="604" y="190" class="body">任务事实按需装载，不继承主线程全部历史</text>
+  <text x="604" y="218" class="small">返回：结论 + 证据位置 + 未决问题</text>
 
-  <g>
-    <rect x="104" y="318" width="352" height="282" rx="16" fill="#08264d"/>
-    <text x="132" y="356" class="eyebrow whiteSoft">MAIN THREAD</text><text x="132" y="389" class="section white">Orchestrator</text>
-    <text x="132" y="427" class="body whiteSoft">保留：用户目标 · 硬约束 · 当前计划</text>
-    <text x="132" y="455" class="body whiteSoft">负责：任务拆分 · 派发 · 等待 · steering</text>
-    <text x="132" y="483" class="body whiteSoft">验收：证据 · diff · 测试 · 冲突处理</text>
-    <rect x="132" y="515" width="296" height="58" rx="10" fill="#fff" fill-opacity=".12" stroke="#7faeff"/>
-    <text x="280" y="539" text-anchor="middle" class="tiny whiteSoft">任务包</text><text x="280" y="561" text-anchor="middle" class="body white">目标 · 范围 · 所有权 · 验收标准</text>
-  </g>
+  <rect x="396" y="282" width="768" height="134" rx="14" fill="#F7F7F5" stroke="#B4B2A9"/>
+  <rect x="396" y="282" width="176" height="134" rx="14" fill="#534AB7"/>
+  <rect x="558" y="282" width="14" height="134" fill="#534AB7"/>
+  <text x="418" y="315" class="label white">AGENT B</text><text x="418" y="346" class="head white">测试与验证</text><text x="418" y="372" class="small white">Shell · read-only FS</text>
+  <text x="604" y="317" class="head">Context View B</text>
+  <text x="604" y="346" class="body">命令预算、权限和终止条件单独配置</text>
+  <text x="604" y="374" class="small">返回：测试结果 + 复现命令 + artifact_ref</text>
 
-  <g>
-    <rect x="588" y="306" width="808" height="104" rx="14" fill="#edf4ff" stroke="#77a8f5"/>
-    <rect x="588" y="438" width="808" height="104" rx="14" fill="#edf4ff" stroke="#77a8f5"/>
-    <rect x="588" y="570" width="808" height="104" rx="14" fill="#edf4ff" stroke="#77a8f5"/>
-    <rect x="588" y="306" width="202" height="104" rx="14" fill="#0a5bff"/><path d="M776 306H790V410H776" fill="#0a5bff"/>
-    <rect x="588" y="438" width="202" height="104" rx="14" fill="#155fd8"/><path d="M776 438H790V542H776" fill="#155fd8"/>
-    <rect x="588" y="570" width="202" height="104" rx="14" fill="#08264d"/><path d="M776 570H790V674H776" fill="#08264d"/>
-    <text x="689" y="344" text-anchor="middle" class="cardTitle white">Agent Thread A</text><text x="689" y="372" text-anchor="middle" class="body whiteSoft">代码探索</text><text x="689" y="395" text-anchor="middle" class="tiny whiteSoft">Read · Search</text>
-    <text x="689" y="476" text-anchor="middle" class="cardTitle white">Agent Thread B</text><text x="689" y="504" text-anchor="middle" class="body whiteSoft">测试与验证</text><text x="689" y="527" text-anchor="middle" class="tiny whiteSoft">Shell · read-only FS</text>
-    <text x="689" y="608" text-anchor="middle" class="cardTitle white">Agent Thread C</text><text x="689" y="636" text-anchor="middle" class="body whiteSoft">实现任务</text><text x="689" y="659" text-anchor="middle" class="tiny whiteSoft">Edit · scoped write</text>
-    <text x="824" y="339" class="cardTitle">独立 Context View</text><text x="824" y="366" class="body">角色指令 · 工具白名单 · 已知事实</text><text x="824" y="392" class="tiny">返回：结论 + 文件路径 + 行号</text>
-    <text x="824" y="471" class="cardTitle">独立 Context View</text><text x="824" y="498" class="body">任务范围 · 命令预算 · 完成条件</text><text x="824" y="524" class="tiny">返回：测试结果 + 复现命令</text>
-    <text x="824" y="603" class="cardTitle">独立 Context View</text><text x="824" y="630" class="body">文件所有权 · 约束 · 预期 diff</text><text x="824" y="656" class="tiny">返回：修改摘要 + diff + 验证结果</text>
-    <path d="M456 385H548V358H588" class="flow"/><path d="M456 442H530V490H588" class="flow"/><path d="M456 499H548V622H588" class="flow"/>
-    <path d="M588 390H540V548H456" class="dash"/><text x="490" y="542" class="tiny">摘要 / 证据</text>
-  </g>
+  <rect x="396" y="438" width="768" height="134" rx="14" fill="#F7F7F5" stroke="#B4B2A9"/>
+  <rect x="396" y="438" width="176" height="134" rx="14" fill="#2E7D32"/>
+  <rect x="558" y="438" width="14" height="134" fill="#2E7D32"/>
+  <text x="418" y="471" class="label white">AGENT C</text><text x="418" y="502" class="head white">实现任务</text><text x="418" y="528" class="small white">Edit · scoped write</text>
+  <text x="604" y="473" class="head">Context View C</text>
+  <text x="604" y="502" class="body">文件所有权、约束和验证方式单独给出</text>
+  <text x="604" y="530" class="small">返回：修改摘要 + diff + 测试结果</text>
 
-  <line x1="98" y1="708" x2="1502" y2="708" stroke="#d8e2ef"/>
-  <text x="98" y="744" class="eyebrow blue">WORKSPACE PLANE</text><text x="98" y="771" class="section">写入隔离按冲突风险选择</text>
-  <g>
-    <rect x="104" y="790" width="630" height="62" rx="12" fill="#edf4ff" stroke="#8cb6f4"/><text x="130" y="817" class="cardTitle">共享 checkout</text><text x="130" y="840" class="body">读取、多审查者、写入边界完全分离</text>
-    <rect x="770" y="790" width="626" height="62" rx="12" fill="#0a5bff"/><text x="796" y="817" class="cardTitle white">独立 worktree</text><text x="796" y="840" class="body whiteSoft">并行实现 → 主线程 review → 测试 → 合并</text>
-  </g>
+  <path d="M322 230H370V193H396" class="line"/><path d="M322 270H370V349H396" class="line"/><path d="M322 310H350V505H396" class="line"/>
+  <path d="M396 552H350V454H322" class="return"/>
 
-  <rect x="72" y="912" width="1456" height="72" rx="14" fill="url(#hero)"/>
-  <text x="102" y="956" class="section white">解法：任务契约管协作，上下文隔离管噪声，worktree 管文件冲突，主线程管最终验收</text>
+  <text x="38" y="630" class="label">WORKSPACE CHOICE</text>
+  <rect x="36" y="648" width="1128" height="96" rx="13" fill="#fff" stroke="#B4B2A9"/>
+  <rect x="58" y="669" width="322" height="54" rx="9" fill="#E8F5E9"/>
+  <text x="76" y="692" class="head">共享 checkout</text><text x="76" y="714" class="small">只读任务，或写集合明确且完全分离</text>
+  <path d="M400 696H438" class="line"/>
+  <rect x="458" y="669" width="322" height="54" rx="9" fill="#FAEEDA"/>
+  <text x="476" y="692" class="head">独立 worktree</text><text x="476" y="714" class="small">并行写入可能重叠，先隔离 diff</text>
+  <path d="M800 696H838" class="line"/>
+  <rect x="858" y="669" width="284" height="54" rx="9" fill="#E6F1FB"/>
+  <text x="876" y="692" class="head">主线程验收</text><text x="876" y="714" class="small">review → test → merge / reject</text>
 </svg>
