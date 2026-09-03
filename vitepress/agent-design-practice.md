@@ -136,7 +136,7 @@ flowchart TD
 
 假设测试还在运行，用户补了一句：“保持公开接口稳定，再补一个回归测试。”这句话到达时 Turn 1 仍处于 active。
 
-支持 steering 的运行时会先把输入登记成 Item，等在途工具返回，在下一个安全采样点把“最新 tool result + 用户补充 + 当前计划”一起交给模型。steering 直译是“转向”：任务行驶到一半，用户不打断执行，只补一条约束或新要求，让后续路径拐向新方向——与 interrupt（立即停下）相对。steering 输入的生效位置由运行时保证：它只会影响尚未发生的动作，已经发出的工具参数不会被半路改写。如果用户说的是“立即停下”，客户端发的是 interrupt，运行时还要分别处理模型采样、前台工具和后台进程的取消。
+支持 steering 的运行时会先把输入登记成 Item，等在途工具返回，在下一个安全采样点把“最新 tool result + 用户补充 + 当前计划”一起交给模型。steering 直译是“转向”：任务行驶到一半，用户不打断执行，只补一条约束或新要求，让后续路径拐向新方向，与 interrupt（立即停下）相对。steering 输入的生效位置由运行时保证：它只会影响尚未发生的动作，已经发出的工具参数不会被半路改写。如果用户说的是“立即停下”，客户端发的是 interrupt，运行时还要分别处理模型采样、前台工具和后台进程的取消。
 
 这几个时间点放进一张时序图会清楚一些：
 
@@ -285,6 +285,54 @@ input:                                # 动态尾部：历史 + 新结果
 
 这就是回填结果在上下文这一侧的样子：前缀不动，尾部只追加。模型读完 `result-7`，下一轮可能返回 `read_file`，再下一次编译就在尾部接 `call-8 -> result-8`；测试运行期间用户插话补充的约束，也会出现在下一个采样点的尾部。一个 Turn 里调用十轮工具，Model View 就会编译十次。
 
+Model View 编译完，序列化成真实的 API 请求。上面那轮采样发出去的请求体长这样（Responses API 风格，字段做了精简；`//` 注释是后加的，真实 JSON 不支持注释）：
+
+```json
+{
+  // ── 采样控制：给远端推理栈的参数，不进入模型上下文 ──
+  "model": "coding-model",        // 路由到哪份权重；自托管单模型服务常忽略此字段
+  "parallel_tool_calls": true,    // 解码策略：一轮采样可连续产出多个 function_call
+
+  // ── 内容字段：服务端渲染进 chat template，模型逐 token 读到的就是它们 ──
+  "instructions": "runtime_contract@v7 全文……加上项目规则全文……",
+  "tools": [
+    { "type": "function", "name": "search_code", "parameters": { "..." : {} } },
+    { "type": "function", "name": "read_file",   "parameters": { "..." : {} } }
+  ],
+  "input": [
+    { "type": "message", "role": "user",
+      "content": "修复登录接口偶发 500，先找原因" },
+    { "type": "message", "role": "assistant",
+      "content": "我先定位登录链路和异常出口。" },
+    { "type": "function_call", "call_id": "call-7",
+      "name": "search_code",
+      "arguments": "{\"pattern\": \"login|authenticate\"}" },
+    { "type": "function_call_output", "call_id": "call-7",
+      "output": "{\"preview\": \"auth/login.py:88 ...\", \"truncated\": false}" }
+  ]
+}
+```
+
+请求体顶层其实是两类字段装在同一个信封里。<strong>内容字段</strong>（`instructions`、`tools`、`input`）由服务端渲染成模型逐 token 读到的 prompt；<strong>采样控制字段</strong>（`model`、`parallel_tool_calls`，同族的还有 `temperature`、`max_tokens`）由推理栈自己在解码时消费：`model` 决定路由到哪份权重，`parallel_tool_calls` 决定生成完第一个 function_call 之后要不要继续产出下一个，基模对它们无感。分清这两类，就不会把“请求里开了并行”误会成“模型知道要并行执行”——并行提案是解码层放行的，真正怎么并行跑，是采样结束、提案回到 agent 之后由运行时决定的（4.2 的冲突感知调度）。
+
+和 3.2 的 Event Store 对照着看，item 到请求条目的映射是一对一的：
+
+| Thread 里的 item | 请求里的条目 |
+|------|------|
+| user_message | `{"type": "message", "role": "user"}` |
+| assistant_message | `{"type": "message", "role": "assistant"}` |
+| function_call | `{"type": "function_call", "call_id": "call-7"}` |
+| function_call_output | `{"type": "function_call_output", "call_id": "call-7"}` |
+| environment、当前计划等派生状态 | 并入尾部 user 消息文本，不单独成条目 |
+
+两个容易踩的细节：`arguments` 和 `output` 在协议里是字符串，是序列化后的 JSON，不是嵌套对象；工具结果走 `function_call_output`，不是一条 user 消息——它不是“用户说的话”。如果走的是 Chat Completions 风格的接口，同样的内容会摊平成 messages 数组：instructions 对应 system 消息，工具调用变成 assistant 消息里的 `tool_calls` 字段，工具结果是以 `role: "tool"` 回传的消息。接口形态不同，对应关系不变：账本里的每个 item 在请求里有唯一位置，前缀稳定、尾部追加的纪律原样成立。
+
+再看三个容易想错的问题，把“该给模型什么”这件事定清楚：
+
+- <strong>历史 user 消息全量保留</strong>。每一条都在，包括任务执行到一半用户插进来的 steering 输入，它们是任务的完整记录，协议层不会悄悄丢，只有窗口不够触发压缩时才会被折进摘要（3.5）。
+- <strong>assistant 消息是自我回放，不是任务描述</strong>。里面是模型自己上一轮说过的话、发起过的调用，回放给它是为了让它接续自己的思路。协议里没有“当前任务”字段：任务就是 user 消息原话，怎么完成由 instructions 的行为约定加模型自己规划；第一章 workflow 与 agent 的分界，落到请求结构上就是这里。
+- <strong>派生状态择要注入，不整仓搬运</strong>。Derived Working State 本身是运行时侧的缓存，模型看不到这个存储；Context Builder 每轮把其中有当前值的条目（当前计划、environment、workspace revision）以文本并入动态尾部。能从现场重新取的原始数据（整份日志、仓库文件）不注入，模型需要时用工具自己读。
+
 使用 Responses API 时有两种续接方式。应用可以手工回传之前的 user、assistant、function call 和 function call output item；也可以传 `previous_response_id`，只提交新增 item，由服务端续接响应状态。后者省掉一部分应用侧重放代码，应用自己的 Event Store 仍然要服务 UI、审计、恢复和跨 provider 迁移。新的请求如果需要相同 instructions，也要显式设置。
 
 ### 3.4 同一个 Thread 里的 Model View 怎么换血
@@ -323,6 +371,33 @@ Prompt cache 看的是连续前缀。system / developer instructions、工具 sc
 2. 大日志外置，只留失败片段、退出码和 artifact 句柄；
 3. 压缩较早且已经闭合的 Turn，最近证据继续保留原文；
 4. 压缩后核对硬约束、精确 ID、文件路径、决策、失败方案和待办事项。
+
+压缩的<strong>时机</strong>只看两个信号。<strong>软阈值</strong>：上一轮真实 prompt_tokens 超过输入预算的 80%，在下一次采样前主动压缩；用上一轮的实测值而不是自己估算，因为 token 计数只有 provider 说得准。<strong>硬错误</strong>：请求撞上 context_length_exceeded，强制压缩后原样重试一次。压缩只发生在工具往返的边界，一对 call / result 不会被拆开压一半。为什么放着缓存命中不管、非要等 80% 才动手？压缩改写前缀，缓存立即全部失效，下一轮按未命中价重算。越早压，这笔重建税交得越频繁；压到 80% 才压，一次重建换来足够的窗口余量，账才算得过来。
+
+<strong>机制</strong>上，压缩就是用一条摘要条目，换掉 `input` 里被压掉的那批 item。拿修登录 500 的任务举例：跑到 86k token 时一次测试又带回 30k 日志，撞上软阈值（86k ≈ 108k × 80%），下一次采样发出去的请求变成：
+
+```json
+{
+  "model": "coding-model",
+  "parallel_tool_calls": true,
+  "instructions": "……与压缩前字节级一致……",
+  "tools": [ "……同样一字不动……" ],
+  "input": [
+    { "type": "compaction",
+      "summary": "目标：修复 /api/login 偶发 500。硬约束：不改公开接口签名。已完成：定位到 auth/session.go 的并发读写问题，方案是加读写锁。失败方案：全局锁，压测不达标，已放弃。待办：补回归测试。next_action：跑 go test ./... 确认。" },
+    { "type": "message", "role": "user",
+      "content": "保持公开接口稳定，再补一个回归测试" },
+    { "type": "function_call", "call_id": "call-12", "name": "run_command",
+      "arguments": "{\"cmd\": \"go test ./... -run TestLogin\"}" },
+    { "type": "function_call_output", "call_id": "call-12",
+      "output": "……最近一轮工具结果原文……" }
+  ]
+}
+```
+
+对着 3.3 的请求看，压缩前后有三处不同。其一，稳定区（`instructions`、`tools`）一个字节没动，模型从这里继续吃到缓存；被换掉的是动态尾部里较早的历史。其二，此前十几轮的工具往返只剩摘要里的一句话，但原始内容还在 Event Store 和 Artifact 里，模型需要时用工具随时取回。压的是视图，不是事实。其三，摘要条目替换后，缓存从零重建，这一次请求是全价，之后的新前缀重新开始累积命中。
+
+摘要怎么生成，有两种做法：让模型读原文自己总结（Claude Code 的 auto compact 是这种，省事但可能磨掉细节），或由运行时从 Event Store 确定性整理（可控性最好，摘要字段即下面的 checkpoint）。无论哪种，Event Store 里的原文都在，审计和回放不受影响。
 
 手工维护 checkpoint 时，至少应该有 `source_range`、`goal`、`hard_constraints`、`decisions`、`completed`、`evidence`、`rejected`、`open_loops`、`next_action` 和 `workspace_revision`。官方 Responses compaction 返回的是用于模型续接的 opaque compaction item，应用侧另存一份结构化 checkpoint，会更方便审计和跨模型迁移。这两份东西用途不同，可以同时存在。
 
