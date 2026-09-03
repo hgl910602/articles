@@ -52,13 +52,15 @@ function closeLightbox() {
 }
 
 function onDocClick(event) {
-  // 用 closest 找图：点击落在 img 内的任何位置都成立，不依赖 event.target 恰为 img
-  const img = event.target instanceof Element
-    ? event.target.closest('.img-figure img')
-    : null;
-  if (!img) return;
+  const target = event.target;
+  if (!(target instanceof HTMLImageElement)) return;
+  // 只放大正文内容图：必须在 .vp-doc 里，且渲染宽度达到内容图量级
+  //（各文章图片标记不统一：img-figure / article-figure / 裸 img，故不做外层 class 限定，
+  //  用渲染宽度排除 logo 和小图标）
+  if (!target.closest('.vp-doc')) return;
+  if (target.clientWidth < 120) return;
   event.preventDefault();
-  openLightbox(img.currentSrc || img.src, img.alt);
+  openLightbox(target.currentSrc || target.src, target.alt);
 }
 
 function onKeydown(event) {
