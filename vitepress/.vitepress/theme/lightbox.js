@@ -15,6 +15,8 @@ const STYLE = `
 }
 .img-lightbox img {
   max-width: 100%; max-height: 100%;
+  /* 透明底图（webp/svg）在深色遮罩上会透出蒙版，统一垫白底 */
+  background: #fff;
   border-radius: 8px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
 }
