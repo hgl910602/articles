@@ -1,5 +1,6 @@
 // 文章列表数据加载器：扫描根目录 *.md（index.md 除外），解析 frontmatter 供首页列表消费。
 // frontmatter 为一行一键的受控格式（迁移批处理与手写文章均如此），故用轻量解析而非完整 YAML。
+// hidden: true 的文章不出现在首页列表（页面本身仍可按 URL 访问，用于不公开列入目录的存档文）。
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,8 +51,10 @@ export default {
           category: fm.category ?? '',
           tags: fm.tags ?? [],
           minutes: readMinutes(body),
+          hidden: fm.hidden === 'true',
         };
       })
+      .filter((post) => !post.hidden)
       .sort((a, b) => String(b.date).localeCompare(String(a.date)));
   },
 };

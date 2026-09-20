@@ -436,3 +436,14 @@
     padding-left: calc(var(--vp-sidebar-width) + 40px);
   }
 }
+
+/*
+ * 数据表格：单元格文字不折行。
+ * 表格被主题限成内容区宽度后，table-layout auto 会把中文首列压成一字一行竖排
+ * （"自然流"变"自/然/流"）；nowrap 让列保持自然宽度，宽表走主题自带的
+ * table 块级 overflow-x 横向滚动，行内容始终保持单行可读。
+ */
+.Layout .vp-doc table th,
+.Layout .vp-doc table td {
+  white-space: nowrap;
+}
