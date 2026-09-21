@@ -49,7 +49,9 @@ export default {
           description: fm.description ?? '',
           date: fm.date ?? '',
           category: fm.category ?? '',
-          tags: fm.tags ?? [],
+          // tags 必须是数组：多行 YAML 列表等格式漂移会被解析成字符串，
+          // 搜索里的 tags.join 会直接抛错把首页打成白屏，这里统一兜底
+          tags: Array.isArray(fm.tags) ? fm.tags : fm.tags ? [fm.tags] : [],
           minutes: readMinutes(body),
           hidden: fm.hidden === 'true',
         };
