@@ -100,6 +100,39 @@ function refreshSidebarOnMarkdownChange() {
   };
 }
 
+// 给所有正文表格统一包一层横向滚动容器 .table-scroll：
+// 表格改成 display:table + width:100% 铺满内容区后（见 theme/custom.css），
+// display:table 不再支持 overflow 滚动，宽表与窄屏由这层容器兜底滚动。
+// 管道表格与正文里原生的 <table> HTML 块都要覆盖：前者走 markdown-it 的
+// table_open/table_close 渲染规则；后者是 html_block token，表内无空行时
+// 为单个 token，有空行会拆成多个，所以要一路扫到 </table> 再闭合容器。
+function wrapTablesInScroll(md) {
+  const defaultOpen = md.renderer.rules.table_open;
+  const defaultClose = md.renderer.rules.table_close;
+  md.renderer.rules.table_open = (...args) =>
+    '<div class="table-scroll">' + (defaultOpen ? defaultOpen(...args) : '<table>\n');
+  md.renderer.rules.table_close = (...args) =>
+    (defaultClose ? defaultClose(...args) : '</table>\n') + '</div><!--/.table-scroll-->';
+
+  md.core.ruler.push('wrap-html-tables', (state) => {
+    const tokens = state.tokens;
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].type !== 'html_block' || !/^\s*<table[\s>]/.test(tokens[i].content)) continue;
+      let end = i;
+      while (end < tokens.length && !tokens[end].content.includes('</table>')) end++;
+      if (end >= tokens.length) continue; // 没扫到闭合标签，保守起见不包
+      const close = new state.Token('html_block', '', 0);
+      close.content = '</div><!--/.table-scroll-->';
+      const open = new state.Token('html_block', '', 0);
+      open.content = '<div class="table-scroll">';
+      // 从后往前插，避免前面的插入让后面的索引位移
+      tokens.splice(end + 1, 0, close);
+      tokens.splice(i, 0, open);
+      i = end + 2;
+    }
+  });
+}
+
 export default defineConfig({
   title: '文章分享集',
   description: '业务与技术分享',
@@ -109,6 +142,9 @@ export default defineConfig({
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
   ],
+  markdown: {
+    config: (md) => wrapTablesInScroll(md),
+  },
   vite: {
     plugins: [refreshSidebarOnMarkdownChange()],
   },

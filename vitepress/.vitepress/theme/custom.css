@@ -438,10 +438,27 @@
 }
 
 /*
- * 数据表格：单元格文字不折行。
- * 表格被主题限成内容区宽度后，table-layout auto 会把中文首列压成一字一行竖排
- * （"自然流"变"自/然/流"）；nowrap 让列保持自然宽度，宽表走主题自带的
- * table 块级 overflow-x 横向滚动，行内容始终保持单行可读。
+ * 数据表格：铺满内容区 + 宽表横向滚动。
+ * 主题默认 table 为 display:block，内部网格按内容收缩，表格只占自然宽度不铺满；
+ * 改 display:table + width:100% 铺满后，display:table 又不再支持 overflow 滚动。
+ * 因此构建层（config.mjs 的 markdown 配置）已给所有表格统一包了 .table-scroll
+ * 容器，表格放不下时由容器横向滚动兜底，不撑破正文。
+ */
+.Layout .vp-doc .table-scroll {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+.Layout .vp-doc .table-scroll > table {
+  display: table;
+  width: 100%;
+}
+
+/*
+ * 单元格文字不折行。
+ * 宽度紧张时 table-layout auto 会把中文列压成一字一行竖排
+ * （"自然流"变"自/然/流"）；nowrap 让列保持自然宽度，
+ * 实在放不下由上面的 .table-scroll 横向滚动，行内容始终保持单行可读。
  */
 .Layout .vp-doc table th,
 .Layout .vp-doc table td {
